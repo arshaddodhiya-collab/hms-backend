@@ -161,6 +161,44 @@ Normalized vitals data.
 | `height` | `DECIMAL(5,2)`| | |
 | `bmi` | `DECIMAL(4,1)`| | |
 
+
+### 🏥 Inpatient (IPD)
+
+#### 🗄️ Table: `ward`
+Hospital wards/units.
+
+| Column | Type | Constraints | Description |
+| :--- | :--- | :--- | :--- |
+| `name` | `VARCHAR(50)` | `UQ, NN` | e.g., General Ward, ICU |
+| `type` | `VARCHAR(20)` | `NN` | |
+| `capacity` | `INT` | `NN` | Total Beds |
+| `is_active` | `BOOLEAN` | `DEF TRUE` | |
+
+#### 🗄️ Table: `bed`
+Individual beds in a ward.
+
+| Column | Type | Constraints | Description |
+| :--- | :--- | :--- | :--- |
+| `ward_id` | `BIGINT` | `FK, NN` | |
+| `number` | `VARCHAR(10)` | `NN` | B-101 |
+| `type` | `ENUM` | `NN` | GENERAL, ICU, VENTILATOR |
+| `is_occupied`| `BOOLEAN` | `DEF FALSE` | |
+| `is_active` | `BOOLEAN` | `DEF TRUE` | |
+
+#### 🗄️ Table: `admission`
+IPD Admissions.
+
+| Column | Type | Constraints | Description |
+| :--- | :--- | :--- | :--- |
+| `patient_id` | `BIGINT` | `FK, NN` | |
+| `bed_id` | `BIGINT` | `FK, NN` | |
+| `doctor_id` | `BIGINT` | `FK, NN` | |
+| `admission_date`| `DATETIME` | `NN` | |
+| `discharge_date`| `DATETIME` | | |
+| `diagnosis` | `TEXT` | | |
+| `discharge_summary`| `TEXT` | | |
+| `status` | `ENUM` | `NN` | ADMITTED, DISCHARGED |
+
 #### 🗄️ Table: `prescription`
 Header for a prescription order.
 
@@ -220,6 +258,7 @@ Billing records.
 | Column | Type | Constraints | Description |
 | :--- | :--- | :--- | :--- |
 | `patient_id` | `BIGINT` | `FK, NN` | |
+| `admission_id`| `BIGINT` | `FK` | Optional for IPD |
 | `total_amount` | `DECIMAL(10,2)`| `NN` | |
 | `status` | `ENUM` | `NN` | PENDING, PAID, CANCELLED |
 | `items` | `JSON` | `NN` | `[{ "desc": "Consultation", "amount": 500 }]` |

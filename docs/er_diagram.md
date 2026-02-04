@@ -35,8 +35,9 @@ erDiagram
 
     PERMISSION {
         BIGINT id PK
-        VARCHAR name
+        VARCHAR code UQ
         VARCHAR module
+        VARCHAR description
     }
 
     PATIENT {
@@ -131,9 +132,39 @@ erDiagram
         BOOLEAN is_abnormal
     }
 
+    WARD {
+        BIGINT id PK
+        VARCHAR name
+        VARCHAR type
+        INT capacity
+        BOOLEAN is_active
+    }
+
+    BED {
+        BIGINT id PK
+        BIGINT ward_id FK
+        VARCHAR number
+        ENUM type
+        BOOLEAN is_occupied
+        BOOLEAN is_active
+    }
+
+    ADMISSION {
+        BIGINT id PK
+        BIGINT patient_id FK
+        BIGINT bed_id FK
+        BIGINT doctor_id FK
+        DATETIME admission_date
+        DATETIME discharge_date
+        TEXT diagnosis
+        TEXT discharge_summary
+        ENUM status
+    }
+
     INVOICE {
         BIGINT id PK
         BIGINT patient_id FK
+        BIGINT admission_id FK
         DECIMAL total_amount
         ENUM status
         JSON items
@@ -173,5 +204,12 @@ erDiagram
     
     PRESCRIPTION ||--|{ PRESCRIPTION_ITEM : "contains"
     
+    PRESCRIPTION ||--|{ PRESCRIPTION_ITEM : "contains"
+    
     LAB_REQUEST ||--|{ LAB_RESULT : "results"
+
+    WARD ||--|{ BED : "contains"
+    BED ||--o| ADMISSION : "occupied by"
+    PATIENT ||--o{ ADMISSION : "admits"
+    ADMISSION ||--o{ INVOICE : "billed"
 ```

@@ -37,6 +37,11 @@ The system is designed for **multi-tenant capability (future-proof)**, **role-ba
 | | Prescription | `/api/v1/consultations/{id}/rx` | `POST` | Add prescription |
 | **Lab** | LabList | `/api/v1/lab-requests` | `GET` | View pending lab tests |
 | | LabResults | `/api/v1/lab-requests/{id}/results` | `POST` | Upload/Enter lab results |
+| **Billing** | InvoiceList | `/api/v1/billing/invoices` | `GET` | List invoices |
+| | InvoiceGenerate | `/api/v1/billing/invoices` | `POST` | Create/Auto-generate invoice |
+| **IPD** | AdmissionList | `/api/v1/ipd/admissions` | `GET` | List admissions |
+| | BedManagement | `/api/v1/ipd/beds` | `GET` | Get bed status |
+| | Discharge | `/api/v1/ipd/admissions/{id}/discharge` | `POST` | Discharge patient |
 | **Admin** | UserMgmt | `/api/v1/admin/users` | `GET/POST`| Manage internal users |
 
 ---
@@ -85,6 +90,23 @@ The system is designed for **multi-tenant capability (future-proof)**, **role-ba
   ```
 - **Response**: `AppointmentDto`
 - **Roles**: `RECEPTION`, `DOCTOR`
+
+### IPD (Inpatient)
+#### Admit Patient
+- **Endpoint**: `POST /api/v1/ipd/admissions`
+- **Request**: `{ patientId, bedId, doctorId, diagnosis }`
+- **Response**: `AdmissionDto`
+
+#### Discharge Patient
+- **Endpoint**: `POST /api/v1/ipd/admissions/{id}/discharge`
+- **Request**: `{ dischargeSummary, diagnosis }`
+- **Response**: `AdmissionDto` (Status: DISCHARGED)
+
+### Billing
+#### Create Invoice
+- **Endpoint**: `POST /api/v1/billing/invoices`
+- **Request**: `{ patientId, admissionId?, items: [{desc, amount}] }`
+- **Response**: `InvoiceDto`
 
 ---
 
