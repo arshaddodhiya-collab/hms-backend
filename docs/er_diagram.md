@@ -35,7 +35,7 @@ erDiagram
 
     PERMISSION {
         BIGINT id PK
-        VARCHAR code UQ
+        VARCHAR code UK
         VARCHAR module
         VARCHAR description
     }
@@ -204,7 +204,7 @@ erDiagram
     
     PRESCRIPTION ||--|{ PRESCRIPTION_ITEM : "contains"
     
-    PRESCRIPTION ||--|{ PRESCRIPTION_ITEM : "contains"
+
     
     LAB_REQUEST ||--|{ LAB_RESULT : "results"
 
