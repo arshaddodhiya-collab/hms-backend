@@ -121,8 +121,8 @@ DB write:
 
 ```sql
 INSERT INTO appointment
-(patient_id, doctor_id, start_time, status)
-VALUES (?, ?, ?, 'SCHEDULED');
+(patient_id, doctor_id, start_time, status, type)
+VALUES (?, ?, ?, 'SCHEDULED', 'CONSULTATION');
 ```
 
 Nothing medical yet — just scheduling.

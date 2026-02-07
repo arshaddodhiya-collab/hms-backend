@@ -50,6 +50,8 @@ erDiagram
         VARCHAR email
         TEXT address
         VARCHAR blood_group
+        TEXT allergies
+        VARCHAR avatar
         BOOLEAN is_deleted
     }
 
@@ -61,7 +63,9 @@ erDiagram
         DATETIME start_time
         DATETIME end_time
         ENUM status
+        ENUM type
         VARCHAR reason
+        TEXT notes
         BOOLEAN is_deleted
     }
 

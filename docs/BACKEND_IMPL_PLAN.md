@@ -66,7 +66,9 @@ The system is designed for **multi-tenant capability (future-proof)**, **role-ba
     "age": 30,
     "gender": "MALE",
     "contact": "1234567890",
-    "email": "john@example.com"
+    "email": "john@example.com",
+    "allergies": "Peanuts",
+    "avatar": "https://example.com/avatar.png"
   }
   ```
 - **Response**: `PatientDto` (with ID and audit fields)
@@ -85,7 +87,9 @@ The system is designed for **multi-tenant capability (future-proof)**, **role-ba
   {
     "patientId": 1,
     "doctorId": 2,
-    "dateTime": "2023-11-01T10:00:00"
+    "dateTime": "2023-11-01T10:00:00",
+    "type": "CONSULTATION",
+    "notes": "Patient complains of headache"
   }
   ```
 - **Response**: `AppointmentDto`
@@ -121,9 +125,35 @@ The system is designed for **multi-tenant capability (future-proof)**, **role-ba
 | `username` | VARCHAR(50) | UQ, NN | Login ID |
 | `password` | VARCHAR(255) | NN | BCrypt Hash |
 | `full_name` | VARCHAR(100)| | Display Name |
-| `role` | VARCHAR(20) | NN | ADMIN, DOCTOR, NURSE... |
+| `department_id` | BIGINT | FK | |
 | `active` | BOOLEAN | DEF TRUE | Soft disable |
 | `created_at` | DATETIME | | Audit |
+
+#### `roles`
+| Column | Type | Constraints | Description |
+| :--- | :--- | :--- | :--- |
+| `id` | BIGINT | PK, AI | |
+| `name` | VARCHAR(50) | UQ, NN | ADMIN, DOCTOR etc |
+| `description` | VARCHAR(255)| | |
+
+#### `permissions`
+| Column | Type | Constraints | Description |
+| :--- | :--- | :--- | :--- |
+| `id` | BIGINT | PK, AI | |
+| `code` | VARCHAR(50) | UQ, NN | E.g. MOD_PATIENTS |
+| `module` | VARCHAR(50) | NN | |
+
+#### `user_roles` (Join)
+| Column | Type | Constraints |
+| :--- | :--- | :--- |
+| `user_id` | BIGINT | FK |
+| `role_id` | BIGINT | FK |
+
+#### `role_permissions` (Join)
+| Column | Type | Constraints |
+| :--- | :--- | :--- |
+| `role_id` | BIGINT | FK |
+| `permission_id` | BIGINT | FK |
 
 #### `patients`
 | Column | Type | Constraints | Description |
