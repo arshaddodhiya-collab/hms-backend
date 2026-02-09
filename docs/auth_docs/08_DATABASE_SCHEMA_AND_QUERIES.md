@@ -2,53 +2,70 @@
 
 This document outlines the database tables implemented for the Authentication module and provides SQL queries to verify the data.
 
-## 1. Schema Overview
+## 1. Full Database Schema (MySQL DDL)
 
-The following tables handle user identity, authorization, and session management.
+You can use the following SQL script to recreate the authentication tables.
 
-### Tables
+```sql
+-- 1. Users Table
+-- Stores user accounts. 'department' is a free-text string.
+CREATE TABLE IF NOT EXISTS users (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    full_name VARCHAR(100),
+    department VARCHAR(100),
+    active BIT(1) NOT NULL DEFAULT 1,
+    deleted BIT(1) NOT NULL DEFAULT 0,
+    created_at DATETIME
+);
 
-#### `users`
-Stores user account information.
-| Column | Type | Description |
-| :--- | :--- | :--- |
-| `id` | BIGINT (PK) | Unique Identifier |
-| `username` | VARCHAR(50) | Unique Login ID |
-| `password` | VARCHAR(255) | BCrypt Encoded Password |
-| `full_name` | VARCHAR(100) | User's Display Name |
-| `department_id` | BIGINT | ID of the department (FK) |
-| `active` | BIT(1) | Is account active? |
-| `deleted` | BIT(1) | Soft Delete flag (0=Active, 1=Deleted) |
-| `created_at` | DATETIME | Timestamp of creation |
+-- 2. Roles Table
+-- Defines system roles (e.g., ADMIN, DOCTOR).
+CREATE TABLE IF NOT EXISTS roles (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(50) NOT NULL UNIQUE,
+    description VARCHAR(255)
+);
 
-#### `roles`
-Defines functional roles (e.g., ADMIN, DOCTOR).
-| Column | Type | Description |
-| :--- | :--- | :--- |
-| `id` | BIGINT (PK) | Unique Identifier |
-| `name` | VARCHAR(50) | Role Name (Unique) |
-| `description` | VARCHAR(255) | Human-readable description |
+-- 3. Permissions Table
+-- Defines granular access rights.
+CREATE TABLE IF NOT EXISTS permissions (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    code VARCHAR(50) NOT NULL UNIQUE,
+    module VARCHAR(50) NOT NULL
+);
 
-#### `permissions`
-Granular access rights (modules/actions).
-| Column | Type | Description |
-| :--- | :--- | :--- |
-| `id` | BIGINT (PK) | Unique Identifier |
-| `code` | VARCHAR(50) | Permission Code (e.g., `MOD_PATIENTS`) |
-| `module` | VARCHAR(50) | Grouping (e.g., `GENERAL`) |
+-- 4. Refresh Tokens Table
+-- Stores JWT refresh tokens. One-to-One with Users (Single Session).
+CREATE TABLE IF NOT EXISTS refresh_tokens (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    token VARCHAR(255) NOT NULL UNIQUE,
+    expiry_date DATETIME NOT NULL,
+    user_id BIGINT UNIQUE,
+    CONSTRAINT fk_refresh_token_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
 
-#### `refresh_tokens`
-Stores long-lived tokens for session renewal.
-| Column | Type | Description |
-| :--- | :--- | :--- |
-| `id` | BIGINT (PK) | Unique Identifier |
-| `token` | VARCHAR(255) | UUID String (Unique) |
-| `user_id` | BIGINT | Owner of the token (FK -> users.id) |
-| `expiry_date` | DATETIME | Time when token becomes invalid |
+-- 5. User Roles (Join Table)
+-- Maps Users to Roles.
+CREATE TABLE IF NOT EXISTS user_roles (
+    user_id BIGINT NOT NULL,
+    role_id BIGINT NOT NULL,
+    PRIMARY KEY (user_id, role_id),
+    CONSTRAINT fk_user_roles_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    CONSTRAINT fk_user_roles_role FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE CASCADE
+);
 
-#### Join Tables
-- **`user_roles`**: Links `users` <-> `roles` (Many-to-Many).
-- **`role_permissions`**: Links `roles` <-> `permissions` (Many-to-Many).
+-- 6. Role Permissions (Join Table)
+-- Maps Roles to Permissions.
+CREATE TABLE IF NOT EXISTS role_permissions (
+    role_id BIGINT NOT NULL,
+    permission_id BIGINT NOT NULL,
+    PRIMARY KEY (role_id, permission_id),
+    CONSTRAINT fk_role_permissions_role FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE CASCADE,
+    CONSTRAINT fk_role_permissions_permission FOREIGN KEY (permission_id) REFERENCES permissions(id) ON DELETE CASCADE
+);
+```
 
 ---
 

@@ -64,28 +64,71 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     private void seedRoles() {
-        createRoleIfNotFound("ADMIN", "Administrator", "MOD_ADMIN", "ACT_VIEW", "ACT_CREATE", "ACT_EDIT", "ACT_DELETE");
-        createRoleIfNotFound("DOCTOR", "Medical Doctor", "MOD_DASHBOARD", "MOD_PATIENTS", "MOD_CONSULTATION",
-                "ACT_VIEW", "ACT_CREATE", "ACT_EDIT");
-        createRoleIfNotFound("NURSE", "Nurse", "MOD_DASHBOARD", "MOD_PATIENTS", "MOD_TRIAGE", "ACT_VIEW", "ACT_CREATE");
-        createRoleIfNotFound("RECEPTION", "Receptionist", "MOD_DASHBOARD", "MOD_PATIENTS", "MOD_APPOINTMENTS",
-                "ACT_VIEW", "ACT_CREATE");
+        // ADMIN: All permissions
+        List<String> adminPerms = Arrays.asList(
+                "MOD_DASHBOARD", "MOD_PATIENTS", "MOD_APPOINTMENTS", "MOD_TRIAGE", "MOD_CONSULTATION",
+                "MOD_LAB", "MOD_BILLING", "MOD_ADMIN", "MOD_VOICE",
+                "CMP_VITALS_WRITE", "CMP_VITALS_READ",
+                "ACT_VIEW", "ACT_CREATE", "ACT_EDIT", "ACT_DELETE",
+                "CMP_PATIENT_ADD", "CMP_PATIENT_LIST", "CMP_PATIENT_VIEW", "CMP_PATIENT_EDIT",
+                "CMP_APPOINTMENT_LIST", "CMP_APPOINTMENT_CREATE", "CMP_APPOINTMENT_VIEW", "CMP_APPOINTMENT_EDIT",
+                "CMP_CONSULTATION_READ", "CMP_CONSULTATION_WRITE",
+                "CMP_LAB_ENTRY", "CMP_LAB_READ",
+                "CMP_BILLING_SUMMARY", "CMP_INVOICE_GENERATE", "CMP_PAYMENT_RECEIPT",
+                "CMP_ADMIN_DEPT_READ", "CMP_ADMIN_DEPT_WRITE",
+                "CMP_ADMIN_USER_READ", "CMP_ADMIN_USER_WRITE", "CMP_ADMIN_ROLE_WRITE");
+        createOrUpdateRole("ADMIN", "Administrator", adminPerms);
+
+        // DOCTOR
+        List<String> doctorPerms = Arrays.asList(
+                "MOD_DASHBOARD", "MOD_PATIENTS", "MOD_APPOINTMENTS", "MOD_CONSULTATION",
+                "ACT_VIEW", "ACT_CREATE", "ACT_EDIT",
+                "CMP_PATIENT_LIST", "CMP_PATIENT_VIEW",
+                "CMP_APPOINTMENT_LIST", "CMP_APPOINTMENT_VIEW",
+                "CMP_VITALS_READ",
+                "CMP_CONSULTATION_WRITE", "CMP_CONSULTATION_READ",
+                "CMP_LAB_READ");
+        createOrUpdateRole("DOCTOR", "Medical Doctor", doctorPerms);
+
+        // NURSE
+        List<String> nursePerms = Arrays.asList(
+                "MOD_DASHBOARD", "MOD_PATIENTS", "MOD_APPOINTMENTS", "MOD_TRIAGE", "MOD_CONSULTATION",
+                "ACT_VIEW", "ACT_CREATE",
+                "CMP_APPOINTMENT_LIST", "CMP_APPOINTMENT_VIEW",
+                "CMP_VITALS_WRITE", "CMP_VITALS_READ",
+                "CMP_CONSULTATION_READ",
+                "CMP_LAB_READ");
+        createOrUpdateRole("NURSE", "Nurse", nursePerms);
+
+        // LAB_TECH
+        List<String> labPerms = Arrays.asList(
+                "MOD_DASHBOARD", "MOD_LAB",
+                "ACT_VIEW", "ACT_CREATE",
+                "CMP_LAB_ENTRY", "CMP_LAB_READ");
+        createOrUpdateRole("LAB_TECH", "Lab Technician", labPerms); // Frontend says "Lab Technician", logic maps to
+                                                                    // LAB_TECH
+
+        // RECEPTION
+        List<String> receptionPerms = Arrays.asList(
+                "MOD_DASHBOARD", "MOD_PATIENTS", "MOD_APPOINTMENTS", "MOD_BILLING",
+                "ACT_VIEW", "ACT_CREATE", "ACT_EDIT",
+                "CMP_PATIENT_ADD", "CMP_PATIENT_LIST", "CMP_PATIENT_VIEW", "CMP_PATIENT_EDIT",
+                "CMP_APPOINTMENT_LIST", "CMP_APPOINTMENT_CREATE", "CMP_APPOINTMENT_VIEW", "CMP_APPOINTMENT_EDIT",
+                "CMP_INVOICE_GENERATE", "CMP_PAYMENT_RECEIPT", "CMP_BILLING_SUMMARY");
+        createOrUpdateRole("RECEPTION", "Front Desk", receptionPerms);
     }
 
-    private void createRoleIfNotFound(String name, String description, String... permissionCodes) {
-        if (roleRepository.findByName(name).isEmpty()) {
-            Role role = new Role();
-            role.setName(name);
-            role.setDescription(description);
+    private void createOrUpdateRole(String name, String description, List<String> permissionCodes) {
+        Role role = roleRepository.findByName(name).orElse(new Role(name));
+        role.setDescription(description);
 
-            Set<Permission> permissions = new HashSet<>();
-            for (String code : permissionCodes) {
-                permissionRepository.findByCode(code).ifPresent(permissions::add);
-            }
-            role.setPermissions(permissions);
-
-            roleRepository.save(role);
+        Set<Permission> permissions = new HashSet<>();
+        for (String code : permissionCodes) {
+            permissionRepository.findByCode(code).ifPresent(permissions::add);
         }
+        role.setPermissions(permissions);
+
+        roleRepository.save(role);
     }
 
     private void seedUsers() {

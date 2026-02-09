@@ -23,8 +23,8 @@ public class User implements Serializable {
     @Column(name = "full_name", length = 100)
     private String fullName;
 
-    @Column(name = "department_id")
-    private Long departmentId;
+    @Column(name = "department", length = 100)
+    private String department;
 
     @Column(nullable = false)
     private boolean active = true;
@@ -79,12 +79,12 @@ public class User implements Serializable {
         this.fullName = fullName;
     }
 
-    public Long getDepartmentId() {
-        return departmentId;
+    public String getDepartment() {
+        return department;
     }
 
-    public void setDepartmentId(Long departmentId) {
-        this.departmentId = departmentId;
+    public void setDepartment(String department) {
+        this.department = department;
     }
 
     public boolean isActive() {

@@ -56,17 +56,19 @@ public class AuthService {
         user.setUsername(request.getUsername());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setFullName(request.getFullName());
-        user.setDepartmentId(request.getDepartmentId());
+        user.setDepartment(request.getDepartment());
 
         Set<Role> roles = new HashSet<>();
-        // Default role: If no specific logic, assign something basic or handle
-        // appropriately
-        // For now, let's assume registering via this endpoint assigns 'DOCTOR' or
-        // 'NURSE' based on logic,
-        // or effectively 'USER' if we had one.
-        // Let's verify if 'RECEPTION' exists, or default to it.
-        Role role = roleRepository.findByName("RECEPTION")
-                .orElseThrow(() -> new RuntimeException("Default Role not found."));
+        // Use provided role or default to RECEPTION
+        String roleInput = (request.getRole() != null && !request.getRole().isEmpty())
+                ? request.getRole()
+                : "RECEPTION";
+
+        // Normalize Role: "Front Desk" -> "RECEPTION", "Doctor" -> "DOCTOR"
+        String roleName = normalizeRoleName(roleInput);
+
+        Role role = roleRepository.findByName(roleName)
+                .orElseThrow(() -> new RuntimeException("Role not found: " + roleName));
         roles.add(role);
         user.setRoles(roles);
 
@@ -158,5 +160,30 @@ public class AuthService {
             throw new RuntimeException("Refresh token was expired. Please make a new signin request");
         }
         return token;
+    }
+
+    private String normalizeRoleName(String input) {
+        String normalized = input.trim().toUpperCase();
+        switch (normalized) {
+            case "ADMINISTRATOR":
+            case "ADMIN":
+                return "ADMIN";
+            case "DOCTOR":
+            case "MEDICAL DOCTOR":
+                return "DOCTOR";
+            case "NURSE":
+                return "NURSE";
+            case "LAB TECHNICIAN":
+            case "LAB":
+            case "LAB_TECH":
+                return "LAB_TECH";
+            case "FRONT DESK":
+            case "RECEPTIONIST":
+            case "RECEPTION":
+                return "RECEPTION";
+            default:
+                // Fallback: Replace spaces with underscores and return uppercase
+                return normalized.replace(" ", "_");
+        }
     }
 }

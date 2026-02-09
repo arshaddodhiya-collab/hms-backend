@@ -4,7 +4,8 @@ public class RegisterRequest {
     private String username;
     private String password;
     private String fullName;
-    private Long departmentId;
+    private String department;
+    private String role; // Optional, defaults to RECEPTION if null
 
     public RegisterRequest() {
     }
@@ -33,11 +34,19 @@ public class RegisterRequest {
         this.fullName = fullName;
     }
 
-    public Long getDepartmentId() {
-        return departmentId;
+    public String getDepartment() {
+        return department;
     }
 
-    public void setDepartmentId(Long departmentId) {
-        this.departmentId = departmentId;
+    public void setDepartment(String department) {
+        this.department = department;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 }

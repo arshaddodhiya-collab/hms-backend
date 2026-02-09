@@ -60,8 +60,11 @@ Registers a new user.
   "username": "jdoe",
   "password": "password123",
   "fullName": "John Doe",
-  "departmentId": 1
+  "department": "Cardiology",
+  "role": "Doctor" 
 }
+```
+*Note: `role` is optional (defaults to `RECEPTION`) and case-insensitive (e.g., "Doctor", "DOCTOR", "Medical Doctor" -> `DOCTOR`). `department` is a free-text string.*
 ```
 **Response**: `AuthResponse` (Access Token, Refresh Token, User Details, Role, **Permissions**).
 

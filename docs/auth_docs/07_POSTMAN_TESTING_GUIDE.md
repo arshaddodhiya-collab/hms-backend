@@ -14,7 +14,8 @@ This guide provides the necessary JSON payloads and steps to test the Authentica
   "username": "newuser",
   "password": "password123",
   "fullName": "New User",
-  "departmentId": 1
+  "department": "ICU",
+  "role": "Nurse"
 }
 ```
 
