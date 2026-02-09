@@ -92,8 +92,10 @@ public class AuthService {
         String refreshToken = createRefreshToken(user).getToken();
 
         String roleName = user.getRoles().isEmpty() ? "" : user.getRoles().iterator().next().getName();
+        Set<String> permissions = new HashSet<>();
+        user.getRoles().forEach(role -> role.getPermissions().forEach(p -> permissions.add(p.getCode())));
 
-        return new AuthResponse(accessToken, refreshToken, user.getUsername(), roleName);
+        return new AuthResponse(accessToken, refreshToken, user.getUsername(), roleName, permissions);
     }
 
     public AuthResponse refreshToken(RefreshTokenRequest request) {
@@ -105,14 +107,37 @@ public class AuthService {
                 .map(user -> {
                     UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUsername());
                     String accessToken = jwtService.generateToken(userDetails);
-                    // Rotate refresh token? Or keep same? Let's keep same for now or rotate.
-                    // Simple implementation: return new access token, keep refresh token (if
-                    // valid).
-                    // Or typically, you might want to return a new refresh token too.
-                    return new AuthResponse(accessToken, requestRefreshToken, user.getUsername(),
-                            user.getRoles().isEmpty() ? "" : user.getRoles().iterator().next().getName());
+
+                    String roleName = user.getRoles().isEmpty() ? "" : user.getRoles().iterator().next().getName();
+                    Set<String> permissions = new HashSet<>();
+                    user.getRoles().forEach(role -> role.getPermissions().forEach(p -> permissions.add(p.getCode())));
+
+                    return new AuthResponse(accessToken, requestRefreshToken, user.getUsername(), roleName,
+                            permissions);
                 })
                 .orElseThrow(() -> new RuntimeException("Refresh token is not in database!"));
+    }
+
+    public void logout(RefreshTokenRequest request) {
+        refreshTokenRepository.findByToken(request.getRefreshToken())
+                .ifPresent(refreshTokenRepository::delete);
+    }
+
+    // Since we don't have a direct way to get the current user entity from context
+    // easily without loading it,
+    // and usually the controller handles extracting the principal.
+    // But we can implement a method that takes the username (extracted from token
+    // in controller)
+    public AuthResponse getCurrentUser(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        String roleName = user.getRoles().isEmpty() ? "" : user.getRoles().iterator().next().getName();
+        Set<String> permissions = new HashSet<>();
+        user.getRoles().forEach(role -> role.getPermissions().forEach(p -> permissions.add(p.getCode())));
+
+        // We don't return tokens for /me endpoint usually, or return null/empty
+        return new AuthResponse(null, null, user.getUsername(), roleName, permissions);
     }
 
     @Transactional

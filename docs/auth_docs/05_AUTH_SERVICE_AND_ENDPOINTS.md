@@ -63,7 +63,7 @@ Registers a new user.
   "departmentId": 1
 }
 ```
-**Response**: `AuthResponse` (Access Token, Refresh Token, User Details).
+**Response**: `AuthResponse` (Access Token, Refresh Token, User Details, Role, **Permissions**).
 
 ### POST `/login`
 Authenticates an existing user.
@@ -75,6 +75,15 @@ Authenticates an existing user.
 }
 ```
 **Response**: `AuthResponse`
+```json
+{
+  "accessToken": "...",
+  "refreshToken": "...",
+  "username": "jdoe",
+  "role": "DOCTOR",
+  "permissions": ["MOD_kp", "ACT_VIEW", ...]
+}
+```
 
 ### POST `/refresh-token`
 Obtains a new Access Token using a valid Refresh Token.
@@ -84,4 +93,19 @@ Obtains a new Access Token using a valid Refresh Token.
   "refreshToken": "c6a71ce3-47d0-432d-9d47-ea8062e6781e"
 }
 ```
-**Response**: `AuthResponse` (New Access Token, Same/New Refresh Token).
+**Response**: `AuthResponse`
+
+### POST `/logout`
+Revokes the Refresh Token, effectively logging the user out from the session persistence perspective.
+**Request**:
+```json
+{
+  "refreshToken": "..."
+}
+```
+**Response**: `200 OK`
+
+### GET `/me`
+Retrieves the current authenticated user's details and permissions.
+**Headers**: `Authorization: Bearer <access_token>`
+**Response**: `AuthResponse` (Tokens null, User Details & Permissions populated).
