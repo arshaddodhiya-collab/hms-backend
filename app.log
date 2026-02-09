@@ -35,26 +35,26 @@
 
  :: Spring Boot ::                (v3.4.1)
 
-2026-02-09T17:43:58.458+05:30  INFO 1064686 --- [HospitalManagementSystem] [  restartedMain] .h.H.HospitalManagementSystemApplication : Starting HospitalManagementSystemApplication using Java 17.0.17 with PID 1064686 (/home/artem/test/hms-final/hms-backend/target/classes started by artem in /home/artem/test/hms-final/hms-backend)
-2026-02-09T17:43:58.462+05:30  INFO 1064686 --- [HospitalManagementSystem] [  restartedMain] .h.H.HospitalManagementSystemApplication : No active profile set, falling back to 1 default profile: "default"
-2026-02-09T17:43:58.514+05:30  INFO 1064686 --- [HospitalManagementSystem] [  restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
-2026-02-09T17:43:58.514+05:30  INFO 1064686 --- [HospitalManagementSystem] [  restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
-2026-02-09T17:43:59.317+05:30  INFO 1064686 --- [HospitalManagementSystem] [  restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
-2026-02-09T17:43:59.396+05:30  INFO 1064686 --- [HospitalManagementSystem] [  restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 67 ms. Found 4 JPA repository interfaces.
-2026-02-09T17:44:00.165+05:30  INFO 1064686 --- [HospitalManagementSystem] [  restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
-2026-02-09T17:44:00.182+05:30  INFO 1064686 --- [HospitalManagementSystem] [  restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
-2026-02-09T17:44:00.182+05:30  INFO 1064686 --- [HospitalManagementSystem] [  restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.34]
-2026-02-09T17:44:00.240+05:30  INFO 1064686 --- [HospitalManagementSystem] [  restartedMain] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
-2026-02-09T17:44:00.241+05:30  INFO 1064686 --- [HospitalManagementSystem] [  restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1725 ms
-2026-02-09T17:44:00.428+05:30  INFO 1064686 --- [HospitalManagementSystem] [  restartedMain] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
-2026-02-09T17:44:00.480+05:30  INFO 1064686 --- [HospitalManagementSystem] [  restartedMain] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.4.Final
-2026-02-09T17:44:00.515+05:30  INFO 1064686 --- [HospitalManagementSystem] [  restartedMain] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
-2026-02-09T17:44:00.826+05:30  INFO 1064686 --- [HospitalManagementSystem] [  restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
-2026-02-09T17:44:00.857+05:30  INFO 1064686 --- [HospitalManagementSystem] [  restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
-2026-02-09T17:44:01.245+05:30  INFO 1064686 --- [HospitalManagementSystem] [  restartedMain] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@512c9f39
-2026-02-09T17:44:01.247+05:30  INFO 1064686 --- [HospitalManagementSystem] [  restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
-2026-02-09T17:44:01.311+05:30  WARN 1064686 --- [HospitalManagementSystem] [  restartedMain] org.hibernate.orm.deprecation            : HHH90000025: MySQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
-2026-02-09T17:44:01.334+05:30  INFO 1064686 --- [HospitalManagementSystem] [  restartedMain] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+2026-02-09T17:58:11.574+05:30  INFO 1069230 --- [HospitalManagementSystem] [  restartedMain] .h.H.HospitalManagementSystemApplication : Starting HospitalManagementSystemApplication using Java 17.0.17 with PID 1069230 (/home/artem/test/hms-final/hms-backend/target/classes started by artem in /home/artem/test/hms-final/hms-backend)
+2026-02-09T17:58:11.577+05:30  INFO 1069230 --- [HospitalManagementSystem] [  restartedMain] .h.H.HospitalManagementSystemApplication : No active profile set, falling back to 1 default profile: "default"
+2026-02-09T17:58:11.632+05:30  INFO 1069230 --- [HospitalManagementSystem] [  restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2026-02-09T17:58:11.632+05:30  INFO 1069230 --- [HospitalManagementSystem] [  restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2026-02-09T17:58:12.493+05:30  INFO 1069230 --- [HospitalManagementSystem] [  restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-02-09T17:58:12.593+05:30  INFO 1069230 --- [HospitalManagementSystem] [  restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 83 ms. Found 4 JPA repository interfaces.
+2026-02-09T17:58:13.350+05:30  INFO 1069230 --- [HospitalManagementSystem] [  restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2026-02-09T17:58:13.365+05:30  INFO 1069230 --- [HospitalManagementSystem] [  restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-02-09T17:58:13.366+05:30  INFO 1069230 --- [HospitalManagementSystem] [  restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.34]
+2026-02-09T17:58:13.429+05:30  INFO 1069230 --- [HospitalManagementSystem] [  restartedMain] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-02-09T17:58:13.431+05:30  INFO 1069230 --- [HospitalManagementSystem] [  restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1796 ms
+2026-02-09T17:58:13.643+05:30  INFO 1069230 --- [HospitalManagementSystem] [  restartedMain] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-02-09T17:58:13.707+05:30  INFO 1069230 --- [HospitalManagementSystem] [  restartedMain] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.4.Final
+2026-02-09T17:58:13.746+05:30  INFO 1069230 --- [HospitalManagementSystem] [  restartedMain] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-02-09T17:58:14.051+05:30  INFO 1069230 --- [HospitalManagementSystem] [  restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-02-09T17:58:14.084+05:30  INFO 1069230 --- [HospitalManagementSystem] [  restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-02-09T17:58:14.523+05:30  INFO 1069230 --- [HospitalManagementSystem] [  restartedMain] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@512c9f39
+2026-02-09T17:58:14.525+05:30  INFO 1069230 --- [HospitalManagementSystem] [  restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-02-09T17:58:14.593+05:30  WARN 1069230 --- [HospitalManagementSystem] [  restartedMain] org.hibernate.orm.deprecation            : HHH90000025: MySQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-02-09T17:58:14.617+05:30  INFO 1069230 --- [HospitalManagementSystem] [  restartedMain] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
 	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
 	Database driver: undefined/unknown
 	Database version: 8.0.44
@@ -62,14 +62,14 @@
 	Isolation level: undefined/unknown
 	Minimum pool size: undefined/unknown
 	Maximum pool size: undefined/unknown
-2026-02-09T17:44:02.594+05:30  INFO 1064686 --- [HospitalManagementSystem] [  restartedMain] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
-2026-02-09T17:44:02.643+05:30  INFO 1064686 --- [HospitalManagementSystem] [  restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
-2026-02-09T17:44:03.289+05:30  INFO 1064686 --- [HospitalManagementSystem] [  restartedMain] eAuthenticationProviderManagerConfigurer : Global AuthenticationManager configured with AuthenticationProvider bean with name daoAuthenticationProvider
-2026-02-09T17:44:03.290+05:30  WARN 1064686 --- [HospitalManagementSystem] [  restartedMain] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with an AuthenticationProvider bean. UserDetailsService beans will not be used by Spring Security for automatically configuring username/password login. Consider removing the AuthenticationProvider bean. Alternatively, consider using the UserDetailsService in a manually instantiated DaoAuthenticationProvider. If the current configuration is intentional, to turn off this warning, increase the logging level of 'org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer' to ERROR
-2026-02-09T17:44:03.344+05:30  WARN 1064686 --- [HospitalManagementSystem] [  restartedMain] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
-2026-02-09T17:44:04.186+05:30  INFO 1064686 --- [HospitalManagementSystem] [  restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : LiveReload server is running on port 35729
-2026-02-09T17:44:04.222+05:30  INFO 1064686 --- [HospitalManagementSystem] [  restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
-2026-02-09T17:44:04.236+05:30  INFO 1064686 --- [HospitalManagementSystem] [  restartedMain] .h.H.HospitalManagementSystemApplication : Started HospitalManagementSystemApplication in 6.251 seconds (process running for 6.719)
+2026-02-09T17:58:15.826+05:30  INFO 1069230 --- [HospitalManagementSystem] [  restartedMain] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-02-09T17:58:15.876+05:30  INFO 1069230 --- [HospitalManagementSystem] [  restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-02-09T17:58:16.645+05:30  INFO 1069230 --- [HospitalManagementSystem] [  restartedMain] eAuthenticationProviderManagerConfigurer : Global AuthenticationManager configured with AuthenticationProvider bean with name daoAuthenticationProvider
+2026-02-09T17:58:16.646+05:30  WARN 1069230 --- [HospitalManagementSystem] [  restartedMain] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with an AuthenticationProvider bean. UserDetailsService beans will not be used by Spring Security for automatically configuring username/password login. Consider removing the AuthenticationProvider bean. Alternatively, consider using the UserDetailsService in a manually instantiated DaoAuthenticationProvider. If the current configuration is intentional, to turn off this warning, increase the logging level of 'org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer' to ERROR
+2026-02-09T17:58:16.703+05:30  WARN 1069230 --- [HospitalManagementSystem] [  restartedMain] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-02-09T17:58:17.482+05:30  INFO 1069230 --- [HospitalManagementSystem] [  restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : LiveReload server is running on port 35729
+2026-02-09T17:58:17.524+05:30  INFO 1069230 --- [HospitalManagementSystem] [  restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2026-02-09T17:58:17.540+05:30  INFO 1069230 --- [HospitalManagementSystem] [  restartedMain] .h.H.HospitalManagementSystemApplication : Started HospitalManagementSystemApplication in 6.401 seconds (process running for 6.852)
 Hibernate: select p1_0.id,p1_0.code,p1_0.module from permissions p1_0 where p1_0.code=?
 Hibernate: select p1_0.id,p1_0.code,p1_0.module from permissions p1_0 where p1_0.code=?
 Hibernate: select p1_0.id,p1_0.code,p1_0.module from permissions p1_0 where p1_0.code=?
@@ -254,6 +254,9 @@ Hibernate: select p1_0.id,p1_0.code,p1_0.module from permissions p1_0 where p1_0
 Hibernate: select p1_0.id,p1_0.code,p1_0.module from permissions p1_0 where p1_0.code=?
 Hibernate: select p1_0.id,p1_0.code,p1_0.module from permissions p1_0 where p1_0.code=?
 Hibernate: select u1_0.id,u1_0.active,u1_0.created_at,u1_0.deleted,u1_0.department,u1_0.full_name,u1_0.password,u1_0.username from users u1_0 where u1_0.username=?
+Hibernate: select r1_0.user_id,r1_1.id,r1_1.description,r1_1.name,p1_0.role_id,p1_1.id,p1_1.code,p1_1.module from user_roles r1_0 join roles r1_1 on r1_1.id=r1_0.role_id left join role_permissions p1_0 on r1_1.id=p1_0.role_id left join permissions p1_1 on p1_1.id=p1_0.permission_id where r1_0.user_id=?
+Hibernate: select u1_0.id,u1_0.active,u1_0.created_at,u1_0.deleted,u1_0.department,u1_0.full_name,u1_0.password,u1_0.username from users u1_0 where u1_0.username=?
+Hibernate: select r1_0.user_id,r1_1.id,r1_1.description,r1_1.name,p1_0.role_id,p1_1.id,p1_1.code,p1_1.module from user_roles r1_0 join roles r1_1 on r1_1.id=r1_0.role_id left join role_permissions p1_0 on r1_1.id=p1_0.role_id left join permissions p1_1 on p1_1.id=p1_0.permission_id where r1_0.user_id=?
 Hibernate: delete from role_permissions where role_id=?
 Hibernate: insert into role_permissions (role_id,permission_id) values (?,?)
 Hibernate: insert into role_permissions (role_id,permission_id) values (?,?)
@@ -273,10 +276,16 @@ Hibernate: insert into role_permissions (role_id,permission_id) values (?,?)
 Hibernate: insert into role_permissions (role_id,permission_id) values (?,?)
 Hibernate: insert into role_permissions (role_id,permission_id) values (?,?)
 Hibernate: insert into role_permissions (role_id,permission_id) values (?,?)
-Hibernate: select r1_0.id,r1_0.description,r1_0.name from roles r1_0 where r1_0.name=?
-Hibernate: insert into users (active,created_at,deleted,department,full_name,password,username) values (?,?,?,?,?,?,?)
-Hibernate: select u1_0.id,u1_0.active,u1_0.created_at,u1_0.deleted,u1_0.department,u1_0.full_name,u1_0.password,u1_0.username from users u1_0 where u1_0.username=?
-Hibernate: select r1_0.id,r1_0.description,r1_0.name from roles r1_0 where r1_0.name=?
-Hibernate: insert into users (active,created_at,deleted,department,full_name,password,username) values (?,?,?,?,?,?,?)
-Hibernate: insert into user_roles (user_id,role_id) values (?,?)
-Hibernate: insert into user_roles (user_id,role_id) values (?,?)
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  03:31 min
+[INFO] Finished at: 2026-02-09T18:01:39+05:30
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.springframework.boot:spring-boot-maven-plugin:3.4.1:run (default-cli) on project HospitalManagementSystem: Process terminated with exit code: 137 -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoExecutionException

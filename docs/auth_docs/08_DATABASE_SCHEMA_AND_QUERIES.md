@@ -110,3 +110,34 @@ JOIN user_roles ur ON u.id = ur.user_id
 JOIN roles r ON ur.role_id = r.id
 WHERE u.username = 'testuser';
 ```
+
+### F. View All Permissions for a Specific User (e.g. 'doc_strange')
+```sql
+SELECT u.username, r.name as role, p.code as permission, p.module
+FROM users u
+JOIN user_roles ur ON u.id = ur.user_id
+JOIN roles r ON ur.role_id = r.id
+JOIN role_permissions rp ON r.id = rp.role_id
+JOIN permissions p ON rp.permission_id = p.id
+WHERE u.username = 'doc_strange'; -- Replace with target username
+```
+
+### G. Find Users who have a Specific Permission (e.g. 'MOD_ADMIN')
+```sql
+SELECT u.username, r.name as role
+FROM users u
+JOIN user_roles ur ON u.id = ur.user_id
+JOIN roles r ON ur.role_id = r.id
+JOIN role_permissions rp ON r.id = rp.role_id
+JOIN permissions p ON rp.permission_id = p.id
+WHERE p.code = 'MOD_ADMIN';
+```
+
+### H. Count Users per Role
+```sql
+SELECT r.name, COUNT(u.id) as user_count
+FROM roles r
+LEFT JOIN user_roles ur ON r.id = ur.role_id
+LEFT JOIN users u ON ur.user_id = u.id
+GROUP BY r.name;
+```
