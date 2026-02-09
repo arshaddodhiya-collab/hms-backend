@@ -114,3 +114,19 @@ SELECT r.id, p.id FROM roles r, permissions p WHERE r.name = 'ADMIN';
 -- $2a$10$r.7... is irrelevant here, user needs to generate one.
 -- I'll insert a placeholder or skip user insertion to avoid bad passwords.
 -- Users should be created via API or manually with known hash.
+
+-- =========================================================================================
+-- [2024-02-09] Auth Features Schema Update
+-- =========================================================================================
+
+-- Add deleted column to users for soft delete
+ALTER TABLE users ADD COLUMN IF NOT EXISTS deleted BIT(1) DEFAULT 0;
+
+-- Create refresh_tokens table
+CREATE TABLE IF NOT EXISTS refresh_tokens (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    token VARCHAR(255) NOT NULL UNIQUE,
+    user_id BIGINT UNIQUE,
+    expiry_date DATETIME(6) NOT NULL,
+    CONSTRAINT fk_refresh_token_user FOREIGN KEY (user_id) REFERENCES users (id)
+);
