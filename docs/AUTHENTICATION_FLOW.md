@@ -131,12 +131,51 @@ sequenceDiagram
 ## 5. CSRF (Cross-Site Request Forgery)
 
 ### Why is it disabled?
-CSRF attacks rely on the browser's behavior of automatically sending cookies (like `JSESSIONID`) with cross-origin requests.
 
-1.  **Cookie-Based Auth**: Protocol `POST http://bank.com/transfer` -> Browser sends `Cookie: session_id=123`. Malicious site can trigger this. **Requires CSRF Token**.
-2.  **Token-Based Auth (Our Approach)**: Protocol `POST http://api.hms/patients` -> Code must explicitly set `Authorization: Bearer <token>`.
-    *   A malicious site cannot force your browser to read `localStorage` and attach the specific header.
-    *   Therefore, **CSRF protection is not required** for this architecture.
+CSRF attacks rely on the browser's behavior of **automatically sending cookies** (like `JSESSIONID`) with cross-origin requests.
+
+#### Scenario A: Cookie-Based Auth (Vulnerable to CSRF)
+This is why traditional apps need a CSRF Token.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant A as Attacker Site
+    participant B as Browser
+    participant S as Server (Bank)
+
+    Note over B, S: User is logged in (Session Cookie stored)
+    
+    A->>B: User visits malicious-site.com
+    B->>S: POST /transfer (Hidden Form Request)
+    Note right of B: Browser AUTOMATICALLY attaches Cookie: JSESSIONID=123
+    
+    S->>S: Validate Session (Success)
+    S->>S: Transfer Money (Exploit Successful!)
+```
+
+#### Scenario B: Token-Based Auth (Our Approach - Safe)
+This is why we can disable CSRF protection safely.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant A as Attacker Site
+    participant B as Browser
+    participant S as Server (HMS API)
+
+    Note over B, S: User is logged in (Token in localStorage)
+    
+    A->>B: User visits malicious-site.com
+    B->>S: POST /api/v1/patients (Hidden Form Request)
+    Note right of B: Browser DOES NOT attach Authorization Header
+    
+    S->>S: Check Header (Missing)
+    S-->>B: 401 Unauthorized (Attack Failed)
+```
+
+### Conclusion
+Because our `AuthInterceptor` must **explicitly** read from `localStorage` and attach the `Authorization` header, a malicious site (which cannot read your domain's `localStorage`) cannot forge a valid request. Therefore, **CSRF protection is unnecessary**.
 
 ### Security Trade-off
 *   **Risk**: If we stored the JWT in an `HttpOnly` cookie (to prevent XSS), we *would* generally need CSRF protection (specifically SameSite=Strict helps, but CSRF tokens are safer).
