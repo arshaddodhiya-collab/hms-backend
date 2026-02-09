@@ -119,3 +119,16 @@ Hibernate: select u1_0.id,u1_0.active,u1_0.created_at,u1_0.deleted,u1_0.departme
 Hibernate: delete from refresh_tokens where id=?
 Hibernate: select rt1_0.id,rt1_0.expiry_date,rt1_0.token,rt1_0.user_id from refresh_tokens rt1_0 where rt1_0.token=?
 2026-02-09T15:50:18.288+05:30  WARN 1037506 --- [HospitalManagementSystem] [nio-8080-exec-9] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [java.lang.RuntimeException: Refresh token is not in database!]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  09:54 min
+[INFO] Finished at: 2026-02-09T15:55:41+05:30
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.springframework.boot:spring-boot-maven-plugin:3.4.1:run (default-cli) on project HospitalManagementSystem: Process terminated with exit code: 137 -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoExecutionException
