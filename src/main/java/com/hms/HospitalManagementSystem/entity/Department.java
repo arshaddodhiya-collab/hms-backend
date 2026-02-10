@@ -21,7 +21,7 @@ public class Department extends PublicEntity {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "head_of_department_id")
     private User headOfDepartment;
 

@@ -30,7 +30,10 @@ public class CustomUserDetailsService implements UserDetailsService {
             // Add Role as Authority (ROLE_ADMIN)
             authorities.add(new SimpleGrantedAuthority("ROLE_" + role.getName()));
 
-            // Add Permissions as Authorities (MOD_PATIENTS)
+            // Add Permissions as Authorities (MOD_PATIENTS) -> CMP_ADMIN_USER_READ
+            role.getPermissions().forEach(permission -> {
+                authorities.add(new SimpleGrantedAuthority(permission.getCode()));
+            });
         });
 
         return new org.springframework.security.core.userdetails.User(
