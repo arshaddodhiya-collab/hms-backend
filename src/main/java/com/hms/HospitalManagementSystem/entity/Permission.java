@@ -1,10 +1,16 @@
 package com.hms.HospitalManagementSystem.entity;
 
 import jakarta.persistence.*;
+import lombok.*;
 import java.io.Serializable;
 
 @Entity
 @Table(name = "permissions")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Permission implements Serializable {
 
     @Id
@@ -16,36 +22,4 @@ public class Permission implements Serializable {
 
     @Column(nullable = false, length = 50)
     private String module;
-
-    public Permission() {
-    }
-
-    public Permission(String code, String module) {
-        this.code = code;
-        this.module = module;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getCode() {
-        return code;
-    }
-
-    public void setCode(String code) {
-        this.code = code;
-    }
-
-    public String getModule() {
-        return module;
-    }
-
-    public void setModule(String module) {
-        this.module = module;
-    }
 }

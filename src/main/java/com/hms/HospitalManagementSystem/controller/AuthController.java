@@ -5,6 +5,8 @@ import com.hms.HospitalManagementSystem.dto.request.RefreshTokenRequest;
 import com.hms.HospitalManagementSystem.dto.request.RegisterRequest;
 import com.hms.HospitalManagementSystem.dto.response.AuthResponse;
 import com.hms.HospitalManagementSystem.service.AuthService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -16,13 +18,11 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/auth")
+@RequiredArgsConstructor
+@Slf4j
 public class AuthController {
 
     private final AuthService authService;
-
-    public AuthController(AuthService authService) {
-        this.authService = authService;
-    }
 
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(@RequestBody RegisterRequest request,

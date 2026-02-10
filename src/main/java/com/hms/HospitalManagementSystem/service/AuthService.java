@@ -7,7 +7,10 @@ import com.hms.HospitalManagementSystem.dto.response.AuthResponse;
 import com.hms.HospitalManagementSystem.entity.*;
 import com.hms.HospitalManagementSystem.repository.*;
 import com.hms.HospitalManagementSystem.security.CustomUserDetailsService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -28,6 +31,8 @@ import java.util.UUID;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
+@Slf4j
 public class AuthService {
 
     private final UserRepository userRepository;
@@ -46,22 +51,6 @@ public class AuthService {
 
     @Value("${app.security.secure-cookie}")
     private boolean secureCookie;
-
-    public AuthService(UserRepository userRepository,
-            RoleRepository roleRepository,
-            RefreshTokenRepository refreshTokenRepository,
-            PasswordEncoder passwordEncoder,
-            JwtService jwtService,
-            AuthenticationManager authenticationManager,
-            CustomUserDetailsService userDetailsService) {
-        this.userRepository = userRepository;
-        this.roleRepository = roleRepository;
-        this.refreshTokenRepository = refreshTokenRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.jwtService = jwtService;
-        this.authenticationManager = authenticationManager;
-        this.userDetailsService = userDetailsService;
-    }
 
     public AuthResponse register(RegisterRequest request, HttpServletResponse response) {
         if (userRepository.findByUsername(request.getUsername()).isPresent()) {
@@ -119,7 +108,7 @@ public class AuthService {
         return new AuthResponse(user.getUsername(), roleName, permissions);
     }
 
-    public AuthResponse refreshToken(RefreshTokenRequest requestBody, jakarta.servlet.http.HttpServletRequest request,
+    public AuthResponse refreshToken(RefreshTokenRequest requestBody, HttpServletRequest request,
             HttpServletResponse response) {
         String refreshToken = null;
 
@@ -130,7 +119,7 @@ public class AuthService {
 
         // 2. If not in body, try from cookie
         if (refreshToken == null && request.getCookies() != null) {
-            for (jakarta.servlet.http.Cookie cookie : request.getCookies()) {
+            for (Cookie cookie : request.getCookies()) {
                 if ("refreshToken".equals(cookie.getName())) {
                     refreshToken = cookie.getValue();
                     break;
@@ -160,7 +149,7 @@ public class AuthService {
                 .orElseThrow(() -> new RuntimeException("Refresh token is not in database!"));
     }
 
-    public void logout(jakarta.servlet.http.HttpServletResponse response) {
+    public void logout(HttpServletResponse response) {
         // Clear cookies
         addTokenCookie(response, "accessToken", null, 0);
         addTokenCookie(response, "refreshToken", null, 0);
@@ -179,7 +168,7 @@ public class AuthService {
         return new AuthResponse(user.getUsername(), roleName, permissions);
     }
 
-    private void addTokenCookie(jakarta.servlet.http.HttpServletResponse response, String name, String value,
+    private void addTokenCookie(HttpServletResponse response, String name, String value,
             long maxAge) {
 
         ResponseCookie cookie = ResponseCookie.from(name, value)
