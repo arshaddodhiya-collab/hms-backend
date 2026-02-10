@@ -29,8 +29,9 @@ public class User implements Serializable {
     @Column(name = "full_name", length = 100)
     private String fullName;
 
-    @Column(name = "department", length = 100)
-    private String department;
+    @ManyToOne(fetch = FetchType.EAGER) // Eager for now to simplify security context
+    @JoinColumn(name = "department_id")
+    private Department department;
 
     @Builder.Default
     @Column(nullable = false)

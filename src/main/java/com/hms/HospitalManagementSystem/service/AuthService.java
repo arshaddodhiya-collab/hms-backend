@@ -37,7 +37,9 @@ public class AuthService {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+    private final DepartmentRepository departmentRepository;
     private final RefreshTokenRepository refreshTokenRepository;
+
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
@@ -61,7 +63,14 @@ public class AuthService {
         user.setUsername(request.getUsername());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setFullName(request.getFullName());
-        user.setDepartment(request.getDepartment());
+        user.setFullName(request.getFullName());
+
+        // Handle Department
+        if (request.getDepartment() != null && !request.getDepartment().isEmpty()) {
+            Department dept = departmentRepository.findByName(request.getDepartment())
+                    .orElseThrow(() -> new RuntimeException("Department not found: " + request.getDepartment()));
+            user.setDepartment(dept);
+        }
 
         Set<Role> roles = new HashSet<>();
         // Use provided role or default to RECEPTION

@@ -30,3 +30,22 @@ Currently, the project uses a manual migration strategy. We do **not** use Flywa
 
 *   **Team Sync**: Other developers need to apply your changes to their local DBs.
 *   **Production Safety**: We need a clear history of changes to apply to the production database safely.
+
+## Database Reset (Development Only)
+
+If you need to wipe the database and start fresh with the new `Department` module:
+
+1.  **Stop the App**.
+2.  **Drop Database**: Log into MySQL and run:
+    ```sql
+    DROP DATABASE hospital_db;
+    CREATE DATABASE hospital_db;
+    ```
+3.  **Start the App**: `./mvnw spring-boot:run`
+    *   Hibernate will automatically recreate the schema (Tables).
+    *   `DataInitializer` will automatically seed:
+        *   Permissions
+        *   Roles
+        *   **Standard Departments** (General, Cardiology, etc.)
+        *   **Default Users** (admin, doctor, etc.) linked to departments.
+
