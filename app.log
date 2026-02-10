@@ -281,3 +281,16 @@ Hibernate: insert into role_permissions (role_id,permission_id) values (?,?)
 2026-02-10T09:49:57.155+05:30  INFO 1099185 --- [HospitalManagementSystem] [nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 2 ms
 Hibernate: select u1_0.id,u1_0.active,u1_0.created_at,u1_0.deleted,u1_0.department,u1_0.full_name,u1_0.password,u1_0.username from users u1_0 where u1_0.username=?
 Hibernate: select r1_0.user_id,r1_1.id,r1_1.description,r1_1.name,p1_0.role_id,p1_1.id,p1_1.code,p1_1.module from user_roles r1_0 join roles r1_1 on r1_1.id=r1_0.role_id left join role_permissions p1_0 on r1_1.id=p1_0.role_id left join permissions p1_1 on p1_1.id=p1_0.permission_id where r1_0.user_id=?
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  05:45 min
+[INFO] Finished at: 2026-02-10T09:55:18+05:30
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.springframework.boot:spring-boot-maven-plugin:3.4.1:run (default-cli) on project HospitalManagementSystem: Process terminated with exit code: 137 -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoExecutionException

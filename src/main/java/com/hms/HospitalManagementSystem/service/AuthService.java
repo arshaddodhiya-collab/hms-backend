@@ -138,7 +138,7 @@ public class AuthService {
                 .orElseThrow(() -> new RuntimeException("Refresh token is not in database!"));
     }
 
-    public void logout(jakarta.servlet.http.HttpServletResponse response) {
+    public void logout(HttpServletResponse response) {
         // Clear cookies
         addTokenCookie(response, "accessToken", null, 0);
         addTokenCookie(response, "refreshToken", null, 0);
@@ -157,7 +157,7 @@ public class AuthService {
         return new AuthResponse(user.getUsername(), roleName, permissions);
     }
 
-    private void addTokenCookie(jakarta.servlet.http.HttpServletResponse response, String name, String value,
+    private void addTokenCookie(HttpServletResponse response, String name, String value,
             int maxAge) {
         jakarta.servlet.http.Cookie cookie = new jakarta.servlet.http.Cookie(name, value);
         cookie.setHttpOnly(true);
