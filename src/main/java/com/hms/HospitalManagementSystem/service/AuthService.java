@@ -10,6 +10,9 @@ import com.hms.HospitalManagementSystem.security.CustomUserDetailsService;
 
 import jakarta.servlet.http.HttpServletResponse;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -33,6 +36,15 @@ public class AuthService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
     private final CustomUserDetailsService userDetailsService;
+
+    @Value("${jwt.expiration}")
+    private long jwtExpiration;
+
+    @Value("${jwt.refresh-expiration}")
+    private long refreshExpiration;
+
+    @Value("${app.security.secure-cookie}")
+    private boolean secureCookie;
 
     public AuthService(UserRepository userRepository,
             RoleRepository roleRepository,
@@ -96,8 +108,8 @@ public class AuthService {
         String accessToken = jwtService.generateToken(userDetails);
         String refreshToken = createRefreshToken(user).getToken();
 
-        addTokenCookie(response, "accessToken", accessToken, 15 * 60); // 15 mins
-        addTokenCookie(response, "refreshToken", refreshToken, 7 * 24 * 60 * 60); // 7 days
+        addTokenCookie(response, "accessToken", accessToken, jwtExpiration / 1000);
+        addTokenCookie(response, "refreshToken", refreshToken, refreshExpiration / 1000);
 
         String roleName = user.getRoles().isEmpty() ? "" : user.getRoles().iterator().next().getName();
         Set<String> permissions = new HashSet<>();
@@ -127,7 +139,7 @@ public class AuthService {
                     UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUsername());
                     String accessToken = jwtService.generateToken(userDetails);
 
-                    addTokenCookie(response, "accessToken", accessToken, 15 * 60);
+                    addTokenCookie(response, "accessToken", accessToken, jwtExpiration / 1000);
 
                     String roleName = user.getRoles().isEmpty() ? "" : user.getRoles().iterator().next().getName();
                     Set<String> permissions = new HashSet<>();
@@ -138,7 +150,7 @@ public class AuthService {
                 .orElseThrow(() -> new RuntimeException("Refresh token is not in database!"));
     }
 
-    public void logout(HttpServletResponse response) {
+    public void logout(jakarta.servlet.http.HttpServletResponse response) {
         // Clear cookies
         addTokenCookie(response, "accessToken", null, 0);
         addTokenCookie(response, "refreshToken", null, 0);
@@ -157,13 +169,18 @@ public class AuthService {
         return new AuthResponse(user.getUsername(), roleName, permissions);
     }
 
-    private void addTokenCookie(HttpServletResponse response, String name, String value,
-            int maxAge) {
-        jakarta.servlet.http.Cookie cookie = new jakarta.servlet.http.Cookie(name, value);
-        cookie.setHttpOnly(true);
-        cookie.setPath("/");
-        cookie.setMaxAge(maxAge);
-        response.addCookie(cookie);
+    private void addTokenCookie(jakarta.servlet.http.HttpServletResponse response, String name, String value,
+            long maxAge) {
+
+        ResponseCookie cookie = ResponseCookie.from(name, value)
+                .httpOnly(true)
+                .secure(secureCookie)
+                .path("/")
+                .maxAge(maxAge)
+                .sameSite("Lax")
+                .build();
+
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
     }
 
     @Transactional
@@ -172,7 +189,7 @@ public class AuthService {
                 .orElse(new RefreshToken());
 
         refreshToken.setUser(user);
-        refreshToken.setExpiryDate(Instant.now().plusMillis(604800000)); // 7 days
+        refreshToken.setExpiryDate(Instant.now().plusMillis(refreshExpiration));
         refreshToken.setToken(UUID.randomUUID().toString());
 
         return refreshTokenRepository.save(refreshToken);
