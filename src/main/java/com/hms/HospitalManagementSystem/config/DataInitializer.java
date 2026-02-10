@@ -134,6 +134,9 @@ public class DataInitializer implements CommandLineRunner {
     private void seedUsers() {
         createUserIfNotFound("admin", "admin123", "System Administrator", "ADMIN");
         createUserIfNotFound("doctor", "doctor123", "Dr. House", "DOCTOR");
+        createUserIfNotFound("nurse", "nurse123", "Nurse Joy", "NURSE");
+        createUserIfNotFound("lab", "lab123", "Dexter Lab", "LAB_TECH");
+        createUserIfNotFound("reception", "reception123", "Pam Beesly", "RECEPTION");
     }
 
     private void createUserIfNotFound(String username, String password, String fullName, String roleName) {
