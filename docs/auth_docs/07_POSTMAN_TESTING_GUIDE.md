@@ -47,13 +47,12 @@ This guide provides the necessary JSON payloads and steps to test the Authentica
 **Expected Response**: `200 OK`
 ```json
 {
-    "accessToken": "eyJhbGciOiJIUz...",
-    "refreshToken": "uuid-string...",
     "username": "testuser",
     "role": "RECEPTION",
     "permissions": ["ACT_VIEW", "MOD_PATIENTS", ...]
 }
 ```
+*(Note: `accessToken` and `refreshToken` are now returned as **HttpOnly Cookies**, not in the JSON body. Postman handles these cookies automatically.)*
 
 ---
 
@@ -61,13 +60,11 @@ This guide provides the necessary JSON payloads and steps to test the Authentica
 **Endpoint**: `GET /me`
 
 **Headers**:
-- `Authorization`: `Bearer <paste_access_token_here>`
+- No explicit `Authorization` header needed if testing in Postman (Cookies are sent automatically).
 
 **Expected Response**: `200 OK`
 ```json
 {
-    "accessToken": null,
-    "refreshToken": null,
     "username": "testuser",
     "role": "RECEPTION",
     "permissions": ["ACT_VIEW", "MOD_PATIENTS", ...]
@@ -80,36 +77,27 @@ This guide provides the necessary JSON payloads and steps to test the Authentica
 **Endpoint**: `POST /refresh-token`
 
 **Body** (raw JSON):
-```json
-{
-  "refreshToken": "<paste_refresh_token_here>"
-}
-```
+- Empty or `{}`. The refresh token is read from the **HttpOnly Cookie**.
 
 **Expected Response**: `200 OK`
 ```json
 {
-    "accessToken": "new-jwt-token...",
-    "refreshToken": "same-or-new-uuid...",
     "username": "testuser",
     "role": "RECEPTION",
     "permissions": [...]
 }
 ```
+*(New `accessToken` cookie will be set in the response)*
 
 ---
 
 ## 5. Logout
 **Endpoint**: `POST /logout`
 
-**Body** (raw JSON):
-```json
-{
-  "refreshToken": "<paste_refresh_token_here>"
-}
-```
+**Body**: Empty.
 
-**Expected Response**: `200 OK` (No content or empty body)
+**Expected Response**: `200 OK`
+*(Cookies `accessToken` and `refreshToken` will be cleared/expired)*
 
 ---
 

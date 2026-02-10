@@ -5,6 +5,10 @@ import com.hms.HospitalManagementSystem.dto.request.RefreshTokenRequest;
 import com.hms.HospitalManagementSystem.dto.request.RegisterRequest;
 import com.hms.HospitalManagementSystem.dto.response.AuthResponse;
 import com.hms.HospitalManagementSystem.service.AuthService;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -21,23 +25,51 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<AuthResponse> register(@RequestBody RegisterRequest request) {
-        return ResponseEntity.ok(authService.register(request));
+    public ResponseEntity<AuthResponse> register(@RequestBody RegisterRequest request,
+            HttpServletResponse response) {
+        return ResponseEntity.ok(authService.register(request, response));
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest request) {
-        return ResponseEntity.ok(authService.login(request));
+    public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest request,
+            HttpServletResponse response) {
+        return ResponseEntity.ok(authService.login(request, response));
     }
 
     @PostMapping("/refresh-token")
-    public ResponseEntity<AuthResponse> refreshToken(@RequestBody RefreshTokenRequest request) {
-        return ResponseEntity.ok(authService.refreshToken(request));
+    public ResponseEntity<AuthResponse> refreshToken(@RequestBody(required = false) RefreshTokenRequest requestBody,
+            HttpServletRequest httpRequest,
+            HttpServletResponse response) {
+        String refreshToken = null;
+
+        // Try getting from body
+        if (requestBody != null && requestBody.getRefreshToken() != null) {
+            refreshToken = requestBody.getRefreshToken();
+        }
+
+        // If not in body, try from cookie
+        if (refreshToken == null && httpRequest.getCookies() != null) {
+            for (jakarta.servlet.http.Cookie cookie : httpRequest.getCookies()) {
+                if ("refreshToken".equals(cookie.getName())) {
+                    refreshToken = cookie.getValue();
+                    break;
+                }
+            }
+        }
+
+        if (refreshToken == null) {
+            throw new RuntimeException("Refresh token is missing!");
+        }
+
+        RefreshTokenRequest request = new RefreshTokenRequest();
+        request.setRefreshToken(refreshToken);
+
+        return ResponseEntity.ok(authService.refreshToken(request, response));
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout(@RequestBody RefreshTokenRequest request) {
-        authService.logout(request);
+    public ResponseEntity<Void> logout(HttpServletResponse response) {
+        authService.logout(response);
         return ResponseEntity.ok().build();
     }
 

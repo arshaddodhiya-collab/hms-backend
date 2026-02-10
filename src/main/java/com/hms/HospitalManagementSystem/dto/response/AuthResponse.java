@@ -3,35 +3,14 @@ package com.hms.HospitalManagementSystem.dto.response;
 import java.util.Set;
 
 public class AuthResponse {
-    private String accessToken;
-    private String refreshToken;
     private String username;
     private String role;
     private Set<String> permissions;
 
-    public AuthResponse(String accessToken, String refreshToken, String username, String role,
-            Set<String> permissions) {
-        this.accessToken = accessToken;
-        this.refreshToken = refreshToken;
+    public AuthResponse(String username, String role, Set<String> permissions) {
         this.username = username;
         this.role = role;
         this.permissions = permissions;
-    }
-
-    public String getAccessToken() {
-        return accessToken;
-    }
-
-    public void setAccessToken(String accessToken) {
-        this.accessToken = accessToken;
-    }
-
-    public String getRefreshToken() {
-        return refreshToken;
-    }
-
-    public void setRefreshToken(String refreshToken) {
-        this.refreshToken = refreshToken;
     }
 
     public String getUsername() {
