@@ -12,7 +12,9 @@ The system is designed for **multi-tenant capability (future-proof)**, **role-ba
 - **ORM**: Spring Data JPA (Hibernate)
 - **Security**: Spring Security 6 + JWT (Stateless)
 - **Documentation**: OpenAPI 3 (Swagger)
-- **Migrations**: Flyway
+- **Documentation**: OpenAPI 3 (Swagger)
+- **Migrations**: Manual (SQL scripts). See [DATABASE_MIGRATION_GUIDE.md](DATABASE_MIGRATION_GUIDE.md)
+- **Logging**: SLF4J + Logback (JSON format for ease of parsing)
 - **Logging**: SLF4J + Logback (JSON format for ease of parsing)
 
 ---
@@ -275,7 +277,7 @@ com.hms.backend
 ```
 
 ## 1️⃣5️⃣ Development Roadmap
-1. **Setup**: Spring Initializr, DB connection, Flyway.
+1. **Setup**: Spring Initializr, DB connection, Manual DB Init.
 2. **Auth**: User Entity, JWT logic, Login Endpoint.
 3. **Patients**: Patient Entity, CRUD APIs, Search.
 4. **Appointments**: Booking logic, validations.

@@ -52,6 +52,8 @@ CREATE DATABASE hospital_db;
     ./mvnw spring-boot:run
     ```
 3.  The application will start and connect to the database. Hibernate will automatically create the necessary tables (`ddl-auto=update`).
+    > **IMPORTANT**: Even though Hibernate updates the schema locally, you **MUST** create a manual SQL migration file for every change. See [DATABASE_MIGRATION_GUIDE.md](DATABASE_MIGRATION_GUIDE.md).
+
 
 ## Troubleshooting
 

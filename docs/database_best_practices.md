@@ -13,6 +13,13 @@ Transactional data (Patient demographics, Admissions, Billing) should be normali
 *   **Why**: Ensures data consistency. Updating a patient's name in one place reflects everywhere.
 *   **Example**: Separate `Patients`, `Visits`, and `Diagnosis` tables rather than one giant flat table.
 
+### Migration Discipline
+**CRITICAL RULE**: Any change to the database schema (tables, columns, indexes) **MUST** be done via a **NEW** migration file.
+*   **Why**: To ensure all developers and production environments can apply changes deterministically.
+*   **How**: Create a new `.sql` file in `hms-backend/db/migration/` (e.g., `V2__add_email_to_users.sql`).
+*   **Reference**: See [DATABASE_MIGRATION_GUIDE.md](DATABASE_MIGRATION_GUIDE.md) for full details.
+
+
 ### Selective Denormalization for Reporting
 Do **not** run complex aggregations on your transactional (OLTP) tables during peak hours.
 *   **Strategy**: Create specific "Summary Tables" or "Materialized Views" for dashboards (e.g., `DailyRevenue`, `BedOccupancySnapshot`).
