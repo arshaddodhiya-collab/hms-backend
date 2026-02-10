@@ -40,31 +40,8 @@ public class AuthController {
     public ResponseEntity<AuthResponse> refreshToken(@RequestBody(required = false) RefreshTokenRequest requestBody,
             HttpServletRequest httpRequest,
             HttpServletResponse response) {
-        String refreshToken = null;
 
-        // Try getting from body
-        if (requestBody != null && requestBody.getRefreshToken() != null) {
-            refreshToken = requestBody.getRefreshToken();
-        }
-
-        // If not in body, try from cookie
-        if (refreshToken == null && httpRequest.getCookies() != null) {
-            for (jakarta.servlet.http.Cookie cookie : httpRequest.getCookies()) {
-                if ("refreshToken".equals(cookie.getName())) {
-                    refreshToken = cookie.getValue();
-                    break;
-                }
-            }
-        }
-
-        if (refreshToken == null) {
-            throw new RuntimeException("Refresh token is missing!");
-        }
-
-        RefreshTokenRequest request = new RefreshTokenRequest();
-        request.setRefreshToken(refreshToken);
-
-        return ResponseEntity.ok(authService.refreshToken(request, response));
+        return ResponseEntity.ok(authService.refreshToken(requestBody, httpRequest, response));
     }
 
     @PostMapping("/logout")

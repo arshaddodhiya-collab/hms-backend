@@ -8,6 +8,7 @@ import com.hms.HospitalManagementSystem.entity.*;
 import com.hms.HospitalManagementSystem.repository.*;
 import com.hms.HospitalManagementSystem.security.CustomUserDetailsService;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -118,21 +119,30 @@ public class AuthService {
         return new AuthResponse(user.getUsername(), roleName, permissions);
     }
 
-    public AuthResponse refreshToken(RefreshTokenRequest request, HttpServletResponse response) {
-        String requestRefreshToken = request.getRefreshToken();
-        // If coming from body, use it. If null, maybe check cookie?
-        // For now adhering to request body for refresh token lookup if provided,
-        // but typically refresh endpoint also reads from cookie in this pattern.
-        // Let's assume the Filter might not have intercepted it for this specific
-        // endpoint wrapper.
-        // But commonly refresh token is also a cookie.
-        // The prompt implies "use the cookie for access and refresh token".
-        // So this method might need to extract from cookie if not in body?
-        // Let's stick to the current flow -> usually the client sends the refresh token
-        // cookie.
-        // Getting it from request object would be better.
+    public AuthResponse refreshToken(RefreshTokenRequest requestBody, jakarta.servlet.http.HttpServletRequest request,
+            HttpServletResponse response) {
+        String refreshToken = null;
 
-        return refreshTokenRepository.findByToken(requestRefreshToken)
+        // 1. Try getting from body
+        if (requestBody != null && requestBody.getRefreshToken() != null) {
+            refreshToken = requestBody.getRefreshToken();
+        }
+
+        // 2. If not in body, try from cookie
+        if (refreshToken == null && request.getCookies() != null) {
+            for (jakarta.servlet.http.Cookie cookie : request.getCookies()) {
+                if ("refreshToken".equals(cookie.getName())) {
+                    refreshToken = cookie.getValue();
+                    break;
+                }
+            }
+        }
+
+        if (refreshToken == null) {
+            throw new RuntimeException("Refresh token is missing!");
+        }
+
+        return refreshTokenRepository.findByToken(refreshToken)
                 .map(this::verifyExpiration)
                 .map(RefreshToken::getUser)
                 .map(user -> {
