@@ -24,4 +24,5 @@ public class PatientResponse {
     private String email;
     private String address;
     private String avatar;
+    private LocalDate lastVisit;
 }

@@ -31,6 +31,7 @@ public interface PatientMapper {
     @Mapping(target = "age", expression = "java(calculateAge(patient.getDob()))")
     PatientDetailsResponse toDetailsResponse(Patient patient);
 
+    @Mapping(source = "conditionName", target = "condition")
     MedicalHistoryDto toMedicalHistoryDto(MedicalHistory medicalHistory);
 
     @Mapping(target = "id", ignore = true) // ID from path variable usually

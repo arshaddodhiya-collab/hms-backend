@@ -14,7 +14,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class MedicalHistoryDto {
     private Long id;
-    private String conditionName;
+    private String condition;
     private LocalDate diagnosedDate;
     private MedicalHistory.Status status;
 }
