@@ -104,7 +104,7 @@ public class AuthService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
         UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUsername());
 
-        String accessToken = jwtService.generateToken(userDetails);
+        String accessToken = jwtService.generateTokenWithUserId(userDetails, user.getId());
         String refreshToken = createRefreshToken(user).getToken();
 
         addTokenCookie(response, "accessToken", accessToken, jwtExpiration / 1000);
@@ -145,7 +145,7 @@ public class AuthService {
                 .map(RefreshToken::getUser)
                 .map(user -> {
                     UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUsername());
-                    String accessToken = jwtService.generateToken(userDetails);
+                    String accessToken = jwtService.generateTokenWithUserId(userDetails, user.getId());
 
                     addTokenCookie(response, "accessToken", accessToken, jwtExpiration / 1000);
 
