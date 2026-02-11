@@ -1,3 +1,5 @@
+DROP TABLE IF EXISTS appointments;
+
 CREATE TABLE appointments (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     patient_id BIGINT NOT NULL,

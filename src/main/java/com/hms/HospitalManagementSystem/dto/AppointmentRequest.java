@@ -11,4 +11,5 @@ public class AppointmentRequest {
     private LocalDateTime endDateTime;
     private String type; // CONSULTATION, FOLLOW_UP, etc.
     private String reason;
+    private String status;
 }

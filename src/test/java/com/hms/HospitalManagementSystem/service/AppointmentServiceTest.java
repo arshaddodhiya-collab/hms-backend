@@ -83,7 +83,8 @@ class AppointmentServiceTest {
         when(userRepository.findById(1L)).thenReturn(Optional.of(doctor));
         when(appointmentRepository.existsOverlappingAppointment(any(), any(), any())).thenReturn(true);
 
-        assertThrows(RuntimeException.class, () -> appointmentService.bookAppointment(request));
+        assertThrows(com.hms.HospitalManagementSystem.exception.ConflictException.class,
+                () -> appointmentService.bookAppointment(request));
         verify(appointmentRepository, never()).save(any(Appointment.class));
     }
 }

@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -55,6 +56,34 @@ public class AppointmentService {
     }
 
     @Transactional
+    public Appointment updateAppointment(Long id, AppointmentRequest request) {
+        Appointment appointment = appointmentRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Appointment not found"));
+
+        // Validate Doctor if changed
+        if (!appointment.getDoctor().getId().equals(request.getDoctorId())) {
+            var doctor = userRepository.findById(request.getDoctorId())
+                    .orElseThrow(() -> new RuntimeException("Doctor not found"));
+            appointment.setDoctor(doctor);
+        }
+
+        appointment.setStartDateTime(request.getStartDateTime());
+        appointment.setEndDateTime(request.getEndDateTime());
+        appointment.setType(AppointmentType.valueOf(request.getType()));
+        appointment.setReason(request.getReason());
+
+        if (request.getStatus() != null) {
+            try {
+                appointment.setStatus(AppointmentStatus.valueOf(request.getStatus()));
+            } catch (IllegalArgumentException e) {
+                // Ignore invalid status or throw error
+            }
+        }
+
+        return appointmentRepository.save(appointment);
+    }
+
+    @Transactional
     public Appointment cancelAppointment(Long id, String reason) {
         Appointment appointment = appointmentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Appointment not found"));
@@ -81,8 +110,20 @@ public class AppointmentService {
         return appointmentRepository.save(appointment);
     }
 
-    public List<Appointment> getDoctorAppointments(Long doctorId, java.time.LocalDateTime start,
-            java.time.LocalDateTime end) {
+    public List<Appointment> getDoctorAppointments(Long doctorId, LocalDateTime start, LocalDateTime end) {
         return appointmentRepository.findByDoctorIdAndStartDateTimeBetween(doctorId, start, end);
+    }
+
+    public List<Appointment> getAllAppointments() {
+        return appointmentRepository.findAll();
+    }
+
+    public List<Appointment> getAppointmentsByDate(LocalDateTime start, LocalDateTime end) {
+        return appointmentRepository.findByStartDateTimeBetween(start, end);
+    }
+
+    public Appointment getAppointmentById(Long id) {
+        return appointmentRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Appointment not found"));
     }
 }

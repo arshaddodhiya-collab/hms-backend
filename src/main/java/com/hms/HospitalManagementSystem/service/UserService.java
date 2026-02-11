@@ -38,6 +38,12 @@ public class UserService {
         return mapToDto(user);
     }
 
+    public List<UserDto> getUsersByRole(String roleName) {
+        return userRepository.findByRoles_Name(roleName).stream()
+                .map(this::mapToDto)
+                .collect(Collectors.toList());
+    }
+
     public UserDto createUser(UserDto dto) {
         if (userRepository.findByUsername(dto.getUsername()).isPresent()) {
             throw new RuntimeException("Username already exists: " + dto.getUsername());

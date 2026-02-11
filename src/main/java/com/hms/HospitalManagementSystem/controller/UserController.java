@@ -23,6 +23,12 @@ public class UserController {
         return ResponseEntity.ok(userService.getAllUsers());
     }
 
+    @GetMapping("/doctors")
+    @PreAuthorize("hasAnyAuthority('CMP_ADMIN_USER_READ', 'CMP_APPOINTMENT_CREATE', 'CMP_APPOINTMENT_READ')")
+    public ResponseEntity<List<UserDto>> getDoctors() {
+        return ResponseEntity.ok(userService.getUsersByRole("DOCTOR"));
+    }
+
     @GetMapping("/{id}")
     @PreAuthorize("hasAuthority('CMP_ADMIN_USER_READ')")
     public ResponseEntity<UserDto> getUserById(@org.springframework.web.bind.annotation.PathVariable Long id) {
