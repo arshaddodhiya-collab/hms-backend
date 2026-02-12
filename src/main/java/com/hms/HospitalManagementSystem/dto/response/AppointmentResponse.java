@@ -17,4 +17,10 @@ public class AppointmentResponse {
     private String status;
     private String type;
     private String reason;
+    private String notes;
+    private String cancelReason;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+    private boolean hasEncounter;
+    private String encounterStatus;
 }

@@ -1,6 +1,7 @@
 package com.hms.HospitalManagementSystem.repository;
 
 import com.hms.HospitalManagementSystem.entity.Appointment;
+import com.hms.HospitalManagementSystem.enums.AppointmentStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -28,4 +29,17 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
         boolean existsOverlappingAppointment(@Param("doctorId") Long doctorId,
                         @Param("startDateTime") LocalDateTime startDateTime,
                         @Param("endDateTime") LocalDateTime endDateTime);
+
+        // New methods for integrity analysis
+        List<Appointment> findByStatusAndDeletedFalseOrderByStartDateTimeAsc(AppointmentStatus status);
+
+        List<Appointment> findByDoctorIdAndStatusAndDeletedFalseOrderByStartDateTimeAsc(Long doctorId,
+                        AppointmentStatus status);
+
+        List<Appointment> findByPatientIdAndStatus(Long patientId, AppointmentStatus status);
+
+        List<Appointment> findByDoctorIdAndStartDateTimeBetweenAndDeletedFalse(Long doctorId, LocalDateTime start,
+                        LocalDateTime end);
+
+        List<Appointment> findByStartDateTimeBetweenAndDeletedFalse(LocalDateTime start, LocalDateTime end);
 }

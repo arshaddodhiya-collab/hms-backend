@@ -25,4 +25,9 @@ public class PatientResponse {
     private String address;
     private String avatar;
     private LocalDate lastVisit;
+    private String allergies;
+
+    public String getName() {
+        return firstName + " " + lastName;
+    }
 }

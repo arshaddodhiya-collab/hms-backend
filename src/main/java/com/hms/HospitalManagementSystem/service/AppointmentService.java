@@ -7,6 +7,9 @@ import com.hms.HospitalManagementSystem.enums.AppointmentType;
 import com.hms.HospitalManagementSystem.repository.AppointmentRepository;
 import com.hms.HospitalManagementSystem.repository.PatientRepository;
 import com.hms.HospitalManagementSystem.repository.UserRepository;
+import com.hms.HospitalManagementSystem.exception.ResourceNotFoundException;
+import com.hms.HospitalManagementSystem.exception.ConflictException;
+import com.hms.HospitalManagementSystem.exception.ValidationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,12 +27,31 @@ public class AppointmentService {
 
     @Transactional
     public Appointment bookAppointment(AppointmentRequest request) {
+        // 0. Validate Input
+        LocalDateTime now = LocalDateTime.now();
+        if (request.getStartDateTime().isBefore(now)) {
+            throw new ValidationException("Appointment time must be in the future");
+        }
+
+        if (request.getEndDateTime().isBefore(request.getStartDateTime())) {
+            throw new ValidationException("End time must be after start time");
+        }
+
+        long durationMinutes = java.time.Duration.between(
+                request.getStartDateTime(),
+                request.getEndDateTime()).toMinutes();
+
+        if (durationMinutes < 15 || durationMinutes > 120) {
+            throw new ValidationException(
+                    "Appointment duration must be between 15 and 120 minutes");
+        }
+
         // 1. Validate Doctor and Patient
         var patient = patientRepository.findById(request.getPatientId())
-                .orElseThrow(() -> new RuntimeException("Patient not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Patient not found"));
 
         var doctor = userRepository.findById(request.getDoctorId())
-                .orElseThrow(() -> new RuntimeException("Doctor not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Doctor not found"));
 
         // 2. Validate Overlaps
         boolean hasOverlap = appointmentRepository.existsOverlappingAppointment(
@@ -38,7 +60,7 @@ public class AppointmentService {
                 request.getEndDateTime());
 
         if (hasOverlap) {
-            throw new RuntimeException("Doctor is not available at this time");
+            throw new ConflictException("Doctor is not available at this time");
         }
 
         // 3. Create Appointment
@@ -58,13 +80,26 @@ public class AppointmentService {
     @Transactional
     public Appointment updateAppointment(Long id, AppointmentRequest request) {
         Appointment appointment = appointmentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Appointment not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Appointment not found"));
 
         // Validate Doctor if changed
         if (!appointment.getDoctor().getId().equals(request.getDoctorId())) {
+            // Check for encounter (stubbed)
+            if (appointment.hasEncounter()) {
+                throw new ConflictException("Cannot change doctor after encounter has been created");
+            }
+
             var doctor = userRepository.findById(request.getDoctorId())
-                    .orElseThrow(() -> new RuntimeException("Doctor not found"));
+                    .orElseThrow(() -> new ResourceNotFoundException("Doctor not found"));
             appointment.setDoctor(doctor);
+        }
+
+        // Prevent time change if encounter is active (stubbed)
+        if (appointment.hasActiveEncounter()) {
+            if (!appointment.getStartDateTime().equals(request.getStartDateTime()) ||
+                    !appointment.getEndDateTime().equals(request.getEndDateTime())) {
+                throw new ConflictException("Cannot change appointment time while encounter is active");
+            }
         }
 
         appointment.setStartDateTime(request.getStartDateTime());
@@ -86,10 +121,15 @@ public class AppointmentService {
     @Transactional
     public Appointment cancelAppointment(Long id, String reason) {
         Appointment appointment = appointmentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Appointment not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Appointment not found"));
+
+        if (appointment.hasActiveEncounter()) {
+            throw new ConflictException(
+                    "Cannot cancel appointment with active encounter. Complete or close the encounter first.");
+        }
 
         if (appointment.getStatus() == AppointmentStatus.COMPLETED) {
-            throw new RuntimeException("Cannot cancel a completed appointment");
+            throw new ConflictException("Cannot cancel a completed appointment");
         }
 
         appointment.setStatus(AppointmentStatus.CANCELLED);
@@ -100,18 +140,86 @@ public class AppointmentService {
     @Transactional
     public Appointment checkIn(Long id) {
         Appointment appointment = appointmentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Appointment not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Appointment not found"));
 
         if (appointment.getStatus() != AppointmentStatus.SCHEDULED) {
-            throw new RuntimeException("Only SCHEDULED appointments can be checked in");
+            throw new ConflictException("Only SCHEDULED appointments can be checked in");
         }
 
         appointment.setStatus(AppointmentStatus.CHECKED_IN);
         return appointmentRepository.save(appointment);
     }
 
+    @Transactional
+    public Appointment startConsultation(Long id) {
+        Appointment appointment = appointmentRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Appointment not found"));
+
+        if (appointment.getStatus() != AppointmentStatus.CHECKED_IN) {
+            throw new ConflictException("Only CHECKED_IN appointments can start consultation");
+        }
+
+        appointment.setStatus(AppointmentStatus.IN_PROGRESS);
+        return appointmentRepository.save(appointment);
+    }
+
+    @Transactional
+    public Appointment completeAppointment(Long id) {
+        Appointment appointment = appointmentRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Appointment not found"));
+
+        if (appointment.getStatus() != AppointmentStatus.IN_PROGRESS) {
+            throw new ConflictException("Only IN_PROGRESS appointments can be completed");
+        }
+
+        // Verify encounter is completed (stubbed)
+        if (appointment.hasActiveEncounter()) { // logic slightly different in stub, basically checks if encounter is
+                                                // NOT completed
+            throw new ConflictException("Cannot complete appointment before encounter is completed");
+        }
+
+        appointment.setStatus(AppointmentStatus.COMPLETED);
+        return appointmentRepository.save(appointment);
+    }
+
+    @Transactional
+    public Appointment markNoShow(Long id) {
+        Appointment appointment = appointmentRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Appointment not found"));
+
+        if (appointment.getStatus() == AppointmentStatus.COMPLETED) {
+            throw new ConflictException("Cannot mark completed appointment as no-show");
+        }
+
+        appointment.setStatus(AppointmentStatus.NO_SHOW);
+        return appointmentRepository.save(appointment);
+    }
+
+    @Transactional
+    public void softDeleteAppointment(Long id) {
+        Appointment appointment = appointmentRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Appointment not found"));
+
+        if (appointment.hasActiveEncounter()) {
+            throw new ConflictException("Cannot delete appointment with active encounter");
+        }
+
+        appointment.setDeleted(true);
+        appointmentRepository.save(appointment);
+    }
+
+    @Transactional
+    public Appointment restoreAppointment(Long id) {
+        Appointment appointment = appointmentRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Appointment not found"));
+
+        appointment.setDeleted(false);
+        return appointmentRepository.save(appointment);
+    }
+
     public List<Appointment> getDoctorAppointments(Long doctorId, LocalDateTime start, LocalDateTime end) {
-        return appointmentRepository.findByDoctorIdAndStartDateTimeBetween(doctorId, start, end);
+        // TODO: Validate current user is doctor or admin
+        return appointmentRepository.findByDoctorIdAndStartDateTimeBetweenAndDeletedFalse(doctorId, start, end);
     }
 
     public List<Appointment> getAllAppointments() {
@@ -119,11 +227,19 @@ public class AppointmentService {
     }
 
     public List<Appointment> getAppointmentsByDate(LocalDateTime start, LocalDateTime end) {
-        return appointmentRepository.findByStartDateTimeBetween(start, end);
+        return appointmentRepository.findByStartDateTimeBetweenAndDeletedFalse(start, end);
     }
 
     public Appointment getAppointmentById(Long id) {
         return appointmentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Appointment not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Appointment not found"));
+    }
+
+    public List<Appointment> getPatientAppointments(Long patientId) {
+        return appointmentRepository.findByPatientId(patientId);
+    }
+
+    public List<Appointment> getPatientAppointmentsByStatus(Long patientId, AppointmentStatus status) {
+        return appointmentRepository.findByPatientIdAndStatus(patientId, status);
     }
 }

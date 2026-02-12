@@ -79,4 +79,17 @@ public class Appointment implements Serializable {
     protected void onUpdate() {
         this.updatedAt = LocalDateTime.now();
     }
+
+    // Stubbed helper methods for Encounter integration
+    public boolean hasEncounter() {
+        // TODO: Implement when Encounter entity is available
+        return false;
+    }
+
+    public boolean hasActiveEncounter() {
+        // TODO: Implement when Encounter entity is available
+        // return encounter != null && encounter.getStatus() !=
+        // EncounterStatus.COMPLETED;
+        return false;
+    }
 }
