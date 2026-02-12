@@ -24,9 +24,11 @@ public class AppointmentService {
     private final AppointmentRepository appointmentRepository;
     private final PatientRepository patientRepository;
     private final UserRepository userRepository;
+    private final com.hms.HospitalManagementSystem.repository.EncounterRepository encounterRepository;
 
     @Transactional
     public Appointment bookAppointment(AppointmentRequest request) {
+        // ... (existing code)
         // 0. Validate Input
         LocalDateTime now = LocalDateTime.now();
         if (request.getStartDateTime().isBefore(now)) {
@@ -147,7 +149,21 @@ public class AppointmentService {
         }
 
         appointment.setStatus(AppointmentStatus.CHECKED_IN);
-        return appointmentRepository.save(appointment);
+        Appointment savedAppointment = appointmentRepository.save(appointment);
+
+        // Create Encounter for Triage
+        com.hms.HospitalManagementSystem.entity.Encounter encounter = com.hms.HospitalManagementSystem.entity.Encounter
+                .builder()
+                .appointment(savedAppointment)
+                .patient(savedAppointment.getPatient())
+                .doctor(savedAppointment.getDoctor())
+                .status(com.hms.HospitalManagementSystem.enums.EncounterStatus.TRIAGE)
+                .startedAt(LocalDateTime.now())
+                .build();
+
+        encounterRepository.save(encounter);
+
+        return savedAppointment;
     }
 
     @Transactional

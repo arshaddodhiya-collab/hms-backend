@@ -8,6 +8,7 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AuthResponse {
+    private Long id;
     private String username;
     private String role;
     private Set<String> permissions;

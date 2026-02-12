@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.hms.HospitalManagementSystem.enums.PrescriptionStatus;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -157,6 +158,15 @@ public class EncounterService {
     }
 
     public List<Encounter> getDoctorQueue(Long doctorId) {
-        return encounterRepository.findByDoctorIdAndStatus(doctorId, EncounterStatus.IN_PROGRESS);
+        // Return encounters in both TRIAGE and IN_PROGRESS status
+        // This follows HMIS standards where encounters appear in consultation queue
+        // immediately after triage is completed (vitals recorded)
+        return encounterRepository.findByDoctorIdAndStatusIn(
+                doctorId,
+                Arrays.asList(EncounterStatus.TRIAGE, EncounterStatus.IN_PROGRESS));
+    }
+
+    public List<Encounter> getPatientEncounters(Long patientId) {
+        return encounterRepository.findByPatientId(patientId);
     }
 }

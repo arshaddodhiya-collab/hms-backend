@@ -3,6 +3,7 @@ package com.hms.HospitalManagementSystem.controller;
 import com.hms.HospitalManagementSystem.dto.request.EncounterCreateRequest;
 import com.hms.HospitalManagementSystem.dto.request.EncounterUpdateRequest;
 import com.hms.HospitalManagementSystem.dto.response.EncounterResponse;
+import com.hms.HospitalManagementSystem.dto.response.VitalsResponse;
 import com.hms.HospitalManagementSystem.entity.Encounter;
 import com.hms.HospitalManagementSystem.entity.User;
 import com.hms.HospitalManagementSystem.service.EncounterService;
@@ -32,6 +33,13 @@ public class EncounterController {
                 request.getAppointmentId(),
                 request.getPatientId(),
                 request.getDoctorId());
+        return ResponseEntity.ok(mapToResponse(encounter));
+    }
+
+    @GetMapping("/{id}/clinical-notes")
+    @PreAuthorize("hasAuthority('CMP_CONSULTATION_READ')")
+    public ResponseEntity<EncounterResponse> getClinicalNotes(@PathVariable Long id) {
+        Encounter encounter = encounterService.getEncounterById(id);
         return ResponseEntity.ok(mapToResponse(encounter));
     }
 
@@ -91,6 +99,15 @@ public class EncounterController {
                 .collect(Collectors.toList()));
     }
 
+    @GetMapping("/patient/{patientId}")
+    @PreAuthorize("hasAnyAuthority('CMP_CONSULTATION_READ', 'CMP_PATIENT_VIEW')")
+    public ResponseEntity<List<EncounterResponse>> getPatientEncounters(@PathVariable Long patientId) {
+        List<Encounter> encounters = encounterService.getPatientEncounters(patientId);
+        return ResponseEntity.ok(encounters.stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList()));
+    }
+
     private Long getCurrentUserId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
@@ -109,17 +126,42 @@ public class EncounterController {
     }
 
     private EncounterResponse mapToResponse(Encounter encounter) {
+        VitalsResponse vitalsResponse = null;
+        if (encounter.getVitals() != null) {
+            vitalsResponse = VitalsResponse.builder()
+                    .id(encounter.getVitals().getId())
+                    .encounterId(encounter.getId())
+                    .temperature(encounter.getVitals().getTemperature())
+                    .systolic(encounter.getVitals().getSystolic())
+                    .diastolic(encounter.getVitals().getDiastolic())
+                    .pulse(encounter.getVitals().getPulse())
+                    .spo2(encounter.getVitals().getSpo2())
+                    .weight(encounter.getVitals().getWeight())
+                    .height(encounter.getVitals().getHeight())
+                    .bmi(encounter.getVitals().getBmi())
+                    .recordedAt(encounter.getVitals().getRecordedAt())
+                    .recordedBy(encounter.getVitals().getRecordedBy() != null
+                            ? encounter.getVitals().getRecordedBy().getFullName()
+                            : null)
+                    .build();
+        }
+
         return EncounterResponse.builder()
                 .id(encounter.getId())
                 .appointmentId(encounter.getAppointment().getId())
                 .patientId(encounter.getPatient().getId())
+                .patientName(encounter.getPatient().getFirstName() + " " + encounter.getPatient().getLastName())
+                .patientGender(encounter.getPatient().getGender().name())
+                .patientDob(encounter.getPatient().getDob().toString())
                 .doctorId(encounter.getDoctor().getId())
+                .doctorName(encounter.getDoctor().getFullName())
                 .status(encounter.getStatus().name())
                 .chiefComplaint(encounter.getChiefComplaint())
                 .diagnosis(encounter.getDiagnosis())
                 .notes(encounter.getNotes())
                 .startedAt(encounter.getStartedAt())
                 .completedAt(encounter.getCompletedAt())
+                .vitals(vitalsResponse)
                 .build();
     }
 }

@@ -67,6 +67,7 @@ public class DataInitializer implements CommandLineRunner {
                 "CMP_PATIENT_ADD", "CMP_PATIENT_LIST", "CMP_PATIENT_VIEW", "CMP_PATIENT_EDIT",
                 "CMP_APPOINTMENT_LIST", "CMP_APPOINTMENT_CREATE", "CMP_APPOINTMENT_VIEW", "CMP_APPOINTMENT_EDIT",
                 "CMP_CONSULTATION_READ", "CMP_CONSULTATION_WRITE",
+                "CMP_PRESCRIPTION_READ", "CMP_PRESCRIPTION_WRITE",
                 "CMP_LAB_ENTRY", "CMP_LAB_READ",
                 "CMP_BILLING_SUMMARY", "CMP_INVOICE_GENERATE", "CMP_PAYMENT_RECEIPT",
                 "CMP_ADMIN_DEPT_READ", "CMP_ADMIN_DEPT_WRITE", "CMP_ADMIN_DEPT_DELETE",
@@ -92,6 +93,7 @@ public class DataInitializer implements CommandLineRunner {
                 "CMP_PATIENT_ADD", "CMP_PATIENT_LIST", "CMP_PATIENT_VIEW", "CMP_PATIENT_EDIT",
                 "CMP_APPOINTMENT_LIST", "CMP_APPOINTMENT_CREATE", "CMP_APPOINTMENT_VIEW", "CMP_APPOINTMENT_EDIT",
                 "CMP_CONSULTATION_READ", "CMP_CONSULTATION_WRITE",
+                "CMP_PRESCRIPTION_READ", "CMP_PRESCRIPTION_WRITE",
                 "CMP_LAB_ENTRY", "CMP_LAB_READ",
                 "CMP_BILLING_SUMMARY", "CMP_INVOICE_GENERATE", "CMP_PAYMENT_RECEIPT",
                 "CMP_ADMIN_DEPT_READ", "CMP_ADMIN_DEPT_WRITE",
@@ -106,6 +108,7 @@ public class DataInitializer implements CommandLineRunner {
                 "CMP_APPOINTMENT_LIST", "CMP_APPOINTMENT_VIEW",
                 "CMP_VITALS_READ",
                 "CMP_CONSULTATION_WRITE", "CMP_CONSULTATION_READ",
+                "CMP_PRESCRIPTION_READ", "CMP_PRESCRIPTION_WRITE",
                 "CMP_LAB_READ");
         createOrUpdateRole("DOCTOR", "Medical Doctor", doctorPerms);
 

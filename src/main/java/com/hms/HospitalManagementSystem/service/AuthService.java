@@ -114,7 +114,7 @@ public class AuthService {
         Set<String> permissions = new HashSet<>();
         user.getRoles().forEach(role -> role.getPermissions().forEach(p -> permissions.add(p.getCode())));
 
-        return new AuthResponse(user.getUsername(), roleName, permissions);
+        return new AuthResponse(user.getId(), user.getUsername(), roleName, permissions);
     }
 
     public AuthResponse refreshToken(RefreshTokenRequest requestBody, HttpServletRequest request,
@@ -153,7 +153,7 @@ public class AuthService {
                     Set<String> permissions = new HashSet<>();
                     user.getRoles().forEach(role -> role.getPermissions().forEach(p -> permissions.add(p.getCode())));
 
-                    return new AuthResponse(user.getUsername(), roleName, permissions);
+                    return new AuthResponse(user.getId(), user.getUsername(), roleName, permissions);
                 })
                 .orElseThrow(() -> new RuntimeException("Refresh token is not in database!"));
     }
@@ -174,7 +174,7 @@ public class AuthService {
         Set<String> permissions = new HashSet<>();
         user.getRoles().forEach(role -> role.getPermissions().forEach(p -> permissions.add(p.getCode())));
 
-        return new AuthResponse(user.getUsername(), roleName, permissions);
+        return new AuthResponse(user.getId(), user.getUsername(), roleName, permissions);
     }
 
     private void addTokenCookie(HttpServletResponse response, String name, String value,

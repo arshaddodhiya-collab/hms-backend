@@ -11,10 +11,15 @@ public class EncounterResponse {
     private Long appointmentId;
     private Long patientId;
     private Long doctorId;
+    private String patientName;
+    private String patientGender;
+    private String patientDob;
+    private String doctorName;
     private String status;
     private String chiefComplaint;
     private String diagnosis;
     private String notes;
     private LocalDateTime startedAt;
     private LocalDateTime completedAt;
+    private VitalsResponse vitals;
 }
