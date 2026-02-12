@@ -53,6 +53,13 @@ public class AuthController {
     @GetMapping("/me")
     public ResponseEntity<AuthResponse> getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        // Check if user is authenticated (not anonymous)
+        if (authentication == null || !authentication.isAuthenticated() ||
+                "anonymousUser".equals(authentication.getName())) {
+            return ResponseEntity.status(401).build();
+        }
+
         String username = authentication.getName();
         return ResponseEntity.ok(authService.getCurrentUser(username));
     }
