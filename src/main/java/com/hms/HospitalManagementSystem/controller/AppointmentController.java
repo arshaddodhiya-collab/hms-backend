@@ -44,7 +44,7 @@ public class AppointmentController {
     }
 
     @PutMapping("/{id}/check-in")
-    @PreAuthorize("hasAnyAuthority('MOD_APPOINTMENT_WRITE', 'ROLE_NURSE', 'ROLE_RECEPTIONIST', 'ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('MOD_APPOINTMENT_WRITE', 'ROLE_NURSE', 'ROLE_RECEPTION', 'ROLE_ADMIN')")
     public ResponseEntity<AppointmentResponse> checkInAppointment(@PathVariable Long id) {
         Appointment appointment = appointmentService.checkIn(id);
         return ResponseEntity.ok(mapToResponse(appointment));
@@ -65,7 +65,7 @@ public class AppointmentController {
     }
 
     @PutMapping("/{id}/no-show")
-    @PreAuthorize("hasAnyAuthority('MOD_APPOINTMENT_WRITE', 'ROLE_RECEPTIONIST', 'ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('MOD_APPOINTMENT_WRITE', 'ROLE_RECEPTION', 'ROLE_ADMIN')")
     public ResponseEntity<AppointmentResponse> markNoShow(@PathVariable Long id) {
         Appointment appointment = appointmentService.markNoShow(id);
         return ResponseEntity.ok(mapToResponse(appointment));

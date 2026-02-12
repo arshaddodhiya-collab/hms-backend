@@ -17,8 +17,15 @@ public interface PatientRepository extends JpaRepository<Patient, Long>, JpaSpec
 
     Optional<Patient> findByEmail(String email);
 
-    @Query("SELECT p FROM Patient p WHERE p.firstName = :firstName AND p.lastName = :lastName AND p.dob = :dob AND p.contact = :contact")
-    Optional<Patient> findPotentialDuplicate(@Param("firstName") String firstName,
+    @Query("""
+    SELECT p FROM Patient p
+    WHERE LOWER(TRIM(p.firstName)) = LOWER(TRIM(:firstName))
+      AND LOWER(TRIM(p.lastName)) = LOWER(TRIM(:lastName))
+      AND p.dob = :dob
+      AND p.contact = :contact
+""")
+    Optional<Patient> findPotentialDuplicate(
+            @Param("firstName") String firstName,
             @Param("lastName") String lastName,
             @Param("dob") LocalDate dob,
             @Param("contact") String contact);
