@@ -53,10 +53,13 @@ public class LabController {
     @GetMapping("/lab-requests")
     @PreAuthorize("hasAnyAuthority('CMP_LAB_READ', 'CMP_LAB_ENTRY')")
     public ResponseEntity<List<LabRequestResponse>> getLabQueue(
-            @RequestParam(required = false) List<LabRequestStatus> status) {
+            @RequestParam(required = false) List<LabRequestStatus> status,
+            @RequestParam(required = false) Long encounterId) {
 
         List<LabRequest> requests;
-        if (status != null && !status.isEmpty()) {
+        if (encounterId != null) {
+            requests = labService.getRequestsByEncounter(encounterId);
+        } else if (status != null && !status.isEmpty()) {
             requests = labService.getLabQueue(status);
         } else {
             // Default to active requests if no status provided? Or all?

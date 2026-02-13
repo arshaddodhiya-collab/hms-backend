@@ -93,6 +93,10 @@ public class LabService {
                         .orElseThrow(() -> new RuntimeException("Lab Request not found")));
     }
 
+    public List<LabRequest> getRequestsByEncounter(Long encounterId) {
+        return labRequestRepository.findByEncounterId(encounterId);
+    }
+
     @Transactional
     public LabRequest updateStatus(Long id, LabRequestStatus status) {
         LabRequest labRequest = getLabRequestById(id);
