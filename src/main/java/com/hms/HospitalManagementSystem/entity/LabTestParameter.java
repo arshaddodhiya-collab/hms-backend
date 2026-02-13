@@ -3,50 +3,42 @@ package com.hms.HospitalManagementSystem.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "lab_test_catalog")
+@Table(name = "lab_test_parameters")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class LabTestCatalog {
+public class LabTestParameter {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private String name;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "lab_test_id", nullable = false)
+    private LabTestCatalog labTest;
 
-    @Column(nullable = false, unique = true)
-    private String code;
+    @Column(name = "parameter_name", nullable = false)
+    private String parameterName;
 
-    @Column(nullable = false)
-    private BigDecimal price;
+    private String unit;
 
-    @Column(name = "reference_range", columnDefinition = "TEXT")
+    @Column(name = "reference_range")
     private String referenceRange;
 
     @Column(name = "is_active", nullable = false)
     @Builder.Default
     private boolean active = true;
 
-    @Column(name = "is_deleted", nullable = false)
-    @Builder.Default
-    private boolean deleted = false;
-
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
-
-    @OneToMany(mappedBy = "labTest", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private java.util.List<LabTestParameter> parameters;
 
     @PrePersist
     protected void onCreate() {

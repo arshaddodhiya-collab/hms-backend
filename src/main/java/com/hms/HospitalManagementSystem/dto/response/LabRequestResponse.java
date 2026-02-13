@@ -21,4 +21,6 @@ public class LabRequestResponse {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private List<LabResultResponse> results;
+    private List<LabTestParameterDto> parameters;
+    private String referenceRange;
 }

@@ -112,11 +112,22 @@ public class LabController {
                 .labTestId(request.getLabTest() != null ? request.getLabTest().getId() : null)
                 .testName(request.getTestName())
                 .testCode(request.getLabTest() != null ? request.getLabTest().getCode() : null)
+                .referenceRange(request.getLabTest() != null ? request.getLabTest().getReferenceRange() : null)
                 .status(request.getStatus().name())
                 .technicianNotes(request.getTechnicianNotes())
                 .createdAt(request.getCreatedAt())
                 .updatedAt(request.getUpdatedAt())
                 .results(results)
+                .parameters(request.getLabTest() != null && request.getLabTest().getParameters() != null
+                        ? request.getLabTest().getParameters().stream()
+                                .map(p -> com.hms.HospitalManagementSystem.dto.response.LabTestParameterDto.builder()
+                                        .id(p.getId())
+                                        .parameterName(p.getParameterName())
+                                        .unit(p.getUnit())
+                                        .referenceRange(p.getReferenceRange())
+                                        .build())
+                                .collect(Collectors.toList())
+                        : null)
                 .build();
     }
 

@@ -110,6 +110,11 @@ public class LabService {
     public LabRequest addLabResults(Long requestId, List<LabResultRequest> resultRequests) {
         LabRequest labRequest = getLabRequestById(requestId);
 
+        if (labRequest.getStatus() == LabRequestStatus.COMPLETED
+                || labRequest.getStatus() == LabRequestStatus.CANCELLED) {
+            throw new RuntimeException("Cannot add results to a completed or cancelled request.");
+        }
+
         // Clear existing results or append?
         // User requirement: "Allow multiple result entries per request (if required)"
         // "After results entry: Mark request COMPLETED (if applicable)"
