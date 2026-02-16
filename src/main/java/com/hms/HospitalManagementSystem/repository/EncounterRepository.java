@@ -22,4 +22,8 @@ public interface EncounterRepository extends JpaRepository<Encounter, Long> {
 
     @Query("SELECT e FROM Encounter e WHERE e.doctor.id = :doctorId AND e.status IN :statuses")
     List<Encounter> findByDoctorIdAndStatusIn(Long doctorId, List<EncounterStatus> statuses);
+
+    List<Encounter> findByDoctorIdAndAppointmentIsNotNullAndStatusIn(Long doctorId, List<EncounterStatus> statuses);
+
+    List<Encounter> findByDoctorIdAndAdmissionIsNotNullAndStatusIn(Long doctorId, List<EncounterStatus> statuses);
 }

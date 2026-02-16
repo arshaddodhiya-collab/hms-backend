@@ -197,6 +197,18 @@ public class EncounterService {
                 Arrays.asList(EncounterStatus.TRIAGE, EncounterStatus.IN_PROGRESS));
     }
 
+    public List<Encounter> getOpdDoctorQueue(Long doctorId) {
+        return encounterRepository.findByDoctorIdAndAppointmentIsNotNullAndStatusIn(
+                doctorId,
+                Arrays.asList(EncounterStatus.TRIAGE, EncounterStatus.IN_PROGRESS));
+    }
+
+    public List<Encounter> getIpdDoctorQueue(Long doctorId) {
+        return encounterRepository.findByDoctorIdAndAdmissionIsNotNullAndStatusIn(
+                doctorId,
+                Arrays.asList(EncounterStatus.TRIAGE, EncounterStatus.IN_PROGRESS));
+    }
+
     public List<Encounter> getPatientEncounters(Long patientId) {
         return encounterRepository.findByPatientId(patientId);
     }

@@ -18,6 +18,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -102,6 +103,24 @@ public class EncounterController {
                 .collect(Collectors.toList()));
     }
 
+    @GetMapping("/queue/opd/doctor/{doctorId}")
+    @PreAuthorize("hasAuthority('CMP_CONSULTATION_READ')")
+    public ResponseEntity<List<EncounterResponse>> getOpdDoctorQueue(@PathVariable Long doctorId) {
+        List<Encounter> encounters = encounterService.getOpdDoctorQueue(doctorId);
+        return ResponseEntity.ok(encounters.stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList()));
+    }
+
+    @GetMapping("/queue/ipd/doctor/{doctorId}")
+    @PreAuthorize("hasAuthority('CMP_CONSULTATION_READ')")
+    public ResponseEntity<List<EncounterResponse>> getIpdDoctorQueue(@PathVariable Long doctorId) {
+        List<Encounter> encounters = encounterService.getIpdDoctorQueue(doctorId);
+        return ResponseEntity.ok(encounters.stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList()));
+    }
+
     @GetMapping("/patient/{patientId}")
     @PreAuthorize("hasAnyAuthority('CMP_CONSULTATION_READ', 'CMP_PATIENT_VIEW')")
     public ResponseEntity<List<EncounterResponse>> getPatientEncounters(@PathVariable Long patientId) {
@@ -152,17 +171,36 @@ public class EncounterController {
 
         // Save Vitals if provided
         if (request.getTemperature() != null || request.getSystolic() != null || request.getPulse() != null) {
-            Vitals vitals = Vitals
-                    .builder()
-                    .encounter(encounter)
-                    .temperature(request.getTemperature())
-                    .systolic(request.getSystolic())
-                    .diastolic(request.getDiastolic())
-                    .pulse(request.getPulse())
-                    .spo2(request.getSpo2())
-                    .recordedBy(encounter.getDoctor())
-                    .recordedAt(java.time.LocalDateTime.now())
-                    .build();
+            // Check for existing vitals for this patient
+            Optional<Vitals> existingVitalsOpt = vitalsRepository
+                    .findFirstByEncounterPatientIdOrderByRecordedAtDesc(encounter.getPatient().getId());
+
+            Vitals vitals;
+            if (existingVitalsOpt.isPresent()) {
+                // Update existing vitals
+                vitals = existingVitalsOpt.get();
+                vitals.setEncounter(encounter); // Link to new encounter (Round)
+                vitals.setTemperature(request.getTemperature());
+                vitals.setSystolic(request.getSystolic());
+                vitals.setDiastolic(request.getDiastolic());
+                vitals.setPulse(request.getPulse());
+                vitals.setSpo2(request.getSpo2());
+                vitals.setRecordedBy(encounter.getDoctor());
+                vitals.setRecordedAt(java.time.LocalDateTime.now());
+            } else {
+                // Create new vitals
+                vitals = Vitals
+                        .builder()
+                        .encounter(encounter)
+                        .temperature(request.getTemperature())
+                        .systolic(request.getSystolic())
+                        .diastolic(request.getDiastolic())
+                        .pulse(request.getPulse())
+                        .spo2(request.getSpo2())
+                        .recordedBy(encounter.getDoctor())
+                        .recordedAt(java.time.LocalDateTime.now())
+                        .build();
+            }
             vitalsRepository.save(vitals);
 
             // Re-fetch encounter to include vitals in response (optional but good for UI)

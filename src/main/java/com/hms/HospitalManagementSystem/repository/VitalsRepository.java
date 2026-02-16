@@ -10,4 +10,6 @@ import java.util.Optional;
 public interface VitalsRepository extends JpaRepository<Vitals, Long> {
 
     Optional<Vitals> findByEncounterId(Long encounterId);
+
+    Optional<Vitals> findFirstByEncounterPatientIdOrderByRecordedAtDesc(Long patientId);
 }
