@@ -24,7 +24,7 @@ public class UserController {
     }
 
     @GetMapping("/doctors")
-    @PreAuthorize("hasAnyAuthority('CMP_ADMIN_USER_READ', 'CMP_APPOINTMENT_CREATE', 'CMP_APPOINTMENT_READ')")
+    @PreAuthorize("hasAnyAuthority('CMP_ADMIN_USER_READ', 'CMP_APPOINTMENT_CREATE', 'CMP_APPOINTMENT_READ', 'MOD_PATIENTS', 'MOD_TRIAGE', 'MOD_CONSULTATION')")
     public ResponseEntity<List<UserDto>> getDoctors() {
         return ResponseEntity.ok(userService.getUsersByRole("DOCTOR"));
     }

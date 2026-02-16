@@ -37,6 +37,9 @@ public class Admission {
     @Column(name = "discharge_summary", columnDefinition = "TEXT")
     private String dischargeSummary;
 
+    @Column(columnDefinition = "TEXT")
+    private String advice;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 

@@ -31,6 +31,7 @@ public class AdmissionService {
     private final BedRepository bedRepository;
     private final PatientRepository patientRepository;
     private final UserRepository userRepository;
+    private final BillingService billingService;
     private final IpdMapper ipdMapper;
 
     @Transactional
@@ -89,9 +90,26 @@ public class AdmissionService {
         }
 
         // 1. Update Admission
-        admission.setDischargeDate(LocalDateTime.now());
+        if (request.getDischargeDate() != null && !request.getDischargeDate().isEmpty()) {
+            try {
+                admission.setDischargeDate(LocalDateTime.parse(request.getDischargeDate()));
+            } catch (Exception e) {
+                admission.setDischargeDate(LocalDateTime.now());
+            }
+        } else {
+            admission.setDischargeDate(LocalDateTime.now());
+        }
+
         admission.setStatus(AdmissionStatus.DISCHARGED);
         admission.setDischargeSummary(request.getDischargeSummary());
+
+        if (request.getDiagnosis() != null) {
+            admission.setDiagnosis(request.getDiagnosis());
+        }
+
+        if (request.getAdvice() != null) {
+            admission.setAdvice(request.getAdvice());
+        }
 
         // 2. Release Bed
         Bed bed = admission.getBed();
@@ -100,7 +118,8 @@ public class AdmissionService {
 
         Admission savedAdmission = admissionRepository.save(admission);
 
-        // TODO: Trigger Billing Service Here
+        // 3. Trigger Billing
+        billingService.generateBill(savedAdmission);
 
         return ipdMapper.toAdmissionResponse(savedAdmission);
     }
