@@ -20,6 +20,7 @@ public class LabTestParameter {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "lab_test_id", nullable = false)
+    @com.fasterxml.jackson.annotation.JsonBackReference
     private LabTestCatalog labTest;
 
     @Column(name = "parameter_name", nullable = false)

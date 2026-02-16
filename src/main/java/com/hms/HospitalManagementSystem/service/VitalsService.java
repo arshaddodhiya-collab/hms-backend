@@ -1,6 +1,6 @@
 package com.hms.HospitalManagementSystem.service;
 
-import com.hms.HospitalManagementSystem.dto.request.VitalsRequest;
+// import com.hms.HospitalManagementSystem.dto.request.VitalsRequest;
 // Wait, the analysis defined Vitals Request DTO. I should create DTOs in a separate step or just use a map/params. 
 // Step 4.2 in analysis says Request DTO is JSON.
 // I haven't created DTO classes yet. I should probably create DTOs first or use inner classes/records.
@@ -37,7 +37,7 @@ public class VitalsService {
         private final VitalsRepository vitalsRepository;
         private final EncounterRepository encounterRepository;
         private final UserRepository userRepository;
-        private final EncounterService encounterService; // To create encounter if needed
+        // private final EncounterService encounterService; // To create encounter if needed
 
         @Transactional
         public Vitals saveVitals(Long encounterId, Vitals vitalsData, Long userId) {

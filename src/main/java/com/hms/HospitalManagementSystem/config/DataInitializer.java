@@ -102,7 +102,7 @@ public class DataInitializer implements CommandLineRunner {
 
         // DOCTOR
         List<String> doctorPerms = Arrays.asList(
-                "MOD_DASHBOARD", "MOD_PATIENTS", "MOD_APPOINTMENTS", "MOD_CONSULTATION",
+                "MOD_DASHBOARD", "MOD_PATIENTS", "MOD_APPOINTMENTS", "MOD_CONSULTATION", "MOD_LAB",
                 "ACT_VIEW", "ACT_CREATE", "ACT_EDIT",
                 "CMP_PATIENT_LIST", "CMP_PATIENT_VIEW",
                 "CMP_APPOINTMENT_LIST", "CMP_APPOINTMENT_VIEW",

@@ -46,6 +46,7 @@ public class LabTestCatalog {
     private LocalDateTime updatedAt;
 
     @OneToMany(mappedBy = "labTest", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @com.fasterxml.jackson.annotation.JsonManagedReference
     private java.util.List<LabTestParameter> parameters;
 
     @PrePersist

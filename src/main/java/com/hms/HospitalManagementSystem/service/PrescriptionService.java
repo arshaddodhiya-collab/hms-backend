@@ -3,21 +3,21 @@ package com.hms.HospitalManagementSystem.service;
 import com.hms.HospitalManagementSystem.entity.Encounter;
 import com.hms.HospitalManagementSystem.entity.Prescription;
 import com.hms.HospitalManagementSystem.entity.PrescriptionItem;
-import com.hms.HospitalManagementSystem.entity.User;
+// import com.hms.HospitalManagementSystem.entity.User;
 import com.hms.HospitalManagementSystem.enums.EncounterStatus;
 import com.hms.HospitalManagementSystem.enums.PrescriptionStatus;
 import com.hms.HospitalManagementSystem.exception.ConflictException;
 import com.hms.HospitalManagementSystem.exception.ResourceNotFoundException;
 import com.hms.HospitalManagementSystem.repository.EncounterRepository;
 import com.hms.HospitalManagementSystem.repository.PrescriptionRepository;
-import com.hms.HospitalManagementSystem.repository.UserRepository;
+// import com.hms.HospitalManagementSystem.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
+// import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -25,7 +25,7 @@ public class PrescriptionService {
 
     private final PrescriptionRepository prescriptionRepository;
     private final EncounterRepository encounterRepository;
-    private final UserRepository userRepository;
+    // private final UserRepository userRepository;
 
     @Transactional
     public Prescription savePrescription(Long encounterId, String note, List<PrescriptionItem> itemsData, Long userId) {

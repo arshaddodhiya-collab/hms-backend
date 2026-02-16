@@ -22,14 +22,14 @@ public class AppointmentController {
     private final AppointmentService appointmentService;
 
     @PostMapping("/book")
-    @PreAuthorize("hasAnyAuthority('MOD_APPOINTMENT_WRITE', 'ROLE_RECEPTIONIST', 'ROLE_ADMIN', 'ROLE_PATIENT')")
+    @PreAuthorize("hasAnyAuthority('CMP_APPOINTMENT_CREATE', 'ROLE_RECEPTION', 'ROLE_ADMIN', 'ROLE_PATIENT')")
     public ResponseEntity<AppointmentResponse> bookAppointment(@RequestBody AppointmentRequest request) {
         Appointment appointment = appointmentService.bookAppointment(request);
         return ResponseEntity.ok(mapToResponse(appointment));
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('MOD_APPOINTMENT_WRITE', 'ROLE_RECEPTIONIST', 'ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('CMP_APPOINTMENT_EDIT', 'ROLE_RECEPTION', 'ROLE_ADMIN')")
     public ResponseEntity<AppointmentResponse> updateAppointment(@PathVariable Long id,
             @RequestBody AppointmentRequest request) {
         Appointment appointment = appointmentService.updateAppointment(id, request);
@@ -37,14 +37,14 @@ public class AppointmentController {
     }
 
     @PutMapping("/{id}/cancel")
-    @PreAuthorize("hasAnyAuthority('MOD_APPOINTMENT_WRITE', 'ROLE_RECEPTIONIST', 'ROLE_ADMIN', 'ROLE_PATIENT')")
+    @PreAuthorize("hasAnyAuthority('CMP_APPOINTMENT_EDIT', 'ROLE_RECEPTION', 'ROLE_ADMIN', 'ROLE_PATIENT')")
     public ResponseEntity<AppointmentResponse> cancelAppointment(@PathVariable Long id, @RequestBody String reason) {
         Appointment appointment = appointmentService.cancelAppointment(id, reason);
         return ResponseEntity.ok(mapToResponse(appointment));
     }
 
     @PutMapping("/{id}/check-in")
-    @PreAuthorize("hasAnyAuthority('MOD_APPOINTMENT_WRITE', 'ROLE_NURSE', 'ROLE_RECEPTION', 'ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('CMP_APPOINTMENT_EDIT', 'ROLE_NURSE', 'ROLE_RECEPTION', 'ROLE_ADMIN')")
     public ResponseEntity<AppointmentResponse> checkInAppointment(@PathVariable Long id) {
         Appointment appointment = appointmentService.checkIn(id);
         return ResponseEntity.ok(mapToResponse(appointment));
@@ -65,28 +65,28 @@ public class AppointmentController {
     }
 
     @PutMapping("/{id}/no-show")
-    @PreAuthorize("hasAnyAuthority('MOD_APPOINTMENT_WRITE', 'ROLE_RECEPTION', 'ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('CMP_APPOINTMENT_EDIT', 'ROLE_RECEPTION', 'ROLE_ADMIN')")
     public ResponseEntity<AppointmentResponse> markNoShow(@PathVariable Long id) {
         Appointment appointment = appointmentService.markNoShow(id);
         return ResponseEntity.ok(mapToResponse(appointment));
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('MOD_APPOINTMENT_DELETE', 'ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ACT_DELETE', 'ROLE_ADMIN')")
     public ResponseEntity<Void> deleteAppointment(@PathVariable Long id) {
         appointmentService.softDeleteAppointment(id);
         return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/{id}/restore")
-    @PreAuthorize("hasAnyAuthority('MOD_APPOINTMENT_DELETE', 'ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ACT_DELETE', 'ROLE_ADMIN')")
     public ResponseEntity<AppointmentResponse> restoreAppointment(@PathVariable Long id) {
         Appointment appointment = appointmentService.restoreAppointment(id);
         return ResponseEntity.ok(mapToResponse(appointment));
     }
 
     @GetMapping("/doctor/{doctorId}")
-    @PreAuthorize("hasAnyAuthority('MOD_APPOINTMENT_READ', 'ROLE_DOCTOR', 'ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('CMP_APPOINTMENT_LIST', 'ROLE_DOCTOR', 'ROLE_ADMIN')")
     public ResponseEntity<List<AppointmentResponse>> getDoctorAppointments(
             @PathVariable Long doctorId,
             @RequestParam String date) {
@@ -100,7 +100,7 @@ public class AppointmentController {
     }
 
     @GetMapping("/patient/{patientId}")
-    @PreAuthorize("hasAnyAuthority('MOD_APPOINTMENT_READ', 'ROLE_DOCTOR', 'ROLE_NURSE', 'ROLE_ADMIN', 'ROLE_PATIENT')")
+    @PreAuthorize("hasAnyAuthority('CMP_APPOINTMENT_LIST', 'ROLE_DOCTOR', 'ROLE_NURSE', 'ROLE_ADMIN', 'ROLE_PATIENT')")
     public ResponseEntity<List<AppointmentResponse>> getPatientAppointments(
             @PathVariable Long patientId,
             @RequestParam(required = false) String status) {
@@ -120,7 +120,7 @@ public class AppointmentController {
     }
 
     @GetMapping("/today")
-    @PreAuthorize("hasAnyAuthority('MOD_APPOINTMENT_READ', 'ROLE_RECEPTIONIST', 'ROLE_NURSE', 'ROLE_DOCTOR', 'ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('CMP_APPOINTMENT_LIST', 'ROLE_RECEPTION', 'ROLE_NURSE', 'ROLE_DOCTOR', 'ROLE_ADMIN')")
     public ResponseEntity<List<AppointmentResponse>> getTodayAppointments() {
         LocalDate today = LocalDate.now();
         LocalDateTime start = today.atStartOfDay();
@@ -131,7 +131,7 @@ public class AppointmentController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyAuthority('MOD_APPOINTMENT_READ', 'ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('CMP_APPOINTMENT_LIST', 'ROLE_ADMIN')")
     public ResponseEntity<List<AppointmentResponse>> getAllAppointments() {
         // Find all appointments
         List<Appointment> appointments = appointmentService.getAllAppointments();
@@ -139,7 +139,7 @@ public class AppointmentController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('MOD_APPOINTMENT_READ', 'ROLE_DOCTOR', 'ROLE_NURSE', 'ROLE_RECEPTIONIST', 'ROLE_ADMIN', 'ROLE_PATIENT')")
+    @PreAuthorize("hasAnyAuthority('CMP_APPOINTMENT_VIEW', 'ROLE_DOCTOR', 'ROLE_NURSE', 'ROLE_RECEPTION', 'ROLE_ADMIN', 'ROLE_PATIENT')")
     public ResponseEntity<AppointmentResponse> getAppointmentById(@PathVariable Long id) {
         Appointment appointment = appointmentService.getAppointmentById(id);
         return ResponseEntity.ok(mapToResponse(appointment));
