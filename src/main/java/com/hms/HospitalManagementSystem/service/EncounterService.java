@@ -3,6 +3,7 @@ package com.hms.HospitalManagementSystem.service;
 import com.hms.HospitalManagementSystem.entity.Appointment;
 import com.hms.HospitalManagementSystem.entity.Encounter;
 import com.hms.HospitalManagementSystem.entity.User;
+import com.hms.HospitalManagementSystem.enums.AdmissionStatus;
 import com.hms.HospitalManagementSystem.enums.AppointmentStatus;
 import com.hms.HospitalManagementSystem.enums.EncounterStatus;
 import com.hms.HospitalManagementSystem.enums.PrescriptionStatus;
@@ -28,12 +29,39 @@ public class EncounterService {
     private final EncounterRepository encounterRepository;
     private final AppointmentRepository appointmentRepository;
     private final UserRepository userRepository;
+    private final com.hms.HospitalManagementSystem.repository.AdmissionRepository admissionRepository;
 
     @Transactional
     public Encounter startEncounter(Long appointmentId, Long patientId, Long doctorId) {
         // 1. Check if encounter already exists
         return encounterRepository.findByAppointmentId(appointmentId)
                 .orElseGet(() -> createEncounter(appointmentId, patientId, doctorId));
+    }
+
+    @Transactional
+    public Encounter createRound(Long admissionId, Long doctorId) {
+        // 1. Validate Admission
+        com.hms.HospitalManagementSystem.entity.Admission admission = admissionRepository.findById(admissionId)
+                .orElseThrow(() -> new ResourceNotFoundException("Admission not found"));
+
+        if (admission.getStatus() == AdmissionStatus.DISCHARGED) {
+            throw new ConflictException("Cannot add round for discharged patient");
+        }
+
+        // 2. Validate Doctor
+        User doctor = userRepository.findById(doctorId)
+                .orElseThrow(() -> new ResourceNotFoundException("Doctor not found"));
+
+        // 3. Create Encounter linked to Admission
+        Encounter encounter = Encounter.builder()
+                .admission(admission)
+                .patient(admission.getPatient())
+                .doctor(doctor)
+                .status(EncounterStatus.IN_PROGRESS) // Rounds start directly as In Progress
+                .startedAt(LocalDateTime.now())
+                .build();
+
+        return encounterRepository.save(encounter);
     }
 
     private Encounter createEncounter(Long appointmentId, Long patientId, Long doctorId) {
@@ -93,8 +121,9 @@ public class EncounterService {
 
         if (encounter.getStatus() == EncounterStatus.TRIAGE) {
             encounter.setStatus(EncounterStatus.IN_PROGRESS);
-            // Update appointment status as well
-            if (encounter.getAppointment().getStatus() != AppointmentStatus.IN_PROGRESS) {
+            // Update appointment status as well if present
+            if (encounter.getAppointment() != null
+                    && encounter.getAppointment().getStatus() != AppointmentStatus.IN_PROGRESS) {
                 encounter.getAppointment().setStatus(AppointmentStatus.IN_PROGRESS);
                 appointmentRepository.save(encounter.getAppointment());
             }
@@ -129,9 +158,11 @@ public class EncounterService {
         encounter.setStatus(EncounterStatus.COMPLETED);
         encounter.setCompletedAt(LocalDateTime.now());
 
-        // Update appointment
-        encounter.getAppointment().setStatus(AppointmentStatus.COMPLETED);
-        appointmentRepository.save(encounter.getAppointment());
+        // Update appointment if present
+        if (encounter.getAppointment() != null) {
+            encounter.getAppointment().setStatus(AppointmentStatus.COMPLETED);
+            appointmentRepository.save(encounter.getAppointment());
+        }
 
         // Issue prescriptions
         encounter.getPrescriptions().forEach(p -> {

@@ -6,6 +6,8 @@ import com.hms.HospitalManagementSystem.dto.response.EncounterResponse;
 import com.hms.HospitalManagementSystem.dto.response.VitalsResponse;
 import com.hms.HospitalManagementSystem.entity.Encounter;
 import com.hms.HospitalManagementSystem.entity.User;
+import com.hms.HospitalManagementSystem.entity.Vitals;
+import com.hms.HospitalManagementSystem.repository.VitalsRepository;
 import com.hms.HospitalManagementSystem.service.EncounterService;
 import com.hms.HospitalManagementSystem.service.UserService; // To get current user
 import lombok.RequiredArgsConstructor;
@@ -25,6 +27,7 @@ public class EncounterController {
 
     private final EncounterService encounterService;
     private final UserService userService; // Or helper to get user ID
+    private final VitalsRepository vitalsRepository;
 
     @PostMapping
     @PreAuthorize("hasAnyAuthority('CMP_VITALS_WRITE', 'CMP_CONSULTATION_WRITE')")
@@ -125,6 +128,50 @@ public class EncounterController {
         return user.getId();
     }
 
+    @PostMapping("/rounds")
+    @PreAuthorize("hasAnyAuthority('CMP_VITALS_WRITE', 'CMP_CONSULTATION_WRITE')")
+    public ResponseEntity<EncounterResponse> createRound(
+            @RequestBody com.hms.HospitalManagementSystem.dto.ipd.RoundRequest request) {
+        // Use current user ID as doctor ID if not provided, or validate
+        Long doctorId = request.getDoctorId();
+        if (doctorId == null) {
+            doctorId = getCurrentUserId();
+        }
+
+        Encounter encounter = encounterService.createRound(request.getAdmissionId(), doctorId);
+
+        // If initial notes are provided, update them
+        if (request.getNotes() != null && !request.getNotes().isEmpty()) {
+            encounter = encounterService.updateClinicalNotes(
+                    encounter.getId(),
+                    null,
+                    null,
+                    request.getNotes(),
+                    doctorId);
+        }
+
+        // Save Vitals if provided
+        if (request.getTemperature() != null || request.getSystolic() != null || request.getPulse() != null) {
+            Vitals vitals = Vitals
+                    .builder()
+                    .encounter(encounter)
+                    .temperature(request.getTemperature())
+                    .systolic(request.getSystolic())
+                    .diastolic(request.getDiastolic())
+                    .pulse(request.getPulse())
+                    .spo2(request.getSpo2())
+                    .recordedBy(encounter.getDoctor())
+                    .recordedAt(java.time.LocalDateTime.now())
+                    .build();
+            vitalsRepository.save(vitals);
+
+            // Re-fetch encounter to include vitals in response (optional but good for UI)
+            encounter = encounterService.getEncounterById(encounter.getId());
+        }
+
+        return ResponseEntity.ok(mapToResponse(encounter));
+    }
+
     private EncounterResponse mapToResponse(Encounter encounter) {
         VitalsResponse vitalsResponse = null;
         if (encounter.getVitals() != null) {
@@ -148,7 +195,8 @@ public class EncounterController {
 
         return EncounterResponse.builder()
                 .id(encounter.getId())
-                .appointmentId(encounter.getAppointment().getId())
+                .appointmentId(encounter.getAppointment() != null ? encounter.getAppointment().getId() : null)
+                .admissionId(encounter.getAdmission() != null ? encounter.getAdmission().getId() : null)
                 .patientId(encounter.getPatient().getId())
                 .patientName(encounter.getPatient().getFirstName() + " " + encounter.getPatient().getLastName())
                 .patientGender(encounter.getPatient().getGender().name())

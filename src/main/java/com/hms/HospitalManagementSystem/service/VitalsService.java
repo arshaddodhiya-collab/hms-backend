@@ -37,7 +37,8 @@ public class VitalsService {
         private final VitalsRepository vitalsRepository;
         private final EncounterRepository encounterRepository;
         private final UserRepository userRepository;
-        // private final EncounterService encounterService; // To create encounter if needed
+        // private final EncounterService encounterService; // To create encounter if
+        // needed
 
         @Transactional
         public Vitals saveVitals(Long encounterId, Vitals vitalsData, Long userId) {
