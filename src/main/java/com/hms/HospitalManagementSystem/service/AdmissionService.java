@@ -33,6 +33,7 @@ public class AdmissionService {
     private final UserRepository userRepository;
     private final BillingService billingService;
     private final IpdMapper ipdMapper;
+    private final EncounterService encounterService;
 
     @Transactional
     public AdmissionResponse admitPatient(AdmissionRequest request) {
@@ -76,6 +77,9 @@ public class AdmissionService {
         admission.setStatus(AdmissionStatus.ADMITTED);
 
         admission = admissionRepository.save(admission);
+
+        // 6. Create IPD Encounter
+        encounterService.createIpdEncounter(admission);
 
         return ipdMapper.toAdmissionResponse(admission);
     }

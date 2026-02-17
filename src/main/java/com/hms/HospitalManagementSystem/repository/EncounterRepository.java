@@ -26,4 +26,6 @@ public interface EncounterRepository extends JpaRepository<Encounter, Long> {
     List<Encounter> findByDoctorIdAndAppointmentIsNotNullAndStatusIn(Long doctorId, List<EncounterStatus> statuses);
 
     List<Encounter> findByDoctorIdAndAdmissionIsNotNullAndStatusIn(Long doctorId, List<EncounterStatus> statuses);
+
+    Optional<Encounter> findByAdmissionId(Long admissionId);
 }

@@ -76,12 +76,17 @@ public class Encounter {
     private boolean deleted = false;
 
     // Relationships (Owned)
-    @OneToOne(mappedBy = "encounter", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Vitals vitals;
+    @Builder.Default
+    @OneToMany(mappedBy = "encounter", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Vitals> vitalsList = new ArrayList<>();
 
     @Builder.Default
     @OneToMany(mappedBy = "encounter", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Prescription> prescriptions = new ArrayList<>();
+
+    @Builder.Default
+    @OneToMany(mappedBy = "encounter", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Round> rounds = new ArrayList<>();
 
     // Removed LabRequest for now as per analysis it says "TO BE IMPLEMENTED" (wait,
     // labRequests is in analysis code block, but not implemented in step 1 list.

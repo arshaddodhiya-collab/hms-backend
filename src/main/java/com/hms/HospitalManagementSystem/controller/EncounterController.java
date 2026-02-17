@@ -28,7 +28,7 @@ public class EncounterController {
 
     private final EncounterService encounterService;
     private final UserService userService; // Or helper to get user ID
-    private final VitalsRepository vitalsRepository;
+    // private final VitalsRepository vitalsRepository;
 
     @PostMapping
     @PreAuthorize("hasAnyAuthority('CMP_VITALS_WRITE', 'CMP_CONSULTATION_WRITE')")
@@ -149,86 +149,46 @@ public class EncounterController {
 
     @PostMapping("/rounds")
     @PreAuthorize("hasAnyAuthority('CMP_VITALS_WRITE', 'CMP_CONSULTATION_WRITE')")
-    public ResponseEntity<EncounterResponse> createRound(
+    public ResponseEntity<Void> addRound(
             @RequestBody com.hms.HospitalManagementSystem.dto.ipd.RoundRequest request) {
         // Use current user ID as doctor ID if not provided, or validate
         Long doctorId = request.getDoctorId();
         if (doctorId == null) {
             doctorId = getCurrentUserId();
+            request.setDoctorId(doctorId);
         }
 
-        Encounter encounter = encounterService.createRound(request.getAdmissionId(), doctorId);
-
-        // If initial notes are provided, update them
-        if (request.getNotes() != null && !request.getNotes().isEmpty()) {
-            encounter = encounterService.updateClinicalNotes(
-                    encounter.getId(),
-                    null,
-                    null,
-                    request.getNotes(),
-                    doctorId);
-        }
-
-        // Save Vitals if provided
-        if (request.getTemperature() != null || request.getSystolic() != null || request.getPulse() != null) {
-            // Check for existing vitals for this patient
-            Optional<Vitals> existingVitalsOpt = vitalsRepository
-                    .findFirstByEncounterPatientIdOrderByRecordedAtDesc(encounter.getPatient().getId());
-
-            Vitals vitals;
-            if (existingVitalsOpt.isPresent()) {
-                // Update existing vitals
-                vitals = existingVitalsOpt.get();
-                vitals.setEncounter(encounter); // Link to new encounter (Round)
-                vitals.setTemperature(request.getTemperature());
-                vitals.setSystolic(request.getSystolic());
-                vitals.setDiastolic(request.getDiastolic());
-                vitals.setPulse(request.getPulse());
-                vitals.setSpo2(request.getSpo2());
-                vitals.setRecordedBy(encounter.getDoctor());
-                vitals.setRecordedAt(java.time.LocalDateTime.now());
-            } else {
-                // Create new vitals
-                vitals = Vitals
-                        .builder()
-                        .encounter(encounter)
-                        .temperature(request.getTemperature())
-                        .systolic(request.getSystolic())
-                        .diastolic(request.getDiastolic())
-                        .pulse(request.getPulse())
-                        .spo2(request.getSpo2())
-                        .recordedBy(encounter.getDoctor())
-                        .recordedAt(java.time.LocalDateTime.now())
-                        .build();
-            }
-            vitalsRepository.save(vitals);
-
-            // Re-fetch encounter to include vitals in response (optional but good for UI)
-            encounter = encounterService.getEncounterById(encounter.getId());
-        }
-
-        return ResponseEntity.ok(mapToResponse(encounter));
+        encounterService.addRound(request);
+        return ResponseEntity.ok().build();
     }
 
     private EncounterResponse mapToResponse(Encounter encounter) {
         VitalsResponse vitalsResponse = null;
-        if (encounter.getVitals() != null) {
-            vitalsResponse = VitalsResponse.builder()
-                    .id(encounter.getVitals().getId())
-                    .encounterId(encounter.getId())
-                    .temperature(encounter.getVitals().getTemperature())
-                    .systolic(encounter.getVitals().getSystolic())
-                    .diastolic(encounter.getVitals().getDiastolic())
-                    .pulse(encounter.getVitals().getPulse())
-                    .spo2(encounter.getVitals().getSpo2())
-                    .weight(encounter.getVitals().getWeight())
-                    .height(encounter.getVitals().getHeight())
-                    .bmi(encounter.getVitals().getBmi())
-                    .recordedAt(encounter.getVitals().getRecordedAt())
-                    .recordedBy(encounter.getVitals().getRecordedBy() != null
-                            ? encounter.getVitals().getRecordedBy().getFullName()
-                            : null)
-                    .build();
+        if (encounter.getVitalsList() != null && !encounter.getVitalsList().isEmpty()) {
+            // Get latest vitals
+            Vitals latestVitals = encounter.getVitalsList().stream()
+                    .sorted((v1, v2) -> v2.getRecordedAt().compareTo(v1.getRecordedAt()))
+                    .findFirst()
+                    .orElse(null);
+
+            if (latestVitals != null) {
+                vitalsResponse = VitalsResponse.builder()
+                        .id(latestVitals.getId())
+                        .encounterId(encounter.getId())
+                        .temperature(latestVitals.getTemperature())
+                        .systolic(latestVitals.getSystolic())
+                        .diastolic(latestVitals.getDiastolic())
+                        .pulse(latestVitals.getPulse())
+                        .spo2(latestVitals.getSpo2())
+                        .weight(latestVitals.getWeight())
+                        .height(latestVitals.getHeight())
+                        .bmi(latestVitals.getBmi())
+                        .recordedAt(latestVitals.getRecordedAt())
+                        .recordedBy(latestVitals.getRecordedBy() != null
+                                ? latestVitals.getRecordedBy().getFullName()
+                                : null)
+                        .build();
+            }
         }
 
         return EncounterResponse.builder()
@@ -248,6 +208,31 @@ public class EncounterController {
                 .startedAt(encounter.getStartedAt())
                 .completedAt(encounter.getCompletedAt())
                 .vitals(vitalsResponse)
+                .vitalsHistory(encounter.getVitalsList().stream().map(v -> VitalsResponse.builder()
+                        .id(v.getId())
+                        .encounterId(encounter.getId())
+                        .temperature(v.getTemperature())
+                        .systolic(v.getSystolic())
+                        .diastolic(v.getDiastolic())
+                        .pulse(v.getPulse())
+                        .spo2(v.getSpo2())
+                        .weight(v.getWeight())
+                        .height(v.getHeight())
+                        .bmi(v.getBmi())
+                        .recordedAt(v.getRecordedAt())
+                        .recordedBy(v.getRecordedBy() != null ? v.getRecordedBy().getFullName() : null)
+                        .build()).collect(Collectors.toList()))
+                .rounds(encounter.getRounds().stream()
+                        .map(r -> com.hms.HospitalManagementSystem.dto.response.RoundResponse.builder()
+                                .id(r.getId())
+                                .encounterId(encounter.getId())
+                                .doctorId(r.getDoctor().getId())
+                                .doctorName(r.getDoctor().getFullName())
+                                .notes(r.getNotes())
+                                .createdAt(r.getCreatedAt())
+                                .updatedAt(r.getUpdatedAt())
+                                .build())
+                        .collect(Collectors.toList()))
                 .build();
     }
 }

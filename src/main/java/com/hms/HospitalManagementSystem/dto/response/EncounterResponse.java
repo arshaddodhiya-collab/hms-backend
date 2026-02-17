@@ -23,4 +23,6 @@ public class EncounterResponse {
     private LocalDateTime startedAt;
     private LocalDateTime completedAt;
     private VitalsResponse vitals;
+    private java.util.List<RoundResponse> rounds;
+    private java.util.List<VitalsResponse> vitalsHistory;
 }
