@@ -8,5 +8,5 @@ import java.util.List;
 
 @Repository
 public interface RoundRepository extends JpaRepository<Round, Long> {
-    List<Round> findByEncounterIdOrderByCreatedAtDesc(Long encounterId);
+    List<Round> findByEncounterId(Long encounterId);
 }

@@ -76,32 +76,31 @@ public class Encounter {
     private boolean deleted = false;
 
     // Relationships (Owned)
+    // Vitals History (OneToMany)
     @Builder.Default
     @OneToMany(mappedBy = "encounter", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Vitals> vitalsList = new ArrayList<>();
+    private List<Vitals> vitalsHistory = new ArrayList<>();
 
-    @Builder.Default
-    @OneToMany(mappedBy = "encounter", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Prescription> prescriptions = new ArrayList<>();
-
+    // Rounds (OneToMany)
     @Builder.Default
     @OneToMany(mappedBy = "encounter", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Round> rounds = new ArrayList<>();
 
-    // Removed LabRequest for now as per analysis it says "TO BE IMPLEMENTED" (wait,
-    // labRequests is in analysis code block, but not implemented in step 1 list.
-    // Analysis says LabRequest -> LabResult. But in Step 3.1 code block it shows
-    // LabRequest list.
-    // The user prompts "implement encounter module analysis". The analysis includes
-    // LabRequest in the code block.
-    // However, I don't want to create LabRequest entity if it's not requested or if
-    // it already exists/doesn't exist.
-    // Step 1 list in task.md does NOT mention LabRequest entity.
-    // I will comment it out or omit it for now to avoid errors if LabRequest
-    // doesn't exist. Checking existing files... LabRequest is NOT in the file list
-    // I saw earlier (Patient, Appointment, User, etc). I saw Department,
-    // MedicalHistory... no LabRequest.
-    // So I will omit LabRequest for now.
+    /**
+     * Helper to get the latest vitals.
+     * Assumes vitals are added in chronological order or sorted.
+     */
+    public Vitals getVitals() {
+        if (vitalsHistory == null || vitalsHistory.isEmpty()) {
+            return null;
+        }
+        // Return last added (latest)
+        return vitalsHistory.get(vitalsHistory.size() - 1);
+    }
+
+    @Builder.Default
+    @OneToMany(mappedBy = "encounter", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Prescription> prescriptions = new ArrayList<>();
 
     @PrePersist
     protected void onCreate() {

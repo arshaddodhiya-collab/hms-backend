@@ -3,6 +3,7 @@ package com.hms.HospitalManagementSystem.dto.response;
 import lombok.Builder;
 import lombok.Data;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Builder
@@ -23,6 +24,6 @@ public class EncounterResponse {
     private LocalDateTime startedAt;
     private LocalDateTime completedAt;
     private VitalsResponse vitals;
-    private java.util.List<RoundResponse> rounds;
-    private java.util.List<VitalsResponse> vitalsHistory;
+    private List<RoundResponse> rounds;
+    private List<VitalsResponse> vitalsHistory;
 }

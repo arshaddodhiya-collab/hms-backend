@@ -14,6 +14,7 @@ import com.hms.HospitalManagementSystem.exception.ResourceNotFoundException;
 import com.hms.HospitalManagementSystem.mapper.IpdMapper;
 import com.hms.HospitalManagementSystem.repository.AdmissionRepository;
 import com.hms.HospitalManagementSystem.repository.BedRepository;
+import com.hms.HospitalManagementSystem.repository.EncounterRepository;
 import com.hms.HospitalManagementSystem.repository.PatientRepository;
 import com.hms.HospitalManagementSystem.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +34,7 @@ public class AdmissionService {
     private final UserRepository userRepository;
     private final BillingService billingService;
     private final IpdMapper ipdMapper;
-    private final EncounterService encounterService;
+    private final EncounterRepository encounterRepository;
 
     @Transactional
     public AdmissionResponse admitPatient(AdmissionRequest request) {
@@ -78,8 +79,16 @@ public class AdmissionService {
 
         admission = admissionRepository.save(admission);
 
-        // 6. Create IPD Encounter
-        encounterService.createIpdEncounter(admission);
+        // 6. Create Encounter for Admission
+        com.hms.HospitalManagementSystem.entity.Encounter encounter = com.hms.HospitalManagementSystem.entity.Encounter
+                .builder()
+                .admission(admission)
+                .patient(patient)
+                .doctor(doctor)
+                .status(com.hms.HospitalManagementSystem.enums.EncounterStatus.IN_PROGRESS)
+                .startedAt(LocalDateTime.now())
+                .build();
+        encounterRepository.save(encounter);
 
         return ipdMapper.toAdmissionResponse(admission);
     }

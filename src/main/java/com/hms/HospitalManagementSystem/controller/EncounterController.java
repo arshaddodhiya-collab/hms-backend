@@ -4,10 +4,13 @@ import com.hms.HospitalManagementSystem.dto.request.EncounterCreateRequest;
 import com.hms.HospitalManagementSystem.dto.request.EncounterUpdateRequest;
 import com.hms.HospitalManagementSystem.dto.response.EncounterResponse;
 import com.hms.HospitalManagementSystem.dto.response.VitalsResponse;
+import com.hms.HospitalManagementSystem.dto.response.RoundResponse;
+import com.hms.HospitalManagementSystem.dto.ipd.RoundRequest;
 import com.hms.HospitalManagementSystem.entity.Encounter;
 import com.hms.HospitalManagementSystem.entity.User;
 import com.hms.HospitalManagementSystem.entity.Vitals;
-import com.hms.HospitalManagementSystem.repository.VitalsRepository;
+import com.hms.HospitalManagementSystem.entity.Round;
+
 import com.hms.HospitalManagementSystem.service.EncounterService;
 import com.hms.HospitalManagementSystem.service.UserService; // To get current user
 import lombok.RequiredArgsConstructor;
@@ -18,7 +21,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -121,6 +123,24 @@ public class EncounterController {
                 .collect(Collectors.toList()));
     }
 
+    @PostMapping("/rounds")
+    @PreAuthorize("hasAuthority('CMP_CONSULTATION_WRITE')")
+    public ResponseEntity<RoundResponse> addRound(
+            @RequestBody RoundRequest request) {
+        Long currentUserId = getCurrentUserId();
+        Round round = encounterService.addRound(request, currentUserId);
+
+        return ResponseEntity.ok(RoundResponse.builder()
+                .id(round.getId())
+                .encounterId(round.getEncounter().getId())
+                .doctorId(round.getDoctor().getId())
+                .doctorName(round.getDoctor().getFullName())
+                .notes(round.getNotes())
+                .createdAt(round.getCreatedAt())
+                .updatedAt(round.getUpdatedAt())
+                .build());
+    }
+
     @GetMapping("/patient/{patientId}")
     @PreAuthorize("hasAnyAuthority('CMP_CONSULTATION_READ', 'CMP_PATIENT_VIEW')")
     public ResponseEntity<List<EncounterResponse>> getPatientEncounters(@PathVariable Long patientId) {
@@ -147,49 +167,19 @@ public class EncounterController {
         return user.getId();
     }
 
-    @PostMapping("/rounds")
-    @PreAuthorize("hasAnyAuthority('CMP_VITALS_WRITE', 'CMP_CONSULTATION_WRITE')")
-    public ResponseEntity<Void> addRound(
-            @RequestBody com.hms.HospitalManagementSystem.dto.ipd.RoundRequest request) {
-        // Use current user ID as doctor ID if not provided, or validate
-        Long doctorId = request.getDoctorId();
-        if (doctorId == null) {
-            doctorId = getCurrentUserId();
-            request.setDoctorId(doctorId);
-        }
-
-        encounterService.addRound(request);
-        return ResponseEntity.ok().build();
-    }
-
     private EncounterResponse mapToResponse(Encounter encounter) {
         VitalsResponse vitalsResponse = null;
-        if (encounter.getVitalsList() != null && !encounter.getVitalsList().isEmpty()) {
-            // Get latest vitals
-            Vitals latestVitals = encounter.getVitalsList().stream()
-                    .sorted((v1, v2) -> v2.getRecordedAt().compareTo(v1.getRecordedAt()))
-                    .findFirst()
-                    .orElse(null);
-
-            if (latestVitals != null) {
-                vitalsResponse = VitalsResponse.builder()
-                        .id(latestVitals.getId())
-                        .encounterId(encounter.getId())
-                        .temperature(latestVitals.getTemperature())
-                        .systolic(latestVitals.getSystolic())
-                        .diastolic(latestVitals.getDiastolic())
-                        .pulse(latestVitals.getPulse())
-                        .spo2(latestVitals.getSpo2())
-                        .weight(latestVitals.getWeight())
-                        .height(latestVitals.getHeight())
-                        .bmi(latestVitals.getBmi())
-                        .recordedAt(latestVitals.getRecordedAt())
-                        .recordedBy(latestVitals.getRecordedBy() != null
-                                ? latestVitals.getRecordedBy().getFullName()
-                                : null)
-                        .build();
-            }
+        if (encounter.getVitals() != null) {
+            vitalsResponse = mapToVitalsResponse(encounter.getVitals());
         }
+
+        List<VitalsResponse> vitalsHistory = encounter.getVitalsHistory().stream()
+                .map(this::mapToVitalsResponse)
+                .collect(Collectors.toList());
+
+        List<RoundResponse> roundResponses = encounter.getRounds().stream()
+                .map(this::mapToRoundResponse)
+                .collect(Collectors.toList());
 
         return EncounterResponse.builder()
                 .id(encounter.getId())
@@ -208,31 +198,39 @@ public class EncounterController {
                 .startedAt(encounter.getStartedAt())
                 .completedAt(encounter.getCompletedAt())
                 .vitals(vitalsResponse)
-                .vitalsHistory(encounter.getVitalsList().stream().map(v -> VitalsResponse.builder()
-                        .id(v.getId())
-                        .encounterId(encounter.getId())
-                        .temperature(v.getTemperature())
-                        .systolic(v.getSystolic())
-                        .diastolic(v.getDiastolic())
-                        .pulse(v.getPulse())
-                        .spo2(v.getSpo2())
-                        .weight(v.getWeight())
-                        .height(v.getHeight())
-                        .bmi(v.getBmi())
-                        .recordedAt(v.getRecordedAt())
-                        .recordedBy(v.getRecordedBy() != null ? v.getRecordedBy().getFullName() : null)
-                        .build()).collect(Collectors.toList()))
-                .rounds(encounter.getRounds().stream()
-                        .map(r -> com.hms.HospitalManagementSystem.dto.response.RoundResponse.builder()
-                                .id(r.getId())
-                                .encounterId(encounter.getId())
-                                .doctorId(r.getDoctor().getId())
-                                .doctorName(r.getDoctor().getFullName())
-                                .notes(r.getNotes())
-                                .createdAt(r.getCreatedAt())
-                                .updatedAt(r.getUpdatedAt())
-                                .build())
-                        .collect(Collectors.toList()))
+                .rounds(roundResponses)
+                .vitalsHistory(vitalsHistory)
+                .build();
+    }
+
+    private VitalsResponse mapToVitalsResponse(Vitals vitals) {
+        return VitalsResponse.builder()
+                .id(vitals.getId())
+                .encounterId(vitals.getEncounter().getId())
+                .temperature(vitals.getTemperature())
+                .systolic(vitals.getSystolic())
+                .diastolic(vitals.getDiastolic())
+                .pulse(vitals.getPulse())
+                .spo2(vitals.getSpo2())
+                .weight(vitals.getWeight())
+                .height(vitals.getHeight())
+                .bmi(vitals.getBmi())
+                .recordedAt(vitals.getRecordedAt())
+                .recordedBy(vitals.getRecordedBy() != null
+                        ? vitals.getRecordedBy().getFullName()
+                        : null)
+                .build();
+    }
+
+    private RoundResponse mapToRoundResponse(Round round) {
+        return RoundResponse.builder()
+                .id(round.getId())
+                .encounterId(round.getEncounter().getId())
+                .doctorId(round.getDoctor().getId())
+                .doctorName(round.getDoctor().getFullName())
+                .notes(round.getNotes())
+                .createdAt(round.getCreatedAt())
+                .updatedAt(round.getUpdatedAt())
                 .build();
     }
 }

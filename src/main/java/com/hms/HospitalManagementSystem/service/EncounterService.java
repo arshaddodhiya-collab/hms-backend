@@ -1,9 +1,12 @@
 package com.hms.HospitalManagementSystem.service;
 
+import com.hms.HospitalManagementSystem.entity.Round;
+import com.hms.HospitalManagementSystem.entity.Vitals;
+import com.hms.HospitalManagementSystem.dto.ipd.RoundRequest;
 import com.hms.HospitalManagementSystem.entity.Appointment;
 import com.hms.HospitalManagementSystem.entity.Encounter;
 import com.hms.HospitalManagementSystem.entity.User;
-import com.hms.HospitalManagementSystem.enums.AdmissionStatus;
+
 import com.hms.HospitalManagementSystem.enums.AppointmentStatus;
 import com.hms.HospitalManagementSystem.enums.EncounterStatus;
 import com.hms.HospitalManagementSystem.enums.PrescriptionStatus;
@@ -29,83 +32,16 @@ public class EncounterService {
     private final EncounterRepository encounterRepository;
     private final AppointmentRepository appointmentRepository;
     private final UserRepository userRepository;
-    // private final com.hms.HospitalManagementSystem.repository.AdmissionRepository
-    // admissionRepository; // Unused now
     private final com.hms.HospitalManagementSystem.repository.RoundRepository roundRepository;
     private final com.hms.HospitalManagementSystem.repository.VitalsRepository vitalsRepository;
+    // private final com.hms.HospitalManagementSystem.repository.AdmissionRepository
+    // admissionRepository; // Unused now
 
     @Transactional
     public Encounter startEncounter(Long appointmentId, Long patientId, Long doctorId) {
         // 1. Check if encounter already exists
         return encounterRepository.findByAppointmentId(appointmentId)
                 .orElseGet(() -> createEncounter(appointmentId, patientId, doctorId));
-    }
-
-    @Transactional
-    public Encounter createIpdEncounter(com.hms.HospitalManagementSystem.entity.Admission admission) {
-        // Create an encounter linked to the admission
-        // This encounter stays active for the duration of the admission
-        Encounter encounter = Encounter.builder()
-                .admission(admission)
-                .patient(admission.getPatient())
-                .doctor(admission.getDoctor())
-                .status(EncounterStatus.IN_PROGRESS) // Start as In Progress
-                .startedAt(LocalDateTime.now())
-                .build();
-
-        return encounterRepository.save(encounter);
-    }
-
-    @Transactional
-    public void addRound(com.hms.HospitalManagementSystem.dto.ipd.RoundRequest request) {
-        // 1. Find the active IPD encounter for this admission
-        // We assume there's one active encounter per admission.
-        // We can find by Admission ID and Status != COMPLETED?
-        // Or just find by Active Admission linked encounter.
-        // For now, let's look up the encounter by Admission ID.
-        // But EncounterRepository doesn't have a direct method for this yet
-        // effectively.
-        // We really want the encounter linked to this admission.
-        // Let's add findByAdmissionId to repository or use stream if necessary (but
-        // better repo method).
-        // Since we don't have findByAdmissionId yet, we can try to find by patient and
-        // admission active?
-        // Wait, Encounter has 'admission' field.
-
-        Encounter encounter = encounterRepository.findByAdmissionId(request.getAdmissionId())
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Active IPD Encounter not found for Admission ID: " + request.getAdmissionId()));
-
-        // 2. Validate Doctor
-        User doctor = userRepository.findById(request.getDoctorId())
-                .orElseThrow(() -> new ResourceNotFoundException("Doctor not found"));
-
-        // 3. Create Round Entity
-        com.hms.HospitalManagementSystem.entity.Round round = com.hms.HospitalManagementSystem.entity.Round.builder()
-                .encounter(encounter)
-                .doctor(doctor)
-                .notes(request.getNotes())
-                .build();
-
-        roundRepository.save(round);
-
-        // 4. Create Vitals Entity (if vitals are present)
-        // Check if any vital sign is provided
-        if (request.getTemperature() != null || request.getSystolic() != null || request.getPulse() != null) {
-            com.hms.HospitalManagementSystem.entity.Vitals vitals = com.hms.HospitalManagementSystem.entity.Vitals
-                    .builder()
-                    .encounter(encounter)
-                    .recordedBy(doctor)
-                    .recordedAt(LocalDateTime.now())
-                    .temperature(request.getTemperature())
-                    .systolic(request.getSystolic())
-                    .diastolic(request.getDiastolic())
-                    .pulse(request.getPulse())
-                    .spo2(request.getSpo2())
-                    .build();
-
-            vitalsRepository.save(vitals);
-        }
     }
 
     private Encounter createEncounter(Long appointmentId, Long patientId, Long doctorId) {
@@ -247,13 +183,60 @@ public class EncounterService {
                 Arrays.asList(EncounterStatus.TRIAGE, EncounterStatus.IN_PROGRESS));
     }
 
-    public List<Encounter> getIpdDoctorQueue(Long doctorId) {
-        return encounterRepository.findByDoctorIdAndAdmissionIsNotNullAndStatusIn(
-                doctorId,
-                Arrays.asList(EncounterStatus.TRIAGE, EncounterStatus.IN_PROGRESS));
-    }
-
     public List<Encounter> getPatientEncounters(Long patientId) {
         return encounterRepository.findByPatientId(patientId);
+    }
+
+    // IPD Rounds
+    @Transactional
+    public Round addRound(RoundRequest request, Long doctorId) {
+        // Find Admission first to get Encounter
+        // Or Request should have encounterId?
+        // Plan says RoundRequest has admissionId.
+        // We need to find the active encounter for this admission.
+        // Assuming 1 active IPD encounter per admission.
+        // But wait, Encounter table has admission_id.
+
+        Encounter encounter = encounterRepository.findByAdmissionId(request.getAdmissionId())
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Active encounter not found for admission " + request.getAdmissionId()));
+
+        User doctor = userRepository.findById(doctorId)
+                .orElseThrow(() -> new ResourceNotFoundException("Doctor not found"));
+
+        Round round = new Round();
+        round.setEncounter(encounter);
+        round.setDoctor(doctor);
+        round.setNotes(request.getNotes());
+
+        // Save Round
+        round = roundRepository.save(round);
+
+        // Helper to save Vitals if present
+        if (request.getSystolic() != null || request.getTemperature() != null) {
+            Vitals vitals = Vitals.builder()
+                    .encounter(encounter)
+                    .temperature(request.getTemperature())
+                    .systolic(request.getSystolic())
+                    .diastolic(request.getDiastolic())
+                    .pulse(request.getPulse())
+                    .spo2(request.getSpo2())
+                    .recordedBy(doctor)
+                    .recordedAt(LocalDateTime.now())
+                    .build();
+            vitalsRepository.save(vitals);
+        }
+
+        return round;
+    }
+
+    public List<Encounter> getIpdDoctorQueue(Long doctorId) {
+        // IPD Queue: Active Encounters (Admitted) assigned to doctor or all?
+        // Typically IPD patients are assigned to a doctor.
+        // Encounter Status: IN_PROGRESS (since they are admitted)
+        // And Admission is not null
+        return encounterRepository.findByDoctorIdAndAdmissionIsNotNullAndStatusIn(
+                doctorId,
+                Arrays.asList(EncounterStatus.IN_PROGRESS));
     }
 }

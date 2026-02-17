@@ -6,9 +6,7 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "rounds", indexes = {
-        @Index(name = "idx_rounds_encounter", columnList = "encounter_id")
-})
+@Table(name = "rounds")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -40,6 +38,7 @@ public class Round {
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
     }
 
     @PreUpdate

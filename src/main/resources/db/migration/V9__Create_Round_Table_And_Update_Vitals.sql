@@ -1,5 +1,5 @@
 -- Create Rounds Table
-CREATE TABLE rounds IF NOT EXISTS (
+CREATE TABLE IF NOT EXISTS rounds (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     encounter_id BIGINT NOT NULL,
     doctor_id BIGINT NOT NULL,
