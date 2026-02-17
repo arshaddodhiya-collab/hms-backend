@@ -1,10 +1,15 @@
 package com.hms.HospitalManagementSystem.service;
 
 import com.hms.HospitalManagementSystem.dto.request.InvoiceRequest;
+import com.hms.HospitalManagementSystem.dto.request.PaymentRequest;
+import com.hms.HospitalManagementSystem.dto.response.BillingSummaryResponse;
 import com.hms.HospitalManagementSystem.dto.response.InvoiceResponse;
+import com.hms.HospitalManagementSystem.dto.response.PaymentResponse;
 import com.hms.HospitalManagementSystem.entity.*;
 import com.hms.HospitalManagementSystem.enums.ChargeStatus;
 import com.hms.HospitalManagementSystem.enums.InvoiceStatus;
+import com.hms.HospitalManagementSystem.enums.PaymentMethod;
+import com.hms.HospitalManagementSystem.enums.PaymentStatus;
 import com.hms.HospitalManagementSystem.exception.ResourceNotFoundException;
 import com.hms.HospitalManagementSystem.mapper.InvoiceMapper;
 import com.hms.HospitalManagementSystem.repository.*;
@@ -26,6 +31,7 @@ public class BillingService {
     private final InvoiceRepository invoiceRepository;
     private final ChargeRepository chargeRepository;
     private final PatientRepository patientRepository;
+    private final PaymentRepository paymentRepository;
     private final InvoiceMapper invoiceMapper;
 
     @Transactional
@@ -48,7 +54,12 @@ public class BillingService {
         invoice.setNetAmount(BigDecimal.ZERO);
         invoice.setPaidAmount(BigDecimal.ZERO);
         invoice.setDueAmount(BigDecimal.ZERO);
-        invoice.setStatus(InvoiceStatus.DRAFT);
+        // Set status from request or default to ISSUED
+        if (request.getStatus() != null) {
+            invoice.setStatus(InvoiceStatus.valueOf(request.getStatus()));
+        } else {
+            invoice.setStatus(InvoiceStatus.ISSUED);
+        }
         invoice.setIssueDate(LocalDateTime.now());
 
         // 2. Process Unbilled Charges (if any)
@@ -152,5 +163,135 @@ public class BillingService {
 
         invoiceRepository.save(invoice);
         log.info("Invoice generated for admission {}", admission.getId());
+    }
+
+    @Transactional
+    public PaymentResponse processPayment(PaymentRequest request) {
+        log.info("Processing payment for invoice ID: {}", request.getInvoiceId());
+
+        Invoice invoice = invoiceRepository.findById(request.getInvoiceId())
+                .orElseThrow(
+                        () -> new ResourceNotFoundException("Invoice not found with id: " + request.getInvoiceId()));
+
+        if (invoice.getStatus() == InvoiceStatus.CANCELLED) {
+            throw new IllegalStateException("Cannot process payment for CANCELLED invoice");
+        }
+
+        if (invoice.getStatus() == InvoiceStatus.PAID) {
+            throw new IllegalStateException("Invoice is already fully PAID");
+        }
+
+        if (request.getAmount().compareTo(invoice.getDueAmount()) > 0) {
+            throw new IllegalArgumentException(
+                    "Payment amount " + request.getAmount() + " exceeds due amount " + invoice.getDueAmount());
+        }
+
+        // Create Payment
+        Payment payment = new Payment();
+        payment.setInvoice(invoice);
+        payment.setAmount(request.getAmount());
+        payment.setPaymentMethod(PaymentMethod.valueOf(request.getPaymentMethod()));
+        payment.setTransactionReference(request.getTransactionReference());
+        payment.setStatus(PaymentStatus.SUCCESS);
+        payment.setPaymentDate(LocalDateTime.now());
+        payment.setNotes(request.getNotes());
+
+        // TODO: Set receivedBy from SecurityContext
+        // payment.setReceivedBy(currentUser);
+
+        paymentRepository.save(payment);
+
+        // Update Invoice
+        invoice.setPaidAmount(invoice.getPaidAmount().add(request.getAmount()));
+        invoice.setDueAmount(invoice.getNetAmount().subtract(invoice.getPaidAmount()));
+
+        if (invoice.getDueAmount().compareTo(BigDecimal.ZERO) == 0) {
+            invoice.setStatus(InvoiceStatus.PAID);
+        } else {
+            invoice.setStatus(InvoiceStatus.PARTIALLY_PAID);
+        }
+
+        invoiceRepository.save(invoice);
+
+        return mapToPaymentResponse(payment);
+    }
+
+    public BillingSummaryResponse getBillingSummary(Long patientId) {
+        log.info("Fetching billing summary for patient ID: {}", patientId);
+
+        if (!patientRepository.existsById(patientId)) {
+            throw new ResourceNotFoundException("Patient not found with id: " + patientId);
+        }
+
+        List<Invoice> allInvoices = invoiceRepository.findByPatientId(patientId);
+
+        BigDecimal totalBilled = allInvoices.stream()
+                .map(Invoice::getTotalAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal totalPaid = allInvoices.stream()
+                .map(Invoice::getPaidAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal totalDue = allInvoices.stream()
+                .filter(inv -> inv.getStatus() != InvoiceStatus.CANCELLED)
+                .map(Invoice::getDueAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        List<Invoice> outstandingInvoices = allInvoices.stream()
+                .filter(inv -> inv.getStatus() == InvoiceStatus.ISSUED
+                        || inv.getStatus() == InvoiceStatus.PARTIALLY_PAID)
+                .toList();
+
+        // Sort specifically? Currently just taking recent ones from the full list if
+        // needed
+        List<InvoiceResponse> recentResponses = allInvoices.stream()
+                .sorted((i1, i2) -> i2.getIssueDate().compareTo(i1.getIssueDate()))
+                .limit(5)
+                .map(invoiceMapper::toResponse)
+                .toList();
+
+        return BillingSummaryResponse.builder()
+                .patientId(patientId)
+                .totalBilledAmount(totalBilled)
+                .totalPaidAmount(totalPaid)
+                .totalDueAmount(totalDue)
+                .outstandingInvoiceCount(outstandingInvoices.size())
+                .recentInvoices(recentResponses)
+                .build();
+    }
+
+    public List<InvoiceResponse> getOutstandingInvoices(Long patientId) {
+        return invoiceRepository
+                .findByPatientIdAndStatusIn(patientId, List.of(InvoiceStatus.ISSUED, InvoiceStatus.PARTIALLY_PAID))
+                .stream()
+                .map(invoiceMapper::toResponse)
+                .toList();
+    }
+
+    public InvoiceResponse getInvoiceById(Long id) {
+        return invoiceRepository.findById(id)
+                .map(invoiceMapper::toResponse)
+                .orElseThrow(() -> new ResourceNotFoundException("Invoice not found with id: " + id));
+    }
+
+    public List<InvoiceResponse> getAllInvoices() {
+        return invoiceRepository.findAll()
+                .stream()
+                .map(invoiceMapper::toResponse)
+                .toList();
+    }
+
+    private PaymentResponse mapToPaymentResponse(Payment payment) {
+        return PaymentResponse.builder()
+                .id(payment.getId())
+                .invoiceId(payment.getInvoice().getId())
+                .amount(payment.getAmount())
+                .paymentMethod(payment.getPaymentMethod().name())
+                .transactionReference(payment.getTransactionReference())
+                .status(payment.getStatus().name())
+                .paymentDate(payment.getPaymentDate())
+                .notes(payment.getNotes())
+                .build();
     }
 }

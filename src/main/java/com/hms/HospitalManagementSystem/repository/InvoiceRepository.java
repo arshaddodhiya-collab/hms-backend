@@ -18,4 +18,7 @@ public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
     List<Invoice> findByStatus(InvoiceStatus status);
 
     List<Invoice> findByIssueDateBetween(LocalDateTime startDate, LocalDateTime endDate);
+
+    List<Invoice> findByPatientIdAndStatusIn(Long patientId, List<InvoiceStatus> statuses);
+
 }

@@ -22,6 +22,8 @@ public class InvoiceRequest {
 
     private List<Long> chargeIds; // IDs of unbilled charges to include
 
+    private String status; // Optional, defaults to ISSUED if null
+
     @NotEmpty(message = "Items are required if creating manual invoice")
     private List<InvoiceItemRequest> items; // For manual items
 }
