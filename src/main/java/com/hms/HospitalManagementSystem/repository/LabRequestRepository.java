@@ -20,4 +20,8 @@ public interface LabRequestRepository extends JpaRepository<LabRequest, Long> {
 
     @Query("SELECT lr FROM LabRequest lr JOIN FETCH lr.labResults WHERE lr.id = :id")
     java.util.Optional<LabRequest> findByIdWithResults(@Param("id") Long id);
+
+    long countByStatus(LabRequestStatus status);
+
+    List<LabRequest> findTop5ByOrderByCreatedAtDesc();
 }

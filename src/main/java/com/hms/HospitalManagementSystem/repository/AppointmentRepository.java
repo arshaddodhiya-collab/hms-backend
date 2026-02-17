@@ -42,4 +42,8 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
                         LocalDateTime end);
 
         List<Appointment> findByStartDateTimeBetweenAndDeletedFalse(LocalDateTime start, LocalDateTime end);
+
+        long countByStartDateTimeBetweenAndDeletedFalse(LocalDateTime start, LocalDateTime end);
+
+        List<Appointment> findTop5ByDeletedFalseOrderByCreatedAtDesc();
 }
