@@ -85,6 +85,13 @@ public class AppointmentController {
         return ResponseEntity.ok(mapToResponse(appointment));
     }
 
+    @GetMapping("/doctor/{doctorId}/upcoming")
+    @PreAuthorize("hasAnyAuthority('CMP_APPOINTMENT_LIST', 'ROLE_DOCTOR', 'ROLE_ADMIN')")
+    public ResponseEntity<List<AppointmentResponse>> getUpcomingAppointmentsForDoctor(@PathVariable Long doctorId) {
+        List<Appointment> appointments = appointmentService.getUpcomingAppointmentsForDoctor(doctorId);
+        return ResponseEntity.ok(appointments.stream().map(this::mapToResponse).collect(Collectors.toList()));
+    }
+
     @GetMapping("/doctor/{doctorId}")
     @PreAuthorize("hasAnyAuthority('CMP_APPOINTMENT_LIST', 'ROLE_DOCTOR', 'ROLE_ADMIN')")
     public ResponseEntity<List<AppointmentResponse>> getDoctorAppointments(

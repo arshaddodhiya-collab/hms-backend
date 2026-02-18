@@ -258,4 +258,39 @@ public class AppointmentService {
     public List<Appointment> getPatientAppointmentsByStatus(Long patientId, AppointmentStatus status) {
         return appointmentRepository.findByPatientIdAndStatus(patientId, status);
     }
+
+    @Transactional
+    public void completeActiveAppointmentsForPatient(Long patientId) {
+        List<Appointment> appointments = appointmentRepository.findByPatientId(patientId);
+        LocalDateTime now = LocalDateTime.now();
+
+        appointments.stream()
+                .filter(a -> !a.isDeleted())
+                .filter(a -> a.getStatus() == AppointmentStatus.SCHEDULED ||
+                        a.getStatus() == AppointmentStatus.CHECKED_IN ||
+                        a.getStatus() == AppointmentStatus.IN_PROGRESS)
+                .filter(a -> a.getStartDateTime().isBefore(now)
+                        || a.getStartDateTime().toLocalDate().equals(now.toLocalDate()))
+                .forEach(a -> {
+                    a.setStatus(AppointmentStatus.COMPLETED);
+                    appointmentRepository.save(a);
+                });
+    }
+
+    public List<Appointment> getUpcomingAppointmentsForDoctor(Long doctorId) {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime endOfDay = now.toLocalDate().atTime(23, 59, 59);
+
+        // For dashboard: We want future appointments OR active appointments (even if
+        // time passed but not completed)
+        return appointmentRepository
+                .findByDoctorIdAndStartDateTimeBetweenAndDeletedFalse(doctorId, now.toLocalDate().atStartOfDay(),
+                        endOfDay)
+                .stream()
+                .filter(a -> a.getStatus() == AppointmentStatus.SCHEDULED ||
+                        a.getStatus() == AppointmentStatus.CHECKED_IN ||
+                        a.getStatus() == AppointmentStatus.IN_PROGRESS)
+                .sorted((a1, a2) -> a1.getStartDateTime().compareTo(a2.getStartDateTime()))
+                .collect(java.util.stream.Collectors.toList());
+    }
 }

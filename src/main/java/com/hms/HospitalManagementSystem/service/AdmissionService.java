@@ -35,6 +35,7 @@ public class AdmissionService {
     private final BillingService billingService;
     private final IpdMapper ipdMapper;
     private final EncounterRepository encounterRepository;
+    private final com.hms.HospitalManagementSystem.service.AppointmentService appointmentService;
 
     @Transactional
     public AdmissionResponse admitPatient(AdmissionRequest request) {
@@ -42,6 +43,9 @@ public class AdmissionService {
         Patient patient = patientRepository.findById(request.getPatientId())
                 .orElseThrow(
                         () -> new ResourceNotFoundException("Patient not found with ID: " + request.getPatientId()));
+
+        // Close any active OPD appointments
+        appointmentService.completeActiveAppointmentsForPatient(patient.getId());
 
         // Check if patient is already admitted
         if (admissionRepository.findActiveByPatientId(patient.getId()).isPresent()) {
@@ -133,6 +137,9 @@ public class AdmissionService {
 
         // 3. Trigger Billing
         billingService.generateBill(savedAdmission);
+
+        // Ensure no stray active appointments remain
+        appointmentService.completeActiveAppointmentsForPatient(admission.getPatient().getId());
 
         return ipdMapper.toAdmissionResponse(savedAdmission);
     }
