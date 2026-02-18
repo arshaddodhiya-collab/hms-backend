@@ -105,4 +105,8 @@ public class PrescriptionService {
         return prescriptionRepository.findByEncounterId(encounterId).stream().findFirst()
                 .orElseThrow(() -> new ResourceNotFoundException("Prescription not found for encounter"));
     }
+
+    public List<Prescription> getPatientPrescriptions(Long patientId) {
+        return prescriptionRepository.findByEncounterPatientId(patientId);
+    }
 }
