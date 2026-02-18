@@ -138,8 +138,4 @@ public class LabService {
         labRequest.setStatus(LabRequestStatus.COMPLETED);
         return labRequestRepository.save(labRequest);
     }
-
-    public List<LabRequest> getPatientLabRequests(Long patientId) {
-        return labRequestRepository.findByPatientId(patientId);
-    }
 }
