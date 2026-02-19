@@ -28,6 +28,8 @@ public class UserService {
 
     public List<UserDto> getAllUsers() {
         return userRepository.findAll().stream()
+                .filter(u -> u.getRoles().stream()
+                        .noneMatch(r -> r.getName().equalsIgnoreCase("PATIENT")))
                 .map(this::mapToDto)
                 .collect(Collectors.toList());
     }

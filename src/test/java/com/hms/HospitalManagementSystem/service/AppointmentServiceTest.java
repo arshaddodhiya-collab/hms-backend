@@ -16,7 +16,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -56,8 +56,8 @@ class AppointmentServiceTest {
         request = new AppointmentRequest();
         request.setDoctorId(1L);
         request.setPatientId(100L);
-        request.setStartDateTime(LocalDateTime.now().plusDays(1).withHour(10).withMinute(0));
-        request.setEndDateTime(LocalDateTime.now().plusDays(1).withHour(10).withMinute(30));
+        request.setStartDateTime(Instant.now().plusSeconds(86400)); // 1 day from now
+        request.setEndDateTime(Instant.now().plusSeconds(86400 + 1800)); // 1 day + 30 mins
         request.setType("CONSULTATION");
         request.setReason("Checkup");
     }

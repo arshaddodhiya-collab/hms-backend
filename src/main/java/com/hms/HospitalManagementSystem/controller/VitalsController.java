@@ -12,6 +12,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/v1/encounters")
@@ -25,7 +26,7 @@ public class VitalsController {
     @PreAuthorize("hasAnyAuthority('CMP_VITALS_WRITE', 'CMP_CONSULTATION_WRITE')")
     public ResponseEntity<VitalsResponse> saveVitals(
             @PathVariable Long encounterId,
-            @RequestBody VitalsRequest request) {
+            @Valid @RequestBody VitalsRequest request) {
 
         Long currentUserId = getCurrentUserId();
 

@@ -1,14 +1,14 @@
 package com.hms.HospitalManagementSystem.dto;
 
 import lombok.Data;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Data
 public class AppointmentRequest {
     private Long patientId;
     private Long doctorId;
-    private LocalDateTime startDateTime;
-    private LocalDateTime endDateTime;
+    private Instant startDateTime;
+    private Instant endDateTime;
     private String type; // CONSULTATION, FOLLOW_UP, etc.
     private String reason;
     private String status;

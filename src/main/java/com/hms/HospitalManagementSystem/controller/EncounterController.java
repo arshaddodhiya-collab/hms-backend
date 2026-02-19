@@ -19,6 +19,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -34,7 +35,7 @@ public class EncounterController {
 
     @PostMapping
     @PreAuthorize("hasAnyAuthority('CMP_VITALS_WRITE', 'CMP_CONSULTATION_WRITE')")
-    public ResponseEntity<EncounterResponse> startEncounter(@RequestBody EncounterCreateRequest request) {
+    public ResponseEntity<EncounterResponse> startEncounter(@Valid @RequestBody EncounterCreateRequest request) {
         Encounter encounter = encounterService.startEncounter(
                 request.getAppointmentId(),
                 request.getPatientId(),
@@ -53,7 +54,7 @@ public class EncounterController {
     @PreAuthorize("hasAuthority('CMP_CONSULTATION_WRITE')")
     public ResponseEntity<EncounterResponse> updateClinicalNotes(
             @PathVariable Long id,
-            @RequestBody EncounterUpdateRequest request) {
+            @Valid @RequestBody EncounterUpdateRequest request) {
         Long currentUserId = getCurrentUserId();
         Encounter encounter = encounterService.updateClinicalNotes(
                 id,
@@ -126,7 +127,7 @@ public class EncounterController {
     @PostMapping("/rounds")
     @PreAuthorize("hasAuthority('CMP_CONSULTATION_WRITE')")
     public ResponseEntity<RoundResponse> addRound(
-            @RequestBody RoundRequest request) {
+            @Valid @RequestBody RoundRequest request) {
         Long currentUserId = getCurrentUserId();
         Round round = encounterService.addRound(request, currentUserId);
 

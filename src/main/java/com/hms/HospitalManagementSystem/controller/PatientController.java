@@ -13,6 +13,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/v1/patients")
@@ -22,7 +23,7 @@ public class PatientController {
     private final PatientService patientService;
 
     @PostMapping
-    public ResponseEntity<PatientResponse> registerPatient(@RequestBody PatientRegisterRequest request) {
+    public ResponseEntity<PatientResponse> registerPatient(@Valid @RequestBody PatientRegisterRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(patientService.registerPatient(request));
     }
 
@@ -40,7 +41,7 @@ public class PatientController {
 
     @PutMapping("/{id}")
     public ResponseEntity<PatientResponse> updatePatient(@PathVariable Long id,
-            @RequestBody PatientUpdateRequest request) {
+            @Valid @RequestBody PatientUpdateRequest request) {
         return ResponseEntity.ok(patientService.updatePatient(id, request));
     }
 

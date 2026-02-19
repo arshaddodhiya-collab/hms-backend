@@ -14,7 +14,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 
 @Service
@@ -28,9 +30,8 @@ public class AppointmentService {
 
     @Transactional
     public Appointment bookAppointment(AppointmentRequest request) {
-        // ... (existing code)
         // 0. Validate Input
-        LocalDateTime now = LocalDateTime.now();
+        Instant now = Instant.now();
         if (request.getStartDateTime().isBefore(now)) {
             throw new ValidationException("Appointment time must be in the future");
         }
@@ -48,6 +49,11 @@ public class AppointmentService {
                     "Appointment duration must be between 15 and 120 minutes");
         }
 
+        // Convert Instant → LocalDateTime using system zone for JPA
+        ZoneId zone = ZoneId.systemDefault();
+        LocalDateTime startLdt = LocalDateTime.ofInstant(request.getStartDateTime(), zone);
+        LocalDateTime endLdt = LocalDateTime.ofInstant(request.getEndDateTime(), zone);
+
         // 1. Validate Doctor and Patient
         var patient = patientRepository.findById(request.getPatientId())
                 .orElseThrow(() -> new ResourceNotFoundException("Patient not found"));
@@ -58,8 +64,8 @@ public class AppointmentService {
         // 2. Validate Overlaps
         boolean hasOverlap = appointmentRepository.existsOverlappingAppointment(
                 request.getDoctorId(),
-                request.getStartDateTime(),
-                request.getEndDateTime());
+                startLdt,
+                endLdt);
 
         if (hasOverlap) {
             throw new ConflictException("Doctor is not available at this time");
@@ -69,8 +75,8 @@ public class AppointmentService {
         Appointment appointment = Appointment.builder()
                 .patient(patient)
                 .doctor(doctor)
-                .startDateTime(request.getStartDateTime())
-                .endDateTime(request.getEndDateTime())
+                .startDateTime(startLdt)
+                .endDateTime(endLdt)
                 .type(AppointmentType.valueOf(request.getType()))
                 .status(AppointmentStatus.SCHEDULED)
                 .reason(request.getReason())
@@ -104,8 +110,13 @@ public class AppointmentService {
             }
         }
 
-        appointment.setStartDateTime(request.getStartDateTime());
-        appointment.setEndDateTime(request.getEndDateTime());
+        // Convert Instant → LocalDateTime using system zone for JPA
+        ZoneId zone = ZoneId.systemDefault();
+        LocalDateTime startLdt = LocalDateTime.ofInstant(request.getStartDateTime(), zone);
+        LocalDateTime endLdt = LocalDateTime.ofInstant(request.getEndDateTime(), zone);
+
+        appointment.setStartDateTime(startLdt);
+        appointment.setEndDateTime(endLdt);
         appointment.setType(AppointmentType.valueOf(request.getType()));
         appointment.setReason(request.getReason());
 

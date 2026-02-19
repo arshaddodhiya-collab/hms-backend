@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -25,13 +26,13 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/register")
-    public ResponseEntity<AuthResponse> register(@RequestBody RegisterRequest request,
+    public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request,
             HttpServletResponse response) {
         return ResponseEntity.ok(authService.register(request, response));
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest request,
+    public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request,
             HttpServletResponse response) {
         return ResponseEntity.ok(authService.login(request, response));
     }
