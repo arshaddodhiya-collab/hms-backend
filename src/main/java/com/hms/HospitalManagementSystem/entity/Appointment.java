@@ -2,6 +2,8 @@ package com.hms.HospitalManagementSystem.entity;
 
 import com.hms.HospitalManagementSystem.enums.AppointmentStatus;
 import com.hms.HospitalManagementSystem.enums.AppointmentType;
+import com.hms.HospitalManagementSystem.enums.EncounterStatus;
+
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -74,7 +76,7 @@ public class Appointment extends BaseEntity implements Serializable {
 
     public boolean hasActiveEncounter() {
         return hasEncounter() &&
-                encounter.getStatus() != com.hms.HospitalManagementSystem.enums.EncounterStatus.COMPLETED &&
-                encounter.getStatus() != com.hms.HospitalManagementSystem.enums.EncounterStatus.CANCELLED;
+                encounter.getStatus() != EncounterStatus.COMPLETED &&
+                encounter.getStatus() != EncounterStatus.CANCELLED;
     }
 }

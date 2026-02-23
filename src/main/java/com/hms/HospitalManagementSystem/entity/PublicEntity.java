@@ -6,14 +6,12 @@ import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
-
 @MappedSuperclass
 @Getter
 @Setter
 @SuperBuilder
 @NoArgsConstructor
-public abstract class PublicEntity extends BaseEntity implements Serializable {
+public abstract class PublicEntity extends BaseEntity {
 
     @Column(nullable = false)
     private boolean active = true;
