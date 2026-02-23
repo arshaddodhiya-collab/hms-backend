@@ -31,3 +31,8 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Sensitive / Debug files ###
+*.log
+cookies.txt
+login_response*.json

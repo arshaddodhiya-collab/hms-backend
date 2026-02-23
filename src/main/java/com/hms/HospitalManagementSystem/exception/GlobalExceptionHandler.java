@@ -1,5 +1,6 @@
 package com.hms.HospitalManagementSystem.exception;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -13,6 +14,7 @@ import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+@Slf4j
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -66,11 +68,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(org.springframework.dao.DataIntegrityViolationException.class)
     public ResponseEntity<Object> handleDataIntegrityViolationException(
             org.springframework.dao.DataIntegrityViolationException ex, WebRequest request) {
+        log.error("Data integrity violation: {}", ex.getMostSpecificCause().getMessage(), ex);
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("timestamp", LocalDateTime.now());
         body.put("status", HttpStatus.CONFLICT.value());
         body.put("error", "Conflict");
-        body.put("message", "Database error: " + ex.getMostSpecificCause().getMessage());
+        body.put("message", "A data conflict occurred. Please check your input and try again.");
         body.put("path", request.getDescription(false));
 
         return new ResponseEntity<>(body, HttpStatus.CONFLICT);
@@ -115,11 +118,12 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> handleGlobalException(Exception ex, WebRequest request) {
+        log.error("Unhandled exception at {}: {}", request.getDescription(false), ex.getMessage(), ex);
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("timestamp", LocalDateTime.now());
         body.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
         body.put("error", "Internal Server Error");
-        body.put("message", ex.getMessage()); // In production, might want to mask this
+        body.put("message", "An unexpected error occurred. Please contact support.");
         body.put("path", request.getDescription(false));
 
         return new ResponseEntity<>(body, HttpStatus.INTERNAL_SERVER_ERROR);
