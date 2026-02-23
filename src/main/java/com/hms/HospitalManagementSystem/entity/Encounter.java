@@ -3,6 +3,7 @@ package com.hms.HospitalManagementSystem.entity;
 import com.hms.HospitalManagementSystem.enums.EncounterStatus;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -19,12 +20,8 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class Encounter {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+@SuperBuilder(toBuilder = true)
+public class Encounter extends BaseEntity {
 
     // Relationships
     @OneToOne(fetch = FetchType.LAZY)
@@ -64,13 +61,6 @@ public class Encounter {
     @Column(name = "completed_at")
     private LocalDateTime completedAt;
 
-    // Audit Fields
-    @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt;
-
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
-
     @Builder.Default
     @Column(name = "is_deleted", nullable = false)
     private boolean deleted = false;
@@ -104,17 +94,11 @@ public class Encounter {
 
     @PrePersist
     protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
         if (this.status == null) {
             this.status = EncounterStatus.TRIAGE;
         }
         if (this.startedAt == null) {
             this.startedAt = LocalDateTime.now();
         }
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        this.updatedAt = LocalDateTime.now();
     }
 }

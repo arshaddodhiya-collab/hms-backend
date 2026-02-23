@@ -2,6 +2,7 @@ package com.hms.HospitalManagementSystem.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -12,7 +13,7 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@SuperBuilder(toBuilder = true)
 public class Department extends PublicEntity {
 
     @Column(unique = true, nullable = false, length = 100)

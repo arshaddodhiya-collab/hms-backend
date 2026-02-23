@@ -4,6 +4,7 @@ import com.hms.HospitalManagementSystem.security.CustomAccessDeniedHandler;
 import com.hms.HospitalManagementSystem.security.CustomUserDetailsService;
 import com.hms.HospitalManagementSystem.security.JwtAuthenticationEntryPoint;
 import com.hms.HospitalManagementSystem.security.JwtAuthenticationFilter;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -93,10 +94,13 @@ public class SecurityConfig {
         return builder.getAuthenticationManager();
     }
 
+    @Value("${cors.allowed-origins}")
+    private String allowedOrigins;
+
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:4200"));
+        configuration.setAllowedOrigins(Arrays.asList(allowedOrigins.split(",")));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type"));
         configuration.setAllowCredentials(true);
