@@ -57,6 +57,9 @@ public class Appointment extends BaseEntity implements Serializable {
     @Column(name = "is_deleted", nullable = false)
     private boolean deleted = false;
 
+    @OneToOne(mappedBy = "appointment", fetch = FetchType.LAZY)
+    private Encounter encounter;
+
     @PrePersist
     protected void onCreate() {
         if (this.status == null) {
@@ -64,16 +67,14 @@ public class Appointment extends BaseEntity implements Serializable {
         }
     }
 
-    // Stubbed helper methods for Encounter integration
+    // Helper methods for Encounter integration
     public boolean hasEncounter() {
-        // TODO: Implement when Encounter entity is available
-        return false;
+        return encounter != null && !encounter.isDeleted();
     }
 
     public boolean hasActiveEncounter() {
-        // TODO: Implement when Encounter entity is available
-        // return encounter != null && encounter.getStatus() !=
-        // EncounterStatus.COMPLETED;
-        return false;
+        return hasEncounter() &&
+                encounter.getStatus() != com.hms.HospitalManagementSystem.enums.EncounterStatus.COMPLETED &&
+                encounter.getStatus() != com.hms.HospitalManagementSystem.enums.EncounterStatus.CANCELLED;
     }
 }
