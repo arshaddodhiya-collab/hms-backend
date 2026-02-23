@@ -15,11 +15,12 @@ import com.hms.HospitalManagementSystem.exception.ResourceNotFoundException;
 import com.hms.HospitalManagementSystem.repository.AppointmentRepository;
 import com.hms.HospitalManagementSystem.repository.EncounterRepository;
 import com.hms.HospitalManagementSystem.repository.UserRepository;
+import com.hms.HospitalManagementSystem.repository.RoundRepository;
+import com.hms.HospitalManagementSystem.repository.VitalsRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-// import com.hms.HospitalManagementSystem.enums.PrescriptionStatus;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -32,10 +33,8 @@ public class EncounterService {
     private final EncounterRepository encounterRepository;
     private final AppointmentRepository appointmentRepository;
     private final UserRepository userRepository;
-    private final com.hms.HospitalManagementSystem.repository.RoundRepository roundRepository;
-    private final com.hms.HospitalManagementSystem.repository.VitalsRepository vitalsRepository;
-    // private final com.hms.HospitalManagementSystem.repository.AdmissionRepository
-    // admissionRepository; // Unused now
+    private final RoundRepository roundRepository;
+    private final VitalsRepository vitalsRepository;
 
     @Transactional
     public Encounter startEncounter(Long appointmentId, Long patientId, Long doctorId) {

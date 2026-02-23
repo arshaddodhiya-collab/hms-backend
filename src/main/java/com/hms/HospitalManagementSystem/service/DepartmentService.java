@@ -1,6 +1,6 @@
 package com.hms.HospitalManagementSystem.service;
 
-import com.hms.HospitalManagementSystem.dto.DepartmentDto;
+import com.hms.HospitalManagementSystem.dto.response.DepartmentDto;
 import com.hms.HospitalManagementSystem.entity.Department;
 import com.hms.HospitalManagementSystem.entity.User;
 import com.hms.HospitalManagementSystem.repository.DepartmentRepository;
@@ -34,7 +34,8 @@ public class DepartmentService {
 
     public DepartmentDto createDepartment(DepartmentDto dto) {
         if (departmentRepository.existsByName(dto.getName())) {
-            throw new RuntimeException("Department with name '" + dto.getName() + "' already exists.");
+            throw new com.hms.HospitalManagementSystem.exception.ConflictException(
+                    "Department with name '" + dto.getName() + "' already exists.");
         }
 
         Department dept = new Department();
@@ -57,7 +58,8 @@ public class DepartmentService {
 
         // Check name uniqueness if changed
         if (!dept.getName().equals(dto.getName()) && departmentRepository.existsByName(dto.getName())) {
-            throw new RuntimeException("Department with name '" + dto.getName() + "' already exists.");
+            throw new com.hms.HospitalManagementSystem.exception.ConflictException(
+                    "Department with name '" + dto.getName() + "' already exists.");
         }
 
         dept.setName(dto.getName());
@@ -80,7 +82,8 @@ public class DepartmentService {
                 .orElseThrow(() -> new RuntimeException("Department not found with ID: " + id));
 
         if (!dept.getUsers().isEmpty()) {
-            throw new RuntimeException("Cannot delete department with active staff members.");
+            throw new com.hms.HospitalManagementSystem.exception.ConflictException(
+                    "Cannot delete department with active staff members.");
         }
 
         departmentRepository.delete(dept);

@@ -12,8 +12,10 @@ import com.hms.HospitalManagementSystem.exception.BusinessRuleViolationException
 import com.hms.HospitalManagementSystem.mapper.IpdMapper;
 import com.hms.HospitalManagementSystem.repository.AdmissionRepository;
 import com.hms.HospitalManagementSystem.repository.BedRepository;
+import com.hms.HospitalManagementSystem.repository.EncounterRepository;
 import com.hms.HospitalManagementSystem.repository.PatientRepository;
 import com.hms.HospitalManagementSystem.repository.UserRepository;
+import com.hms.HospitalManagementSystem.service.AppointmentService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -39,7 +41,11 @@ class AdmissionServiceTest {
     @Mock
     private UserRepository userRepository;
     @Mock
+    private EncounterRepository encounterRepository;
+    @Mock
     private IpdMapper ipdMapper;
+    @Mock
+    private AppointmentService appointmentService;
 
     @InjectMocks
     private AdmissionService admissionService;

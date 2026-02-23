@@ -1,9 +1,10 @@
 package com.hms.HospitalManagementSystem.service;
 
-import com.hms.HospitalManagementSystem.dto.PermissionDto;
-import com.hms.HospitalManagementSystem.dto.RoleDto;
+import com.hms.HospitalManagementSystem.dto.response.PermissionDto;
+import com.hms.HospitalManagementSystem.dto.response.RoleDto;
 import com.hms.HospitalManagementSystem.entity.Permission;
 import com.hms.HospitalManagementSystem.entity.Role;
+import com.hms.HospitalManagementSystem.exception.ResourceNotFoundException;
 import com.hms.HospitalManagementSystem.repository.PermissionRepository;
 import com.hms.HospitalManagementSystem.repository.RoleRepository;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +38,7 @@ public class RoleService {
 
     public RoleDto updateRolePermissions(Long roleId, Set<Long> permissionIds) {
         Role role = roleRepository.findById(roleId)
-                .orElseThrow(() -> new RuntimeException("Role not found with ID: " + roleId));
+                .orElseThrow(() -> new ResourceNotFoundException("Role not found with ID: " + roleId));
 
         List<Permission> permissions = permissionRepository.findAllById(permissionIds);
         role.setPermissions(new HashSet<>(permissions));

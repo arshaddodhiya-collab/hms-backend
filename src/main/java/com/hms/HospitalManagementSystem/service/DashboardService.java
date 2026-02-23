@@ -1,7 +1,7 @@
 package com.hms.HospitalManagementSystem.service;
 
-import com.hms.HospitalManagementSystem.dto.ActivityDTO;
-import com.hms.HospitalManagementSystem.dto.DashboardDTO;
+import com.hms.HospitalManagementSystem.dto.response.ActivityDTO;
+import com.hms.HospitalManagementSystem.dto.response.DashboardDTO;
 import com.hms.HospitalManagementSystem.entity.*;
 import com.hms.HospitalManagementSystem.enums.AppointmentStatus;
 import com.hms.HospitalManagementSystem.enums.LabRequestStatus;

@@ -5,6 +5,8 @@ import com.hms.HospitalManagementSystem.dto.request.PatientUpdateRequest;
 import com.hms.HospitalManagementSystem.dto.response.PatientDetailsResponse;
 import com.hms.HospitalManagementSystem.dto.response.PatientResponse;
 import com.hms.HospitalManagementSystem.entity.Patient;
+import com.hms.HospitalManagementSystem.exception.ConflictException;
+import com.hms.HospitalManagementSystem.exception.ResourceNotFoundException;
 import com.hms.HospitalManagementSystem.mapper.PatientMapper;
 import com.hms.HospitalManagementSystem.repository.PatientRepository;
 import com.hms.HospitalManagementSystem.specification.PatientSpecification;
@@ -30,11 +32,11 @@ public class PatientService {
 
         // Check for duplicates
         if (patientRepository.existsByContact(request.getContact())) {
-            throw new IllegalArgumentException("Patient with this contact number already exists.");
+            throw new ConflictException("Patient with this contact number already exists.");
         }
         if (request.getEmail() != null && !request.getEmail().isEmpty()
                 && patientRepository.existsByEmail(request.getEmail())) {
-            throw new IllegalArgumentException("Patient with this email already exists.");
+            throw new ConflictException("Patient with this email already exists.");
         }
 
         // Further duplicate check based on Name + DOB + Contact logic if needed
@@ -45,7 +47,7 @@ public class PatientService {
                 request.getLastName(),
                 request.getDob(),
                 request.getContact()).ifPresent(p -> {
-                    throw new IllegalArgumentException("Duplicate patient record found.");
+                    throw new ConflictException("Duplicate patient record found.");
                 });
 
         Patient patient = patientMapper.toEntity(request);
@@ -62,20 +64,20 @@ public class PatientService {
     @Transactional(readOnly = true)
     public PatientDetailsResponse getPatientDetails(Long id) {
         Patient patient = patientRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Patient not found with ID: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Patient not found with ID: " + id));
         return patientMapper.toDetailsResponse(patient);
     }
 
     @Transactional
     public PatientResponse updatePatient(Long id, PatientUpdateRequest request) {
         Patient patient = patientRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Patient not found with ID: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Patient not found with ID: " + id));
 
         // Optimistic locking check is handled by @Version and Hibernate,
         // but if we want manual version check we could do it here.
         if (request.getVersion() != null && patient.getVersion() != null
                 && !request.getVersion().equals(patient.getVersion())) {
-            throw new RuntimeException(
+            throw new ConflictException(
                     "Patient record has been modified by another transaction. Please refresh and try again.");
         }
 
@@ -87,7 +89,7 @@ public class PatientService {
     @Transactional
     public void deletePatient(Long id) {
         Patient patient = patientRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Patient not found with ID: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Patient not found with ID: " + id));
         patient.setDeleted(true);
         patient.setActive(false);
         patientRepository.save(patient);

@@ -54,8 +54,8 @@ public class VitalsController {
 
     private Long getCurrentUserId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !authentication.isAuthenticated()) {
-            throw new RuntimeException("User not authenticated");
+        if (authentication == null || authentication.getName() == null) {
+            throw new org.springframework.security.authentication.BadCredentialsException("User not authenticated");
         }
         String username = authentication.getName();
         User user = userService.getUserByUsername(username);

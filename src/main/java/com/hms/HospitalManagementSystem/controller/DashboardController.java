@@ -1,7 +1,7 @@
 package com.hms.HospitalManagementSystem.controller;
 
-import com.hms.HospitalManagementSystem.dto.ActivityDTO;
-import com.hms.HospitalManagementSystem.dto.DashboardDTO;
+import com.hms.HospitalManagementSystem.dto.response.ActivityDTO;
+import com.hms.HospitalManagementSystem.dto.response.DashboardDTO;
 import com.hms.HospitalManagementSystem.service.DashboardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

@@ -32,7 +32,8 @@ public class LabService {
     @Transactional
     public LabTestCatalog createLabTest(LabTestRequest request) {
         if (labTestCatalogRepository.findByCode(request.getCode()).isPresent()) {
-            throw new RuntimeException("Lab test with code " + request.getCode() + " already exists.");
+            throw new com.hms.HospitalManagementSystem.exception.ConflictException(
+                    "Lab Test already exists:h code " + request.getCode() + " already exists.");
         }
 
         LabTestCatalog labTest = LabTestCatalog.builder()
@@ -55,7 +56,8 @@ public class LabService {
     @Transactional
     public LabRequest createLabRequest(LabRequestCreateRequest request) {
         Encounter encounter = encounterRepository.findById(request.getEncounterId())
-                .orElseThrow(() -> new RuntimeException("Encounter not found"));
+                .orElseThrow(() -> new com.hms.HospitalManagementSystem.exception.ResourceNotFoundException(
+                        "Encounter not found"));
 
         if (encounter.getStatus() == EncounterStatus.COMPLETED || encounter.getStatus() == EncounterStatus.CANCELLED) {
             // In some hospitals, you can add tests after completion, but usually it's
@@ -69,7 +71,8 @@ public class LabService {
                 .orElseThrow(() -> new RuntimeException("Patient not found"));
 
         LabTestCatalog labTest = labTestCatalogRepository.findById(request.getLabTestId())
-                .orElseThrow(() -> new RuntimeException("Lab Test not found"));
+                .orElseThrow(() -> new com.hms.HospitalManagementSystem.exception.ResourceNotFoundException(
+                        "Lab Test not found"));
 
         LabRequest labRequest = LabRequest.builder()
                 .encounter(encounter)
@@ -90,7 +93,8 @@ public class LabService {
     public LabRequest getLabRequestById(Long id) {
         return labRequestRepository.findByIdWithResults(id)
                 .orElse(labRequestRepository.findById(id)
-                        .orElseThrow(() -> new RuntimeException("Lab Request not found")));
+                        .orElseThrow(() -> new com.hms.HospitalManagementSystem.exception.ResourceNotFoundException(
+                                "Lab Request not found")));
     }
 
     public List<LabRequest> getRequestsByEncounter(Long encounterId) {

@@ -1,6 +1,6 @@
 package com.hms.HospitalManagementSystem.controller;
 
-import com.hms.HospitalManagementSystem.dto.DepartmentDto;
+import com.hms.HospitalManagementSystem.dto.response.DepartmentDto;
 import com.hms.HospitalManagementSystem.service.DepartmentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

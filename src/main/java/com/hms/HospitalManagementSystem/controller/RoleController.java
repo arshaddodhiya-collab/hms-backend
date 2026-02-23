@@ -1,7 +1,7 @@
 package com.hms.HospitalManagementSystem.controller;
 
-import com.hms.HospitalManagementSystem.dto.PermissionDto;
-import com.hms.HospitalManagementSystem.dto.RoleDto;
+import com.hms.HospitalManagementSystem.dto.response.PermissionDto;
+import com.hms.HospitalManagementSystem.dto.response.RoleDto;
 import com.hms.HospitalManagementSystem.service.RoleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

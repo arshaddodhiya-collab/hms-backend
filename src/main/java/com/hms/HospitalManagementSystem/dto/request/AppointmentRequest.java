@@ -1,4 +1,4 @@
-package com.hms.HospitalManagementSystem.dto;
+package com.hms.HospitalManagementSystem.dto.request;
 
 import lombok.Data;
 import java.time.Instant;

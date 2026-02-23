@@ -1,6 +1,6 @@
 package com.hms.HospitalManagementSystem.controller;
 
-import com.hms.HospitalManagementSystem.dto.AppointmentRequest;
+import com.hms.HospitalManagementSystem.dto.request.AppointmentRequest;
 import com.hms.HospitalManagementSystem.dto.response.AppointmentResponse;
 import com.hms.HospitalManagementSystem.entity.Appointment;
 import com.hms.HospitalManagementSystem.service.AppointmentService;

@@ -1,6 +1,6 @@
 package com.hms.HospitalManagementSystem.mapper;
 
-import com.hms.HospitalManagementSystem.dto.MedicalHistoryDto;
+import com.hms.HospitalManagementSystem.dto.response.MedicalHistoryDto;
 import com.hms.HospitalManagementSystem.dto.request.PatientRegisterRequest;
 import com.hms.HospitalManagementSystem.dto.request.PatientUpdateRequest;
 import com.hms.HospitalManagementSystem.dto.response.PatientDetailsResponse;

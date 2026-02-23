@@ -5,6 +5,8 @@ import com.hms.HospitalManagementSystem.dto.request.RefreshTokenRequest;
 import com.hms.HospitalManagementSystem.dto.request.RegisterRequest;
 import com.hms.HospitalManagementSystem.dto.response.AuthResponse;
 import com.hms.HospitalManagementSystem.entity.*;
+import com.hms.HospitalManagementSystem.exception.ConflictException;
+import com.hms.HospitalManagementSystem.exception.ResourceNotFoundException;
 import com.hms.HospitalManagementSystem.repository.*;
 import com.hms.HospitalManagementSystem.security.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +20,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.AuthenticationManager;
+// import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -56,19 +60,19 @@ public class AuthService {
 
     public AuthResponse register(RegisterRequest request, HttpServletResponse response) {
         if (userRepository.findByUsername(request.getUsername()).isPresent()) {
-            throw new RuntimeException("Username is already taken!");
+            throw new ConflictException("Username is already taken!");
         }
 
         User user = new User();
         user.setUsername(request.getUsername());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setFullName(request.getFullName());
-        user.setFullName(request.getFullName());
 
         // Handle Department
         if (request.getDepartment() != null && !request.getDepartment().isEmpty()) {
             Department dept = departmentRepository.findByName(request.getDepartment())
-                    .orElseThrow(() -> new RuntimeException("Department not found: " + request.getDepartment()));
+                    .orElseThrow(
+                            () -> new ResourceNotFoundException("Department not found: " + request.getDepartment()));
             user.setDepartment(dept);
         }
 
@@ -82,7 +86,7 @@ public class AuthService {
         String roleName = normalizeRoleName(roleInput);
 
         Role role = roleRepository.findByName(roleName)
-                .orElseThrow(() -> new RuntimeException("Role not found: " + roleName));
+                .orElseThrow(() -> new ResourceNotFoundException("Role not found: " + roleName));
         roles.add(role);
         user.setRoles(roles);
 
@@ -101,7 +105,7 @@ public class AuthService {
                 new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
 
         User user = userRepository.findByUsername(request.getUsername())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new BadCredentialsException("User not found"));
         UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUsername());
 
         String accessToken = jwtService.generateTokenWithUserId(userDetails, user.getId());
@@ -137,7 +141,7 @@ public class AuthService {
         }
 
         if (refreshToken == null) {
-            throw new RuntimeException("Refresh token is missing!");
+            throw new BadCredentialsException("Refresh token is missing!");
         }
 
         return refreshTokenRepository.findByToken(refreshToken)
@@ -155,7 +159,7 @@ public class AuthService {
 
                     return new AuthResponse(user.getId(), user.getUsername(), roleName, permissions);
                 })
-                .orElseThrow(() -> new RuntimeException("Refresh token is not in database!"));
+                .orElseThrow(() -> new BadCredentialsException("Refresh token is not in database!"));
     }
 
     public void logout(HttpServletResponse response) {
@@ -168,7 +172,7 @@ public class AuthService {
     // needs user info
     public AuthResponse getCurrentUser(String username) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         String roleName = user.getRoles().isEmpty() ? "" : user.getRoles().iterator().next().getName();
         Set<String> permissions = new HashSet<>();
@@ -204,9 +208,9 @@ public class AuthService {
     }
 
     public RefreshToken verifyExpiration(RefreshToken token) {
-        if (token.getExpiryDate().compareTo(Instant.now()) < 0) {
+        if (token.getExpiryDate().compareTo(java.time.Instant.now()) < 0) {
             refreshTokenRepository.delete(token);
-            throw new RuntimeException("Refresh token was expired. Please make a new signin request");
+            throw new BadCredentialsException("Refresh token was expired. Please make a new signin request");
         }
         return token;
     }

@@ -1,4 +1,4 @@
-package com.hms.HospitalManagementSystem.dto;
+package com.hms.HospitalManagementSystem.dto.response;
 
 import com.hms.HospitalManagementSystem.entity.MedicalHistory;
 import lombok.Data;

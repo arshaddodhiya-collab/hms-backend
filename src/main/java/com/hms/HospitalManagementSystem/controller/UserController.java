@@ -1,6 +1,6 @@
 package com.hms.HospitalManagementSystem.controller;
 
-import com.hms.HospitalManagementSystem.dto.UserDto;
+import com.hms.HospitalManagementSystem.dto.response.UserDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;

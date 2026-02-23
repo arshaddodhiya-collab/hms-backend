@@ -1,8 +1,9 @@
 package com.hms.HospitalManagementSystem.service;
 
-import com.hms.HospitalManagementSystem.dto.UserDto;
+import com.hms.HospitalManagementSystem.dto.response.UserDto;
 import com.hms.HospitalManagementSystem.entity.Role;
 import com.hms.HospitalManagementSystem.entity.User;
+import com.hms.HospitalManagementSystem.exception.ConflictException;
 import com.hms.HospitalManagementSystem.repository.DepartmentRepository;
 import com.hms.HospitalManagementSystem.repository.RoleRepository;
 import com.hms.HospitalManagementSystem.repository.UserRepository;
@@ -53,7 +54,7 @@ public class UserService {
 
     public UserDto createUser(UserDto dto) {
         if (userRepository.findByUsername(dto.getUsername()).isPresent()) {
-            throw new RuntimeException("Username already exists: " + dto.getUsername());
+            throw new ConflictException("Username already exists: " + dto.getUsername());
         }
 
         User user = new User();
