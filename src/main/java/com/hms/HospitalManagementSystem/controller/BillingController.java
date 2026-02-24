@@ -21,6 +21,7 @@ import java.util.List;
 public class BillingController {
 
     private final BillingService billingService;
+    private final com.hms.HospitalManagementSystem.service.ReportService reportService;
 
     @PostMapping("/invoices")
     @PreAuthorize("hasAuthority('CMP_INVOICE_GENERATE')")
@@ -56,5 +57,19 @@ public class BillingController {
     @PreAuthorize("hasAuthority('CMP_BILLING_SUMMARY')")
     public ResponseEntity<List<InvoiceResponse>> getAllInvoices() {
         return ResponseEntity.ok(billingService.getAllInvoices());
+    }
+
+    @GetMapping("/invoices/{id}/pdf")
+    @PreAuthorize("hasAuthority('CMP_INVOICE_GENERATE') or hasAuthority('CMP_BILLING_SUMMARY')")
+    public ResponseEntity<byte[]> getInvoicePdf(@PathVariable Long id) {
+        try {
+            byte[] pdf = reportService.generateInvoicePdf(id);
+            org.springframework.http.HttpHeaders headers = new org.springframework.http.HttpHeaders();
+            headers.setContentType(org.springframework.http.MediaType.APPLICATION_PDF);
+            headers.setContentDispositionFormData("filename", "invoice_" + id + ".pdf");
+            return new ResponseEntity<>(pdf, headers, HttpStatus.OK);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 }

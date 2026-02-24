@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 public class LabController {
 
     private final LabService labService;
+    private final com.hms.HospitalManagementSystem.service.ReportService reportService;
 
     // --- Lab Test Catalog Endpoints ---
 
@@ -95,6 +96,20 @@ public class LabController {
             @Valid @RequestBody List<LabResultRequest> resultRequests) {
         LabRequest labRequest = labService.addLabResults(id, resultRequests);
         return ResponseEntity.ok(mapToResponse(labRequest));
+    }
+
+    @GetMapping("/lab-requests/{id}/pdf")
+    @PreAuthorize("hasAnyAuthority('CMP_LAB_READ', 'CMP_LAB_ENTRY', 'CMP_CONSULTATION_READ')")
+    public ResponseEntity<byte[]> getLabReportPdf(@PathVariable Long id) {
+        try {
+            byte[] pdf = reportService.generateLabReportPdf(id);
+            org.springframework.http.HttpHeaders headers = new org.springframework.http.HttpHeaders();
+            headers.setContentType(org.springframework.http.MediaType.APPLICATION_PDF);
+            headers.setContentDispositionFormData("filename", "lab_report_" + id + ".pdf");
+            return new ResponseEntity<>(pdf, headers, org.springframework.http.HttpStatus.OK);
+        } catch (Exception e) {
+            return ResponseEntity.status(org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     // --- Mapper Helper ---
