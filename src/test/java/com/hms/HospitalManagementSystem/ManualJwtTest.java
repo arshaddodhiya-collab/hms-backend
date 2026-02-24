@@ -1,6 +1,8 @@
 package com.hms.HospitalManagementSystem;
 
 import com.hms.HospitalManagementSystem.service.JwtService;
+import com.hms.HospitalManagementSystem.service.impl.JwtServiceImpl;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.security.core.userdetails.User;
@@ -16,7 +18,7 @@ public class ManualJwtTest {
     public void testJwtGenerationAndValidation() {
         System.out.println("--- START MANUAL JWT TEST ---");
 
-        JwtService jwtService = new JwtService();
+        JwtService jwtService = new JwtServiceImpl();
         // Inject values manually since we aren't using Spring Context
         // Secret must be Base64 encoded.
         // "ThisIsASecretKeyThatIsLongEnoughForHS256Algorithm" -> Base64
