@@ -35,7 +35,7 @@ public class AdmissionService {
     private final BillingService billingService;
     private final IpdMapper ipdMapper;
     private final EncounterRepository encounterRepository;
-    private final com.hms.HospitalManagementSystem.service.AppointmentService appointmentService;
+    private final AppointmentService appointmentService;
 
     @Transactional
     public AdmissionResponse admitPatient(AdmissionRequest request) {
