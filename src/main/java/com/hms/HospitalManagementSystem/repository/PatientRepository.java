@@ -14,6 +14,8 @@ import java.util.List;
 @Repository
 public interface PatientRepository extends JpaRepository<Patient, Long>, JpaSpecificationExecutor<Patient> {
 
+        <T> Optional<T> findById(Long id, Class<T> type);
+
         Optional<Patient> findByContact(String contact);
 
         Optional<Patient> findByEmail(String email);

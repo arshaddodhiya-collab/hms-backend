@@ -2,8 +2,8 @@ package com.hms.HospitalManagementSystem.service.impl;
 
 import com.hms.HospitalManagementSystem.dto.request.PatientRegisterRequest;
 import com.hms.HospitalManagementSystem.dto.request.PatientUpdateRequest;
-import com.hms.HospitalManagementSystem.dto.response.PatientDetailsResponse;
-import com.hms.HospitalManagementSystem.dto.response.PatientResponse;
+import com.hms.HospitalManagementSystem.projection.PatientDetailsProjection;
+import com.hms.HospitalManagementSystem.projection.PatientProjection;
 import com.hms.HospitalManagementSystem.entity.Patient;
 import com.hms.HospitalManagementSystem.exception.ConflictException;
 import com.hms.HospitalManagementSystem.exception.ResourceNotFoundException;
@@ -29,7 +29,7 @@ public class PatientServiceImpl implements PatientService {
 
     @Override
     @Transactional
-    public PatientResponse registerPatient(PatientRegisterRequest request) {
+    public PatientProjection registerPatient(PatientRegisterRequest request) {
         log.info("Registering new patient: {} {}", request.getFirstName(), request.getLastName());
 
         // Check for duplicates
@@ -53,28 +53,27 @@ public class PatientServiceImpl implements PatientService {
                 });
 
         Patient patient = patientMapper.toEntity(request);
-        Patient savedPatient = patientRepository.save(patient);
-        return patientMapper.toResponse(savedPatient);
+        Patient savedPatient = patientRepository.saveAndFlush(patient);
+        return patientRepository.findById(savedPatient.getId(), PatientProjection.class).orElseThrow();
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Page<PatientResponse> searchPatients(String query, Pageable pageable) {
+    public Page<PatientProjection> searchPatients(String query, Pageable pageable) {
         Specification<Patient> spec = PatientSpecification.search(query);
-        return patientRepository.findAll(spec, pageable).map(patientMapper::toResponse);
+        return patientRepository.findBy(spec, q -> q.as(PatientProjection.class).page(pageable));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public PatientDetailsResponse getPatientDetails(Long id) {
-        Patient patient = patientRepository.findById(id)
+    public PatientDetailsProjection getPatientDetails(Long id) {
+        return patientRepository.findById(id, PatientDetailsProjection.class)
                 .orElseThrow(() -> new ResourceNotFoundException("Patient not found with ID: " + id));
-        return patientMapper.toDetailsResponse(patient);
     }
 
     @Override
     @Transactional
-    public PatientResponse updatePatient(Long id, PatientUpdateRequest request) {
+    public PatientProjection updatePatient(Long id, PatientUpdateRequest request) {
         Patient patient = patientRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Patient not found with ID: " + id));
 
@@ -87,8 +86,8 @@ public class PatientServiceImpl implements PatientService {
         }
 
         patientMapper.updateEntityFromRequest(request, patient);
-        Patient updatedPatient = patientRepository.save(patient);
-        return patientMapper.toResponse(updatedPatient);
+        Patient updatedPatient = patientRepository.saveAndFlush(patient);
+        return patientRepository.findById(updatedPatient.getId(), PatientProjection.class).orElseThrow();
     }
 
     @Override

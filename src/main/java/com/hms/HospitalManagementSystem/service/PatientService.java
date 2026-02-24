@@ -2,19 +2,19 @@ package com.hms.HospitalManagementSystem.service;
 
 import com.hms.HospitalManagementSystem.dto.request.PatientRegisterRequest;
 import com.hms.HospitalManagementSystem.dto.request.PatientUpdateRequest;
-import com.hms.HospitalManagementSystem.dto.response.PatientDetailsResponse;
-import com.hms.HospitalManagementSystem.dto.response.PatientResponse;
+import com.hms.HospitalManagementSystem.projection.PatientDetailsProjection;
+import com.hms.HospitalManagementSystem.projection.PatientProjection;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface PatientService {
-    PatientResponse registerPatient(PatientRegisterRequest request);
+    PatientProjection registerPatient(PatientRegisterRequest request);
 
-    Page<PatientResponse> searchPatients(String query, Pageable pageable);
+    Page<PatientProjection> searchPatients(String query, Pageable pageable);
 
-    PatientDetailsResponse getPatientDetails(Long id);
+    PatientDetailsProjection getPatientDetails(Long id);
 
-    PatientResponse updatePatient(Long id, PatientUpdateRequest request);
+    PatientProjection updatePatient(Long id, PatientUpdateRequest request);
 
     void deletePatient(Long id);
 }
