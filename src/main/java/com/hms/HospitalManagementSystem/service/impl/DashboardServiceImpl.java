@@ -3,7 +3,7 @@ package com.hms.HospitalManagementSystem.service.impl;
 import com.hms.HospitalManagementSystem.dto.response.ActivityDTO;
 import com.hms.HospitalManagementSystem.dto.response.DashboardDTO;
 import com.hms.HospitalManagementSystem.entity.*;
-import com.hms.HospitalManagementSystem.enums.AppointmentStatus;
+// import com.hms.HospitalManagementSystem.enums.AppointmentStatus;
 import com.hms.HospitalManagementSystem.enums.LabRequestStatus;
 import com.hms.HospitalManagementSystem.repository.*;
 import com.hms.HospitalManagementSystem.service.DashboardService;

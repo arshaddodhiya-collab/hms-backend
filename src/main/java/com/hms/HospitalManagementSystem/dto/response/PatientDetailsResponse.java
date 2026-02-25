@@ -1,6 +1,6 @@
 package com.hms.HospitalManagementSystem.dto.response;
 
-import com.hms.HospitalManagementSystem.dto.response.MedicalHistoryDto;
+// import com.hms.HospitalManagementSystem.dto.response.MedicalHistoryDto;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;

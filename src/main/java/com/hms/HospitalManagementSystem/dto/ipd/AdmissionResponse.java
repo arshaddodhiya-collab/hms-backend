@@ -1,6 +1,6 @@
 package com.hms.HospitalManagementSystem.dto.ipd;
 
-import com.hms.HospitalManagementSystem.dto.ipd.BedResponse;
+// import com.hms.HospitalManagementSystem.dto.ipd.BedResponse;
 import com.hms.HospitalManagementSystem.enums.AdmissionStatus;
 import lombok.Data;
 
