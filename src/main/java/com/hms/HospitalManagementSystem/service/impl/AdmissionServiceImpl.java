@@ -138,6 +138,13 @@ public class AdmissionServiceImpl implements AdmissionService {
         bed.setOccupied(false);
         bedRepository.save(bed);
 
+        // 3. Complete the IPD Encounter
+        encounterRepository.findByAdmissionId(admissionId).ifPresent(encounter -> {
+            encounter.setStatus(com.hms.HospitalManagementSystem.enums.EncounterStatus.COMPLETED);
+            encounter.setCompletedAt(LocalDateTime.now());
+            encounterRepository.save(encounter);
+        });
+
         Admission savedAdmission = admissionRepository.save(admission);
 
         // 3. Trigger Billing
