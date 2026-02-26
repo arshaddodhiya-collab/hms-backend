@@ -32,6 +32,7 @@ public class BillingServiceImpl implements BillingService {
     private final InvoiceRepository invoiceRepository;
     private final ChargeRepository chargeRepository;
     private final PatientRepository patientRepository;
+    private final AdmissionRepository admissionRepository;
     private final PaymentRepository paymentRepository;
     private final InvoiceMapper invoiceMapper;
     private final PaymentMapper paymentMapper;
@@ -49,6 +50,14 @@ public class BillingServiceImpl implements BillingService {
                 .orElseThrow(
                         () -> new ResourceNotFoundException("Patient not found with id: " + request.getPatientId()));
         invoice.setPatient(patient);
+
+        // Set admission if provided
+        if (request.getAdmissionId() != null) {
+            Admission admission = admissionRepository.findById(request.getAdmissionId())
+                    .orElseThrow(() -> new ResourceNotFoundException(
+                            "Admission not found with id: " + request.getAdmissionId()));
+            invoice.setAdmission(admission);
+        }
 
         // Let's implement basics
         invoice.setTotalAmount(BigDecimal.ZERO);
