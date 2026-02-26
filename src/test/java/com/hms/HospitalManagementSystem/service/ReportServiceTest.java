@@ -7,10 +7,9 @@ import com.hms.HospitalManagementSystem.entity.Patient;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-
 import java.time.LocalDateTime;
 import java.util.List;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import static org.mockito.Mockito.when;
 
@@ -20,10 +19,10 @@ public class ReportServiceTest {
     @Autowired
     private ReportService reportService;
 
-    @MockBean
+    @MockitoBean
     private LabService labService;
 
-    @MockBean
+    @MockitoBean
     private BillingService billingService;
 
     @Test
@@ -47,7 +46,7 @@ public class ReportServiceTest {
         mockResult.setUnit("g/dL");
         mockResult.setReferenceRange("13.8 - 17.2");
         mockResult.setAbnormal(false);
-        mockRequest.setLabResults(List.of(mockResult));
+        mockRequest.setLabResults(java.util.Set.of(mockResult));
 
         when(labService.getLabRequestById(1L)).thenReturn(mockRequest);
 

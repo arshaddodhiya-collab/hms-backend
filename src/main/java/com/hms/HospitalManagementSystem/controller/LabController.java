@@ -133,17 +133,34 @@ public class LabController {
                 .createdAt(request.getCreatedAt())
                 .updatedAt(request.getUpdatedAt())
                 .results(results)
-                .parameters(request.getLabTest() != null && request.getLabTest().getParameters() != null
-                        ? request.getLabTest().getParameters().stream()
-                                .map(p -> com.hms.HospitalManagementSystem.dto.response.LabTestParameterDto.builder()
-                                        .id(p.getId())
-                                        .parameterName(p.getParameterName())
-                                        .unit(p.getUnit())
-                                        .referenceRange(p.getReferenceRange())
-                                        .build())
-                                .collect(Collectors.toList())
-                        : null)
+                .parameters(mapParameters(request.getLabTest()))
                 .build();
+    }
+
+    private List<com.hms.HospitalManagementSystem.dto.response.LabTestParameterDto> mapParameters(
+            LabTestCatalog labTest) {
+        if (labTest == null)
+            return null;
+
+        if (labTest.getParameters() != null && !labTest.getParameters().isEmpty()) {
+            return labTest.getParameters().stream()
+                    .map(p -> com.hms.HospitalManagementSystem.dto.response.LabTestParameterDto.builder()
+                            .id(p.getId())
+                            .parameterName(p.getParameterName())
+                            .unit(p.getUnit())
+                            .referenceRange(p.getReferenceRange())
+                            .build())
+                    .collect(Collectors.toList());
+        } else {
+            // Fallback for singular tests that don't have explicit parameters
+            return List.of(com.hms.HospitalManagementSystem.dto.response.LabTestParameterDto.builder()
+                    .id(labTest.getId() * -1) // Use negative ID to avoid collision if necessary, but DTO doesn't
+                                              // strictly care
+                    .parameterName(labTest.getName())
+                    .unit("")
+                    .referenceRange(labTest.getReferenceRange())
+                    .build());
+        }
     }
 
     private LabResultResponse mapResultToResponse(LabResult result) {

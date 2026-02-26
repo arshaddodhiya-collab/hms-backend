@@ -47,7 +47,7 @@ public class LabTestCatalog {
 
     @OneToMany(mappedBy = "labTest", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @com.fasterxml.jackson.annotation.JsonManagedReference
-    private java.util.List<LabTestParameter> parameters;
+    private java.util.Set<LabTestParameter> parameters;
 
     @PrePersist
     protected void onCreate() {

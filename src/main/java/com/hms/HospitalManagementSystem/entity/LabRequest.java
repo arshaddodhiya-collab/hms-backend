@@ -7,6 +7,7 @@ import lombok.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "lab_requests", indexes = {
@@ -49,7 +50,7 @@ public class LabRequest {
 
     @OneToMany(mappedBy = "labRequest", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
-    private List<LabResult> labResults = new ArrayList<>();
+    private Set<LabResult> labResults = new java.util.HashSet<>();
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;

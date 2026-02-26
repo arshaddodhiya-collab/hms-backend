@@ -87,9 +87,9 @@ public class ReportServiceImpl implements ReportService {
         parameters.put("technicianNotes",
                 labRequest.getTechnicianNotes() == null ? "" : labRequest.getTechnicianNotes());
 
-        List<com.hms.HospitalManagementSystem.entity.LabResult> results = labRequest.getLabResults();
+        java.util.Set<com.hms.HospitalManagementSystem.entity.LabResult> results = labRequest.getLabResults();
         if (results == null) {
-            results = java.util.Collections.emptyList();
+            results = java.util.Collections.emptySet();
         }
 
         List<LabResultDtoWrapper> resultDtos = results.stream().map(r -> new LabResultDtoWrapper(r)).toList();

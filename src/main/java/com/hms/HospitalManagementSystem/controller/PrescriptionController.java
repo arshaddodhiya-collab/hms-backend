@@ -6,6 +6,7 @@ import com.hms.HospitalManagementSystem.dto.response.PrescriptionResponse;
 import com.hms.HospitalManagementSystem.entity.Prescription;
 import com.hms.HospitalManagementSystem.entity.PrescriptionItem;
 import com.hms.HospitalManagementSystem.entity.User;
+import com.hms.HospitalManagementSystem.exception.ResourceNotFoundException;
 import com.hms.HospitalManagementSystem.service.PrescriptionService;
 import com.hms.HospitalManagementSystem.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -56,8 +57,12 @@ public class PrescriptionController {
         @GetMapping("/{encounterId}/prescriptions")
         @PreAuthorize("hasAnyAuthority('CMP_PRESCRIPTION_READ', 'CMP_CONSULTATION_READ')")
         public ResponseEntity<PrescriptionResponse> getPrescription(@PathVariable Long encounterId) {
-                Prescription prescription = prescriptionService.getPrescriptionByEncounterId(encounterId);
-                return ResponseEntity.ok(mapToResponse(prescription));
+                try {
+                        Prescription prescription = prescriptionService.getPrescriptionByEncounterId(encounterId);
+                        return ResponseEntity.ok(mapToResponse(prescription));
+                } catch (ResourceNotFoundException e) {
+                        return ResponseEntity.ok(null); // Or empty response DTO based on frontend expectations
+                }
         }
 
         private Long getCurrentUserId() {
