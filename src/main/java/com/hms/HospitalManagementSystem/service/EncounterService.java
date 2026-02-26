@@ -1,31 +1,32 @@
 package com.hms.HospitalManagementSystem.service;
 
 import com.hms.HospitalManagementSystem.dto.ipd.RoundRequest;
-import com.hms.HospitalManagementSystem.entity.Encounter;
-import com.hms.HospitalManagementSystem.entity.Round;
+import com.hms.HospitalManagementSystem.dto.response.EncounterResponse;
+import com.hms.HospitalManagementSystem.dto.response.RoundResponse;
 
 import java.util.List;
 
 public interface EncounterService {
-    Encounter startEncounter(Long appointmentId, Long patientId, Long doctorId);
+    EncounterResponse startEncounter(Long appointmentId, Long patientId, Long doctorId);
 
-    Encounter updateClinicalNotes(Long id, String chiefComplaint, String diagnosis, String notes, Long currentUserId);
+    EncounterResponse updateClinicalNotes(Long id, String chiefComplaint, String diagnosis, String notes,
+            Long currentUserId);
 
-    Encounter completeEncounter(Long id, Long currentUserId);
+    EncounterResponse completeEncounter(Long id, Long currentUserId);
 
-    Encounter getEncounterById(Long id);
+    EncounterResponse getEncounterById(Long id);
 
-    Encounter getEncounterByAppointmentId(Long appointmentId);
+    EncounterResponse getEncounterByAppointmentId(Long appointmentId);
 
-    List<Encounter> getTriageQueue();
+    List<EncounterResponse> getTriageQueue();
 
-    List<Encounter> getDoctorQueue(Long doctorId);
+    List<EncounterResponse> getDoctorQueue(Long doctorId);
 
-    List<Encounter> getOpdDoctorQueue(Long doctorId);
+    List<EncounterResponse> getOpdDoctorQueue(Long doctorId);
 
-    List<Encounter> getPatientEncounters(Long patientId);
+    List<EncounterResponse> getPatientEncounters(Long patientId);
 
-    Round addRound(RoundRequest request, Long doctorId);
+    RoundResponse addRound(RoundRequest request, Long doctorId);
 
-    List<Encounter> getIpdDoctorQueue(Long doctorId);
+    List<EncounterResponse> getIpdDoctorQueue(Long doctorId);
 }

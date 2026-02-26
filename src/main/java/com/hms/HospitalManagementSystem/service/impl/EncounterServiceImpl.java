@@ -5,8 +5,11 @@ import com.hms.HospitalManagementSystem.entity.*;
 import com.hms.HospitalManagementSystem.enums.AppointmentStatus;
 import com.hms.HospitalManagementSystem.enums.EncounterStatus;
 import com.hms.HospitalManagementSystem.enums.PrescriptionStatus;
+import com.hms.HospitalManagementSystem.dto.response.EncounterResponse;
+import com.hms.HospitalManagementSystem.dto.response.RoundResponse;
 import com.hms.HospitalManagementSystem.exception.ConflictException;
 import com.hms.HospitalManagementSystem.exception.ResourceNotFoundException;
+import com.hms.HospitalManagementSystem.mapper.EncounterMapper;
 import com.hms.HospitalManagementSystem.repository.AppointmentRepository;
 import com.hms.HospitalManagementSystem.repository.EncounterRepository;
 import com.hms.HospitalManagementSystem.repository.RoundRepository;
@@ -21,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -31,13 +35,15 @@ public class EncounterServiceImpl implements EncounterService {
     private final UserRepository userRepository;
     private final RoundRepository roundRepository;
     private final VitalsRepository vitalsRepository;
+    private final EncounterMapper encounterMapper;
 
     @Override
     @Transactional
-    public Encounter startEncounter(Long appointmentId, Long patientId, Long doctorId) {
+    public EncounterResponse startEncounter(Long appointmentId, Long patientId, Long doctorId) {
         // 1. Check if encounter already exists
-        return encounterRepository.findByAppointmentId(appointmentId)
+        Encounter encounter = encounterRepository.findByAppointmentId(appointmentId)
                 .orElseGet(() -> createEncounter(appointmentId, patientId, doctorId));
+        return encounterMapper.toResponse(encounter);
     }
 
     private Encounter createEncounter(Long appointmentId, Long patientId, Long doctorId) {
@@ -78,7 +84,7 @@ public class EncounterServiceImpl implements EncounterService {
 
     @Override
     @Transactional
-    public Encounter updateClinicalNotes(Long id, String chiefComplaint, String diagnosis, String notes,
+    public EncounterResponse updateClinicalNotes(Long id, String chiefComplaint, String diagnosis, String notes,
             Long currentUserId) {
         Encounter encounter = encounterRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Encounter not found"));
@@ -106,12 +112,12 @@ public class EncounterServiceImpl implements EncounterService {
             }
         }
 
-        return encounterRepository.save(encounter);
+        return encounterMapper.toResponse(encounterRepository.save(encounter));
     }
 
     @Override
     @Transactional
-    public Encounter completeEncounter(Long id, Long currentUserId) {
+    public EncounterResponse completeEncounter(Long id, Long currentUserId) {
         Encounter encounter = encounterRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Encounter not found"));
 
@@ -148,53 +154,59 @@ public class EncounterServiceImpl implements EncounterService {
             p.setIssuedAt(LocalDateTime.now());
         });
 
-        return encounterRepository.save(encounter);
+        return encounterMapper.toResponse(encounterRepository.save(encounter));
     }
 
     @Override
-    public Encounter getEncounterById(Long id) {
-        return encounterRepository.findById(id)
+    public EncounterResponse getEncounterById(Long id) {
+        Encounter encounter = encounterRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Encounter not found"));
+        return encounterMapper.toResponse(encounter);
     }
 
     @Override
-    public Encounter getEncounterByAppointmentId(Long appointmentId) {
-        return encounterRepository.findByAppointmentId(appointmentId)
+    public EncounterResponse getEncounterByAppointmentId(Long appointmentId) {
+        Encounter encounter = encounterRepository.findByAppointmentId(appointmentId)
                 .orElseThrow(
                         () -> new ResourceNotFoundException("Encounter not found for appointment " + appointmentId));
+        return encounterMapper.toResponse(encounter);
     }
 
     @Override
-    public List<Encounter> getTriageQueue() {
-        return encounterRepository.findByStatus(EncounterStatus.TRIAGE);
+    public List<EncounterResponse> getTriageQueue() {
+        return encounterRepository.findByStatus(EncounterStatus.TRIAGE)
+                .stream().map(encounterMapper::toResponse).collect(Collectors.toList());
     }
 
     @Override
-    public List<Encounter> getDoctorQueue(Long doctorId) {
+    public List<EncounterResponse> getDoctorQueue(Long doctorId) {
         // Return encounters in both TRIAGE and IN_PROGRESS status
         // This follows HMIS standards where encounters appear in consultation queue
         // immediately after triage is completed (vitals recorded)
         return encounterRepository.findByDoctorIdAndStatusIn(
                 doctorId,
-                Arrays.asList(EncounterStatus.TRIAGE, EncounterStatus.IN_PROGRESS));
+                Arrays.asList(EncounterStatus.TRIAGE, EncounterStatus.IN_PROGRESS))
+                .stream().map(encounterMapper::toResponse).collect(Collectors.toList());
     }
 
     @Override
-    public List<Encounter> getOpdDoctorQueue(Long doctorId) {
+    public List<EncounterResponse> getOpdDoctorQueue(Long doctorId) {
         return encounterRepository.findByDoctorIdAndAppointmentIsNotNullAndStatusIn(
                 doctorId,
-                Arrays.asList(EncounterStatus.TRIAGE, EncounterStatus.IN_PROGRESS));
+                Arrays.asList(EncounterStatus.TRIAGE, EncounterStatus.IN_PROGRESS))
+                .stream().map(encounterMapper::toResponse).collect(Collectors.toList());
     }
 
     @Override
-    public List<Encounter> getPatientEncounters(Long patientId) {
-        return encounterRepository.findByPatientId(patientId);
+    public List<EncounterResponse> getPatientEncounters(Long patientId) {
+        return encounterRepository.findByPatientId(patientId)
+                .stream().map(encounterMapper::toResponse).collect(Collectors.toList());
     }
 
     // IPD Rounds
     @Override
     @Transactional
-    public Round addRound(RoundRequest request, Long doctorId) {
+    public RoundResponse addRound(RoundRequest request, Long doctorId) {
         // Find Admission first to get Encounter
         // Or Request should have encounterId?
         // Plan says RoundRequest has admissionId.
@@ -232,17 +244,18 @@ public class EncounterServiceImpl implements EncounterService {
             vitalsRepository.save(vitals);
         }
 
-        return round;
+        return encounterMapper.toRoundResponse(round);
     }
 
     @Override
-    public List<Encounter> getIpdDoctorQueue(Long doctorId) {
+    public List<EncounterResponse> getIpdDoctorQueue(Long doctorId) {
         // IPD Queue: Active Encounters (Admitted) assigned to doctor or all?
         // Typically IPD patients are assigned to a doctor.
         // Encounter Status: IN_PROGRESS (since they are admitted)
         // And Admission is not null
         return encounterRepository.findByDoctorIdAndAdmissionIsNotNullAndStatusIn(
                 doctorId,
-                Arrays.asList(EncounterStatus.IN_PROGRESS));
+                Arrays.asList(EncounterStatus.IN_PROGRESS))
+                .stream().map(encounterMapper::toResponse).collect(Collectors.toList());
     }
 }

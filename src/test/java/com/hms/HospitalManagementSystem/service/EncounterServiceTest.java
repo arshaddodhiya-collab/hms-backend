@@ -1,5 +1,6 @@
 package com.hms.HospitalManagementSystem.service;
 
+import com.hms.HospitalManagementSystem.dto.response.EncounterResponse;
 import com.hms.HospitalManagementSystem.entity.Appointment;
 import com.hms.HospitalManagementSystem.entity.Encounter;
 import com.hms.HospitalManagementSystem.entity.Patient;
@@ -11,9 +12,11 @@ import com.hms.HospitalManagementSystem.enums.PrescriptionStatus;
 import com.hms.HospitalManagementSystem.repository.AppointmentRepository;
 import com.hms.HospitalManagementSystem.repository.EncounterRepository;
 import com.hms.HospitalManagementSystem.repository.UserRepository; // Not used directly in startEncounter but needed for mocks if service uses it
+import com.hms.HospitalManagementSystem.mapper.EncounterMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -38,6 +41,9 @@ class EncounterServiceTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private EncounterMapper encounterMapper;
 
     @InjectMocks
     private EncounterServiceImpl encounterService;
@@ -94,11 +100,17 @@ class EncounterServiceTest {
             return saved;
         });
 
-        Encounter result = encounterService.startEncounter(10L, 100L, 1L);
+        EncounterResponse expectedResponse = mock(EncounterResponse.class);
+        when(encounterMapper.toResponse(any(Encounter.class))).thenReturn(expectedResponse);
+
+        EncounterResponse result = encounterService.startEncounter(10L, 100L, 1L);
 
         assertNotNull(result);
-        assertEquals(50L, result.getId());
-        verify(encounterRepository).save(any(Encounter.class));
+
+        ArgumentCaptor<Encounter> captor = ArgumentCaptor.forClass(Encounter.class);
+        verify(encounterRepository).save(captor.capture());
+        Encounter saved = captor.getValue();
+        assertEquals(50L, saved.getId());
     }
 
     @Test
@@ -108,14 +120,16 @@ class EncounterServiceTest {
 
         // Mock appointment save
         when(appointmentRepository.save(any(Appointment.class))).thenReturn(appointment);
+        EncounterResponse expectedResponse = mock(EncounterResponse.class);
+        when(encounterMapper.toResponse(any(Encounter.class))).thenReturn(expectedResponse);
 
-        Encounter result = encounterService.completeEncounter(50L, 1L); // 1L is doctor ID
+        EncounterResponse result = encounterService.completeEncounter(50L, 1L); // 1L is doctor ID
 
         assertNotNull(result);
-        assertEquals(EncounterStatus.COMPLETED, result.getStatus());
-        assertEquals(AppointmentStatus.COMPLETED, result.getAppointment().getStatus());
-        assertEquals(PrescriptionStatus.ISSUED, result.getPrescriptions().get(0).getStatus());
-        assertNotNull(result.getPrescriptions().get(0).getIssuedAt());
+        assertEquals(EncounterStatus.COMPLETED, encounter.getStatus());
+        assertEquals(AppointmentStatus.COMPLETED, encounter.getAppointment().getStatus());
+        assertEquals(PrescriptionStatus.ISSUED, encounter.getPrescriptions().get(0).getStatus());
+        assertNotNull(encounter.getPrescriptions().get(0).getIssuedAt());
 
         verify(encounterRepository).save(encounter);
         verify(appointmentRepository).save(appointment);

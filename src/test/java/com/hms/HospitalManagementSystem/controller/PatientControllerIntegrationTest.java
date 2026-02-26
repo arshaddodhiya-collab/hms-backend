@@ -9,6 +9,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 
@@ -17,6 +18,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc(addFilters = false)
+@Transactional
 public class PatientControllerIntegrationTest {
 
         @Autowired
@@ -58,13 +60,15 @@ public class PatientControllerIntegrationTest {
         @Test
         public void shouldReturnCreatedWhenRegistrationDetailsAreValid() throws Exception {
                 // Given
+                String uniqueSuffix = java.util.UUID.randomUUID().toString().replaceAll("[^0-9]", "").substring(0, 7);
                 PatientRegisterRequest request = PatientRegisterRequest.builder()
                                 .firstName("John")
                                 .lastName("Doe")
                                 .dob(LocalDate.of(1990, 1, 1))
                                 .gender(Patient.Gender.MALE)
-                                .contact("9999999999") // Unique contact number for test
-                                .email("unique.john.doe@example.com") // Unique email for test
+                                .contact("999" + uniqueSuffix) // Unique 10-digit contact number for test
+                                .email("john.doe." + java.util.UUID.randomUUID().toString().substring(0, 8)
+                                                + "@example.com") // Unique email for test
                                 .build();
 
                 // When/Then
