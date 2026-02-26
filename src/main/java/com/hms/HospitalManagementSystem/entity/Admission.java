@@ -15,11 +15,7 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Admission {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class Admission extends BaseEntity {
 
     @Column(name = "admission_date", nullable = false)
     private LocalDateTime admissionDate;
@@ -40,12 +36,6 @@ public class Admission {
     @Column(columnDefinition = "TEXT")
     private String advice;
 
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "patient_id", nullable = false)
     private Patient patient;
@@ -59,19 +49,12 @@ public class Admission {
     private Bed bed;
 
     @PrePersist
-    protected void onCreate() {
-        createdAt = LocalDateTime.now();
-        updatedAt = LocalDateTime.now();
+    protected void prePersistAdmission() {
         if (admissionDate == null) {
             admissionDate = LocalDateTime.now();
         }
         if (status == null) {
             status = AdmissionStatus.ADMITTED;
         }
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        updatedAt = LocalDateTime.now();
     }
 }

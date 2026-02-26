@@ -25,7 +25,6 @@ public class ManualJwtTest {
         String base64Secret = "VGhpc0lzQVNlY3JldEtleVGhhdElzTG9uZ0Vub3VnaEZvckhTMjU2QWxnb3JpdGht";
         ReflectionTestUtils.setField(jwtService, "secretKey", base64Secret);
         ReflectionTestUtils.setField(jwtService, "jwtExpiration", 1800000L); // 30 mins
-        ReflectionTestUtils.setField(jwtService, "refreshExpiration", 604800000L); // 7 days
 
         UserDetails user = new User("admin", "password", new ArrayList<>());
 

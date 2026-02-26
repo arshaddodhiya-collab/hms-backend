@@ -12,6 +12,7 @@ import com.hms.HospitalManagementSystem.enums.PaymentMethod;
 import com.hms.HospitalManagementSystem.enums.PaymentStatus;
 import com.hms.HospitalManagementSystem.exception.ResourceNotFoundException;
 import com.hms.HospitalManagementSystem.mapper.InvoiceMapper;
+import com.hms.HospitalManagementSystem.mapper.PaymentMapper;
 import com.hms.HospitalManagementSystem.repository.*;
 import com.hms.HospitalManagementSystem.service.BillingService;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +34,7 @@ public class BillingServiceImpl implements BillingService {
     private final PatientRepository patientRepository;
     private final PaymentRepository paymentRepository;
     private final InvoiceMapper invoiceMapper;
+    private final PaymentMapper paymentMapper;
 
     @Override
     @Transactional
@@ -216,7 +218,7 @@ public class BillingServiceImpl implements BillingService {
 
         invoiceRepository.save(invoice);
 
-        return mapToPaymentResponse(payment);
+        return paymentMapper.toResponse(payment);
     }
 
     @Override
@@ -287,18 +289,5 @@ public class BillingServiceImpl implements BillingService {
                 .stream()
                 .map(invoiceMapper::toResponse)
                 .toList();
-    }
-
-    private PaymentResponse mapToPaymentResponse(Payment payment) {
-        return PaymentResponse.builder()
-                .id(payment.getId())
-                .invoiceId(payment.getInvoice().getId())
-                .amount(payment.getAmount())
-                .paymentMethod(payment.getPaymentMethod().name())
-                .transactionReference(payment.getTransactionReference())
-                .status(payment.getStatus().name())
-                .paymentDate(payment.getPaymentDate())
-                .notes(payment.getNotes())
-                .build();
     }
 }

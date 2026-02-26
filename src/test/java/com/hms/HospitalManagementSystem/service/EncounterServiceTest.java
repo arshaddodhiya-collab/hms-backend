@@ -17,6 +17,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import com.hms.HospitalManagementSystem.service.impl.EncounterServiceImpl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +40,7 @@ class EncounterServiceTest {
     private UserRepository userRepository;
 
     @InjectMocks
-    private EncounterService encounterService;
+    private EncounterServiceImpl encounterService;
 
     private User doctor;
     private Patient patient;

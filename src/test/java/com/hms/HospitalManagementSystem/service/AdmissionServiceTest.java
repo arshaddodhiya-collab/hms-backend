@@ -21,6 +21,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import com.hms.HospitalManagementSystem.service.impl.AdmissionServiceImpl;
+import com.hms.HospitalManagementSystem.service.BillingService;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
@@ -46,9 +48,11 @@ class AdmissionServiceTest {
     private IpdMapper ipdMapper;
     @Mock
     private AppointmentService appointmentService;
+    @Mock
+    private BillingService billingService;
 
     @InjectMocks
-    private AdmissionService admissionService;
+    private AdmissionServiceImpl admissionService;
 
     private Patient patient;
     private User doctor;

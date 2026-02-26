@@ -15,6 +15,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import com.hms.HospitalManagementSystem.service.impl.AppointmentServiceImpl;
 
 import java.time.Instant;
 import java.util.Optional;
@@ -36,7 +37,7 @@ class AppointmentServiceTest {
     private UserRepository userRepository;
 
     @InjectMocks
-    private AppointmentService appointmentService;
+    private AppointmentServiceImpl appointmentService;
 
     private User doctor;
     private Patient patient;

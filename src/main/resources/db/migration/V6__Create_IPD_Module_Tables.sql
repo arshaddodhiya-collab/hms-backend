@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS beds (
     is_occupied BOOLEAN NOT NULL DEFAULT FALSE,
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
     ward_id BIGINT NOT NULL,
-    CONSTRAINT fk_bed_ward FOREIGN KEY (ward_id) REFERENCES wards(id) ON DELETE CASCADE,
+    CONSTRAINT fk_bed_ward FOREIGN KEY (ward_id) REFERENCES wards (id) ON DELETE CASCADE,
     UNIQUE (ward_id, number)
 );
 
@@ -24,12 +24,13 @@ CREATE TABLE IF NOT EXISTS admissions (
     status VARCHAR(20) NOT NULL,
     diagnosis TEXT,
     discharge_summary TEXT,
+    advice TEXT,
     created_at DATETIME NOT NULL,
     updated_at DATETIME,
     patient_id BIGINT NOT NULL,
     doctor_id BIGINT NOT NULL,
     bed_id BIGINT NOT NULL,
-    CONSTRAINT fk_admission_patient FOREIGN KEY (patient_id) REFERENCES patients(id),
-    CONSTRAINT fk_admission_doctor FOREIGN KEY (doctor_id) REFERENCES users(id),
-    CONSTRAINT fk_admission_bed FOREIGN KEY (bed_id) REFERENCES beds(id)
+    CONSTRAINT fk_admission_patient FOREIGN KEY (patient_id) REFERENCES patients (id),
+    CONSTRAINT fk_admission_doctor FOREIGN KEY (doctor_id) REFERENCES users (id),
+    CONSTRAINT fk_admission_bed FOREIGN KEY (bed_id) REFERENCES beds (id)
 );

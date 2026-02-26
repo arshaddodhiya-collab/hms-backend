@@ -117,11 +117,7 @@ public class AuthServiceImpl implements AuthService {
         addTokenCookie(response, "accessToken", accessToken, jwtExpiration / 1000);
         addTokenCookie(response, "refreshToken", refreshToken, refreshExpiration / 1000);
 
-        String roleName = user.getRoles().isEmpty() ? "" : user.getRoles().iterator().next().getName();
-        Set<String> permissions = new HashSet<>();
-        user.getRoles().forEach(role -> role.getPermissions().forEach(p -> permissions.add(p.getCode())));
-
-        return new AuthResponse(user.getId(), user.getUsername(), roleName, permissions);
+        return buildAuthResponse(user);
     }
 
     @Override
@@ -157,11 +153,7 @@ public class AuthServiceImpl implements AuthService {
 
                     addTokenCookie(response, "accessToken", accessToken, jwtExpiration / 1000);
 
-                    String roleName = user.getRoles().isEmpty() ? "" : user.getRoles().iterator().next().getName();
-                    Set<String> permissions = new HashSet<>();
-                    user.getRoles().forEach(role -> role.getPermissions().forEach(p -> permissions.add(p.getCode())));
-
-                    return new AuthResponse(user.getId(), user.getUsername(), roleName, permissions);
+                    return buildAuthResponse(user);
                 })
                 .orElseThrow(() -> new BadCredentialsException("Refresh token is not in database!"));
     }
@@ -180,10 +172,13 @@ public class AuthServiceImpl implements AuthService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
+        return buildAuthResponse(user);
+    }
+
+    private AuthResponse buildAuthResponse(User user) {
         String roleName = user.getRoles().isEmpty() ? "" : user.getRoles().iterator().next().getName();
         Set<String> permissions = new HashSet<>();
         user.getRoles().forEach(role -> role.getPermissions().forEach(p -> permissions.add(p.getCode())));
-
         return new AuthResponse(user.getId(), user.getUsername(), roleName, permissions);
     }
 
