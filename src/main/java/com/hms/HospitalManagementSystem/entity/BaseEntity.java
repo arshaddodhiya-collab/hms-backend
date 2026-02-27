@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 @Setter
 @SuperBuilder(toBuilder = true)
 @NoArgsConstructor
+@EntityListeners(org.springframework.data.jpa.domain.support.AuditingEntityListener.class)
 public abstract class BaseEntity implements Serializable {
 
     @Id
@@ -30,16 +31,12 @@ public abstract class BaseEntity implements Serializable {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    // Optional: Optimistic Locking
-    // @Version
-    // private Long version;
+    @org.springframework.data.annotation.CreatedBy
+    @Column(name = "created_by", updatable = false)
+    private String createdBy;
 
-    // I will include version since I used it in Charge.java explicitly as a field?
-    // Wait, in Charge.java I wrote:
-    // @Version
-    // private Long version;
-    // So if Charge has it, BaseEntity doesn't need to enforce it, or Charge
-    // overrides it?
-    // In Charge.java I defined `private Long version;` explicitly.
-    // So BaseEntity strictly needs ID, createdAt, updatedAt.
+    @org.springframework.data.annotation.LastModifiedBy
+    @Column(name = "last_modified_by")
+    private String lastModifiedBy;
+
 }

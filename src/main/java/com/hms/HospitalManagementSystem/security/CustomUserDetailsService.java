@@ -28,7 +28,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         // Flatten roles and permissions into authorities
         user.getRoles().forEach(role -> {
             // Add Role as Authority (ROLE_ADMIN)
-            authorities.add(new SimpleGrantedAuthority("ROLE_" + role.getName()));
+//            authorities.add(new SimpleGrantedAuthority("ROLE_" + role.getName()));
 
             // Add Permissions as Authorities (MOD_PATIENTS) -> CMP_ADMIN_USER_READ
             role.getPermissions().forEach(permission -> {
