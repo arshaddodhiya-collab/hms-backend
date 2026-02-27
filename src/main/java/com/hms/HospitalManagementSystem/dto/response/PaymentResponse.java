@@ -18,4 +18,10 @@ public class PaymentResponse {
     private LocalDateTime paymentDate;
     private Long receivedBy;
     private String notes;
+
+    // Audit fields
+    private String createdBy;
+    private String lastModifiedBy;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }

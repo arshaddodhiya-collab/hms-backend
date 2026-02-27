@@ -20,4 +20,10 @@ public class VitalsResponse {
     private BigDecimal bmi;
     private LocalDateTime recordedAt;
     private String recordedBy;
+
+    // Audit fields
+    private String createdBy;
+    private String lastModifiedBy;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }

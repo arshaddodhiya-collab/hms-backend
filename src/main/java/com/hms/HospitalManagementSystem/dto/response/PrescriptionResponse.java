@@ -14,4 +14,10 @@ public class PrescriptionResponse {
     private String status;
     private LocalDateTime issuedAt;
     private List<PrescriptionItemResponse> items;
+
+    // Audit fields
+    private String createdBy;
+    private String lastModifiedBy;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }

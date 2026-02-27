@@ -17,4 +17,10 @@ public class InvoiceItemResponse {
     private BigDecimal unitPrice;
     private Integer quantity;
     private BigDecimal totalPrice;
+
+    // Audit fields
+    private String createdBy;
+    private String lastModifiedBy;
+    private java.time.LocalDateTime createdAt;
+    private java.time.LocalDateTime updatedAt;
 }

@@ -14,4 +14,8 @@ public class RoundResponse {
     private String notes;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
+    // Audit fields
+    private String createdBy;
+    private String lastModifiedBy;
 }

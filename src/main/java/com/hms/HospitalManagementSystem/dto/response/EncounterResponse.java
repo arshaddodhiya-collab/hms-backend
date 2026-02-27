@@ -26,4 +26,10 @@ public class EncounterResponse {
     private VitalsResponse vitals;
     private List<RoundResponse> rounds;
     private List<VitalsResponse> vitalsHistory;
+
+    // Audit fields
+    private String createdBy;
+    private String lastModifiedBy;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }

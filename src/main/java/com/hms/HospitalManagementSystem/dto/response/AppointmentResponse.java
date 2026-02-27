@@ -23,4 +23,8 @@ public class AppointmentResponse {
     private LocalDateTime updatedAt;
     private boolean hasEncounter;
     private String encounterStatus;
+
+    // Audit fields
+    private String createdBy;
+    private String lastModifiedBy;
 }

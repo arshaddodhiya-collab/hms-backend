@@ -20,4 +20,10 @@ public class ChargeCatalogResponse {
     private ServiceType serviceType;
     private BigDecimal standardPrice;
     private boolean isActive;
+
+    // Audit fields
+    private String createdBy;
+    private String lastModifiedBy;
+    private java.time.LocalDateTime createdAt;
+    private java.time.LocalDateTime updatedAt;
 }

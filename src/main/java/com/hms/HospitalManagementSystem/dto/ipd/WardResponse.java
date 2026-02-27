@@ -10,4 +10,10 @@ public class WardResponse {
     private WardType type;
     private int capacity;
     private boolean isActive;
+
+    // Audit fields
+    private String createdBy;
+    private String lastModifiedBy;
+    private java.time.LocalDateTime createdAt;
+    private java.time.LocalDateTime updatedAt;
 }

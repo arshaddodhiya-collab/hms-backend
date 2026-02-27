@@ -23,4 +23,8 @@ public class LabRequestResponse {
     private List<LabResultResponse> results;
     private List<LabTestParameterDto> parameters;
     private String referenceRange;
+
+    // Audit fields
+    private String createdBy;
+    private String lastModifiedBy;
 }

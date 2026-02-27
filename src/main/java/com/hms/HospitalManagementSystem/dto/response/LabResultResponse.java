@@ -15,4 +15,7 @@ public class LabResultResponse {
     private String referenceRange;
     private Boolean isAbnormal;
     private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+    private String createdBy;
+    private String lastModifiedBy;
 }

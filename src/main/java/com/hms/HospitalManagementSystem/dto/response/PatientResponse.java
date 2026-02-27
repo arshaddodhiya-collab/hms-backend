@@ -27,6 +27,12 @@ public class PatientResponse {
     private LocalDate lastVisit;
     private String allergies;
 
+    // Audit fields
+    private String createdBy;
+    private String lastModifiedBy;
+    private java.time.LocalDateTime createdAt;
+    private java.time.LocalDateTime updatedAt;
+
     public String getName() {
         return firstName + " " + lastName;
     }

@@ -13,4 +13,10 @@ public class BedResponse {
     private boolean isOccupied;
     private boolean isActive;
     private WardResponse ward;
+
+    // Audit fields
+    private String createdBy;
+    private String lastModifiedBy;
+    private java.time.LocalDateTime createdAt;
+    private java.time.LocalDateTime updatedAt;
 }

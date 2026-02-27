@@ -17,4 +17,10 @@ public class UserDto {
     private Set<String> roles;
     private boolean active;
     private String password; // Optional for updates, required for create (handled in service)
+
+    // Audit fields
+    private String createdBy;
+    private String lastModifiedBy;
+    private java.time.LocalDateTime createdAt;
+    private java.time.LocalDateTime updatedAt;
 }

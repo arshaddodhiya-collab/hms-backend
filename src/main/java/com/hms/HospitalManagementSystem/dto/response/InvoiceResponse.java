@@ -30,4 +30,10 @@ public class InvoiceResponse {
     private LocalDateTime issueDate;
     private LocalDateTime dueDate;
     private List<InvoiceItemResponse> items;
+
+    // Audit fields
+    private String createdBy;
+    private String lastModifiedBy;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }

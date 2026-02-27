@@ -19,4 +19,10 @@ public class AdmissionResponse {
     private Long doctorId;
     private String doctorName;
     private BedResponse bed;
+
+    // Audit fields
+    private String createdBy;
+    private String lastModifiedBy;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }
