@@ -6,7 +6,7 @@ import com.hms.HospitalManagementSystem.projection.PatientDetailsProjection;
 import com.hms.HospitalManagementSystem.projection.PatientProjection;
 import com.hms.HospitalManagementSystem.service.PatientService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -28,7 +28,7 @@ public class PatientController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<PatientProjection>> searchPatients(
+    public ResponseEntity<Slice<PatientProjection>> searchPatients(
             @RequestParam(required = false) String query,
             @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         return ResponseEntity.ok(patientService.searchPatients(query, pageable));

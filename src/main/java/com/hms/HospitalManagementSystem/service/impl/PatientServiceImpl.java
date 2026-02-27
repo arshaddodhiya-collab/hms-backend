@@ -13,7 +13,7 @@ import com.hms.HospitalManagementSystem.service.PatientService;
 import com.hms.HospitalManagementSystem.specification.PatientSpecification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -59,7 +59,7 @@ public class PatientServiceImpl implements PatientService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<PatientProjection> searchPatients(String query, Pageable pageable) {
+    public Slice<PatientProjection> searchPatients(String query, Pageable pageable) {
         Specification<Patient> spec = PatientSpecification.search(query);
         return patientRepository.findBy(spec, q -> q.as(PatientProjection.class).page(pageable));
     }

@@ -32,4 +32,13 @@ public interface PatientProjection {
     String getAvatar();
 
     String getAllergies();
+
+    // Audit fields
+    String getCreatedBy();
+
+    String getLastModifiedBy();
+
+    java.time.LocalDateTime getCreatedAt();
+
+    java.time.LocalDateTime getUpdatedAt();
 }
