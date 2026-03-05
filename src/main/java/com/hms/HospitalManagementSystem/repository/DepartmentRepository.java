@@ -1,6 +1,7 @@
 package com.hms.HospitalManagementSystem.repository;
 
 import com.hms.HospitalManagementSystem.entity.Department;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -12,5 +13,5 @@ public interface DepartmentRepository extends JpaRepository<Department, Long> {
 
     boolean existsByName(String name);
 
-    org.springframework.data.domain.Slice<Department> findAllBy(org.springframework.data.domain.Pageable pageable);
+    Slice<Department> findAllBy(org.springframework.data.domain.Pageable pageable);
 }

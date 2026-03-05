@@ -2,6 +2,7 @@ package com.hms.HospitalManagementSystem.repository;
 
 import com.hms.HospitalManagementSystem.entity.Encounter;
 import com.hms.HospitalManagementSystem.enums.EncounterStatus;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -16,12 +17,12 @@ public interface EncounterRepository extends JpaRepository<Encounter, Long> {
 
     List<Encounter> findByStatus(EncounterStatus status);
 
-    org.springframework.data.domain.Slice<Encounter> findByStatus(EncounterStatus status,
-            org.springframework.data.domain.Pageable pageable);
+    Slice<Encounter> findByStatus(EncounterStatus status,
+                                  org.springframework.data.domain.Pageable pageable);
 
     List<Encounter> findByPatientId(Long patientId);
 
-    org.springframework.data.domain.Slice<Encounter> findByPatientId(Long patientId,
+    Slice<Encounter> findByPatientId(Long patientId,
             org.springframework.data.domain.Pageable pageable);
 
     List<Encounter> findByDoctorIdAndStatus(Long doctorId, EncounterStatus status);
@@ -30,17 +31,17 @@ public interface EncounterRepository extends JpaRepository<Encounter, Long> {
     List<Encounter> findByDoctorIdAndStatusIn(Long doctorId, List<EncounterStatus> statuses);
 
     @Query("SELECT e FROM Encounter e WHERE e.doctor.id = :doctorId AND e.status IN :statuses")
-    org.springframework.data.domain.Slice<Encounter> findByDoctorIdAndStatusIn(Long doctorId,
+    Slice<Encounter> findByDoctorIdAndStatusIn(Long doctorId,
             List<EncounterStatus> statuses, org.springframework.data.domain.Pageable pageable);
 
     List<Encounter> findByDoctorIdAndAppointmentIsNotNullAndStatusIn(Long doctorId, List<EncounterStatus> statuses);
 
-    org.springframework.data.domain.Slice<Encounter> findByDoctorIdAndAppointmentIsNotNullAndStatusIn(Long doctorId,
+    Slice<Encounter> findByDoctorIdAndAppointmentIsNotNullAndStatusIn(Long doctorId,
             List<EncounterStatus> statuses, org.springframework.data.domain.Pageable pageable);
 
     List<Encounter> findByDoctorIdAndAdmissionIsNotNullAndStatusIn(Long doctorId, List<EncounterStatus> statuses);
 
-    org.springframework.data.domain.Slice<Encounter> findByDoctorIdAndAdmissionIsNotNullAndStatusIn(Long doctorId,
+    Slice<Encounter> findByDoctorIdAndAdmissionIsNotNullAndStatusIn(Long doctorId,
             List<EncounterStatus> statuses, org.springframework.data.domain.Pageable pageable);
 
     Optional<Encounter> findByAdmissionId(Long admissionId);

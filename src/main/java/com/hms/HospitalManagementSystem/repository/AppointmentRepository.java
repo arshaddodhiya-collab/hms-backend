@@ -2,6 +2,7 @@ package com.hms.HospitalManagementSystem.repository;
 
 import com.hms.HospitalManagementSystem.entity.Appointment;
 import com.hms.HospitalManagementSystem.enums.AppointmentStatus;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -15,8 +16,8 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
 
         List<Appointment> findByPatientId(Long patientId);
 
-        org.springframework.data.domain.Slice<Appointment> findByPatientId(Long patientId,
-                        org.springframework.data.domain.Pageable pageable);
+        Slice<Appointment> findByPatientId(Long patientId,
+                                           org.springframework.data.domain.Pageable pageable);
 
         List<Appointment> findByDoctorIdAndStartDateTimeBetween(Long doctorId, LocalDateTime start, LocalDateTime end);
 
@@ -41,24 +42,24 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
 
         List<Appointment> findByPatientIdAndStatus(Long patientId, AppointmentStatus status);
 
-        org.springframework.data.domain.Slice<Appointment> findByPatientIdAndStatus(Long patientId,
+        Slice<Appointment> findByPatientIdAndStatus(Long patientId,
                         AppointmentStatus status, org.springframework.data.domain.Pageable pageable);
 
         List<Appointment> findByDoctorIdAndStartDateTimeBetweenAndDeletedFalse(Long doctorId, LocalDateTime start,
                         LocalDateTime end);
 
-        org.springframework.data.domain.Slice<Appointment> findByDoctorIdAndStartDateTimeBetweenAndDeletedFalse(
+        Slice<Appointment> findByDoctorIdAndStartDateTimeBetweenAndDeletedFalse(
                         Long doctorId, LocalDateTime start,
                         LocalDateTime end, org.springframework.data.domain.Pageable pageable);
 
-        org.springframework.data.domain.Slice<Appointment> findByDoctorIdAndStartDateTimeBetweenAndStatusInAndDeletedFalse(
+        Slice<Appointment> findByDoctorIdAndStartDateTimeBetweenAndStatusInAndDeletedFalse(
                         Long doctorId, LocalDateTime start,
                         LocalDateTime end, java.util.Collection<AppointmentStatus> statuses,
                         org.springframework.data.domain.Pageable pageable);
 
         List<Appointment> findByStartDateTimeBetweenAndDeletedFalse(LocalDateTime start, LocalDateTime end);
 
-        org.springframework.data.domain.Slice<Appointment> findByStartDateTimeBetweenAndDeletedFalse(
+        Slice<Appointment> findByStartDateTimeBetweenAndDeletedFalse(
                         LocalDateTime start, LocalDateTime end, org.springframework.data.domain.Pageable pageable);
 
         long countByStartDateTimeBetweenAndDeletedFalse(LocalDateTime start, LocalDateTime end);
