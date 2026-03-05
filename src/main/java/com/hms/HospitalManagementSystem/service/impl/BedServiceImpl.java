@@ -11,10 +11,9 @@ import com.hms.HospitalManagementSystem.repository.BedRepository;
 import com.hms.HospitalManagementSystem.repository.WardRepository;
 import com.hms.HospitalManagementSystem.service.BedService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -42,7 +41,7 @@ public class BedServiceImpl implements BedService {
     @Override
     @Transactional(readOnly = true)
     public org.springframework.data.domain.Slice<BedResponse> getAvailableBeds(Long wardId, BedType type,
-            org.springframework.data.domain.Pageable pageable) {
+            Pageable pageable) {
         if (type != null) {
             return bedRepository.findAvailableBedsByWardAndType(wardId, type, pageable)
                     .map(ipdMapper::toBedResponse);

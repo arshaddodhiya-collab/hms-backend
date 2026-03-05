@@ -4,6 +4,7 @@ import com.hms.HospitalManagementSystem.dto.ipd.AdmissionRequest;
 import com.hms.HospitalManagementSystem.dto.ipd.AdmissionResponse;
 import com.hms.HospitalManagementSystem.dto.ipd.DischargeRequest;
 import com.hms.HospitalManagementSystem.dto.ipd.TransferRequest;
+import org.springframework.data.domain.Slice;
 
 import java.util.List;
 
@@ -14,7 +15,7 @@ public interface AdmissionService {
 
     AdmissionResponse transferPatient(Long admissionId, TransferRequest request);
 
-    org.springframework.data.domain.Slice<AdmissionResponse> getActiveAdmissions(
+    Slice<AdmissionResponse> getActiveAdmissions(
             org.springframework.data.domain.Pageable pageable);
 
     AdmissionResponse getAdmissionById(Long id);

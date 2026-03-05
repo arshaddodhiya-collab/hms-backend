@@ -13,6 +13,7 @@ import com.hms.HospitalManagementSystem.exception.ConflictException;
 import com.hms.HospitalManagementSystem.exception.ValidationException;
 import com.hms.HospitalManagementSystem.service.AppointmentService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -289,7 +290,7 @@ public class AppointmentServiceImpl implements AppointmentService {
 
     @Override
     public org.springframework.data.domain.Slice<Appointment> getPatientAppointmentsByStatus(Long patientId,
-            AppointmentStatus status, org.springframework.data.domain.Pageable pageable) {
+            AppointmentStatus status, Pageable pageable) {
         return appointmentRepository.findByPatientIdAndStatus(patientId, status, pageable);
     }
 
@@ -314,7 +315,7 @@ public class AppointmentServiceImpl implements AppointmentService {
 
     @Override
     public org.springframework.data.domain.Slice<Appointment> getUpcomingAppointmentsForDoctor(Long doctorId,
-            org.springframework.data.domain.Pageable pageable) {
+            Pageable pageable) {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime endOfDay = now.toLocalDate().atTime(23, 59, 59);
 

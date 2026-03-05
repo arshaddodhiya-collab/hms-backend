@@ -9,12 +9,12 @@ import com.hms.HospitalManagementSystem.repository.RoleRepository;
 import com.hms.HospitalManagementSystem.repository.UserRepository;
 import com.hms.HospitalManagementSystem.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -29,8 +29,8 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public org.springframework.data.domain.Slice<UserDto> getAllUsers(
-            org.springframework.data.domain.Pageable pageable) {
+    public Slice<UserDto> getAllUsers(
+            Pageable pageable) {
         return userRepository.findNonPatientUsers(pageable)
                 .map(this::mapToDto);
     }

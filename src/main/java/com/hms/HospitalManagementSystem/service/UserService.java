@@ -2,11 +2,11 @@ package com.hms.HospitalManagementSystem.service;
 
 import com.hms.HospitalManagementSystem.dto.response.UserDto;
 import com.hms.HospitalManagementSystem.entity.User;
-
-import java.util.List;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 
 public interface UserService {
-    org.springframework.data.domain.Slice<UserDto> getAllUsers(org.springframework.data.domain.Pageable pageable);
+    Slice<UserDto> getAllUsers(org.springframework.data.domain.Pageable pageable);
 
     UserDto getUserById(Long id);
 
