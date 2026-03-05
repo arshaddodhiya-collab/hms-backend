@@ -33,8 +33,10 @@ public class WardServiceImpl implements WardService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<WardResponse> getAllWards() {
-        return ipdMapper.toWardResponseList(wardRepository.findAll());
+    public org.springframework.data.domain.Slice<WardResponse> getAllWards(
+            org.springframework.data.domain.Pageable pageable) {
+        return wardRepository.findAllBy(pageable)
+                .map(ipdMapper::toWardResponse);
     }
 
     @Override

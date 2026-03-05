@@ -26,17 +26,17 @@ public class RoleServiceImpl implements RoleService {
     private final PermissionRepository permissionRepository;
 
     @Override
-    public List<RoleDto> getAllRoles() {
-        return roleRepository.findAll().stream()
-                .map(this::mapRoleToDto)
-                .collect(Collectors.toList());
+    public org.springframework.data.domain.Slice<RoleDto> getAllRoles(
+            org.springframework.data.domain.Pageable pageable) {
+        return roleRepository.findAllBy(pageable)
+                .map(this::mapRoleToDto);
     }
 
     @Override
-    public List<PermissionDto> getAllPermissions() {
-        return permissionRepository.findAll().stream()
-                .map(this::mapPermissionToDto)
-                .collect(Collectors.toList());
+    public org.springframework.data.domain.Slice<PermissionDto> getAllPermissions(
+            org.springframework.data.domain.Pageable pageable) {
+        return permissionRepository.findAllBy(pageable)
+                .map(this::mapPermissionToDto);
     }
 
     @Override

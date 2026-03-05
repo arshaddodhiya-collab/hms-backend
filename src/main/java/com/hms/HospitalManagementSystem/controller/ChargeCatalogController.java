@@ -27,8 +27,9 @@ public class ChargeCatalogController {
 
     @GetMapping
     @PreAuthorize("hasAuthority('ACT_VIEW')")
-    public ResponseEntity<List<ChargeCatalogResponse>> getAllCharges() {
-        return ResponseEntity.ok(chargeCatalogService.getAllCharges());
+    public ResponseEntity<org.springframework.data.domain.Slice<ChargeCatalogResponse>> getAllCharges(
+            @org.springframework.data.web.PageableDefault(sort = "name", direction = org.springframework.data.domain.Sort.Direction.ASC) org.springframework.data.domain.Pageable pageable) {
+        return ResponseEntity.ok(chargeCatalogService.getAllCharges(pageable));
     }
 
     @GetMapping("/{id}")

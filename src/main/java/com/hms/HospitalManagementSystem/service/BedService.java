@@ -9,9 +9,10 @@ import java.util.List;
 public interface BedService {
     BedResponse createBed(BedRequest request);
 
-    List<BedResponse> getAvailableBeds(Long wardId, BedType type);
+    org.springframework.data.domain.Slice<BedResponse> getAvailableBeds(Long wardId, BedType type,
+            org.springframework.data.domain.Pageable pageable);
 
-    List<BedResponse> getAllBeds();
+    org.springframework.data.domain.Slice<BedResponse> getAllBeds(org.springframework.data.domain.Pageable pageable);
 
     BedResponse updateBedStatus(Long id, boolean isActive);
 }

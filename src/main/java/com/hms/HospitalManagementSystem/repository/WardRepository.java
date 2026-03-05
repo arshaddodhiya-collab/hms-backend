@@ -9,4 +9,6 @@ import java.util.Optional;
 @Repository
 public interface WardRepository extends JpaRepository<Ward, Long> {
     Optional<Ward> findByName(String name);
+
+    org.springframework.data.domain.Slice<Ward> findAllBy(org.springframework.data.domain.Pageable pageable);
 }

@@ -8,7 +8,8 @@ import java.util.List;
 public interface ChargeCatalogService {
     ChargeCatalogResponse createCharge(ChargeCatalogRequest request);
 
-    List<ChargeCatalogResponse> getAllCharges();
+    org.springframework.data.domain.Slice<ChargeCatalogResponse> getAllCharges(
+            org.springframework.data.domain.Pageable pageable);
 
     ChargeCatalogResponse getChargeById(Long id);
 

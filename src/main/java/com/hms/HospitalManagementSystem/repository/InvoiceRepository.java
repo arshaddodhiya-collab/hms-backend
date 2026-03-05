@@ -23,6 +23,9 @@ public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
 
     List<Invoice> findByPatientIdAndStatusIn(Long patientId, List<InvoiceStatus> statuses);
 
+    org.springframework.data.domain.Slice<Invoice> findByPatientIdAndStatusIn(Long patientId,
+            List<InvoiceStatus> statuses, org.springframework.data.domain.Pageable pageable);
+
     @Query("SELECT SUM(i.netAmount) FROM Invoice i WHERE i.issueDate BETWEEN :startDate AND :endDate")
     java.math.BigDecimal sumNetAmountByIssueDateBetween(@Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate);

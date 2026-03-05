@@ -9,4 +9,6 @@ import java.util.Optional;
 @Repository
 public interface ChargeCatalogRepository extends JpaRepository<ChargeCatalog, Long> {
     Optional<ChargeCatalog> findByCode(String code);
+
+    org.springframework.data.domain.Slice<ChargeCatalog> findAllBy(org.springframework.data.domain.Pageable pageable);
 }

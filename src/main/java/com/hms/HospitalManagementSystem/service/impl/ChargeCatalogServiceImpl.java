@@ -37,10 +37,10 @@ public class ChargeCatalogServiceImpl implements ChargeCatalogService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ChargeCatalogResponse> getAllCharges() {
-        return chargeCatalogRepository.findAll().stream()
-                .map(chargeCatalogMapper::toResponse)
-                .collect(Collectors.toList());
+    public org.springframework.data.domain.Slice<ChargeCatalogResponse> getAllCharges(
+            org.springframework.data.domain.Pageable pageable) {
+        return chargeCatalogRepository.findAllBy(pageable)
+                .map(chargeCatalogMapper::toResponse);
     }
 
     @Override

@@ -18,8 +18,9 @@ public class DepartmentController {
 
     @GetMapping
     @PreAuthorize("hasAuthority('CMP_ADMIN_DEPT_READ')")
-    public ResponseEntity<List<DepartmentDto>> getAllDepartments() {
-        return ResponseEntity.ok(departmentService.getAllDepartments());
+    public ResponseEntity<org.springframework.data.domain.Slice<DepartmentDto>> getAllDepartments(
+            @org.springframework.data.web.PageableDefault(sort = "name", direction = org.springframework.data.domain.Sort.Direction.ASC) org.springframework.data.domain.Pageable pageable) {
+        return ResponseEntity.ok(departmentService.getAllDepartments(pageable));
     }
 
     @GetMapping("/{id}")

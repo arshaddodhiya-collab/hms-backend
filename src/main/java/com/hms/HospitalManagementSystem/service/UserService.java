@@ -6,13 +6,14 @@ import com.hms.HospitalManagementSystem.entity.User;
 import java.util.List;
 
 public interface UserService {
-    List<UserDto> getAllUsers();
+    org.springframework.data.domain.Slice<UserDto> getAllUsers(org.springframework.data.domain.Pageable pageable);
 
     UserDto getUserById(Long id);
 
     User getUserByUsername(String username);
 
-    List<UserDto> getUsersByRole(String roleName);
+    org.springframework.data.domain.Slice<UserDto> getUsersByRole(String roleName,
+            org.springframework.data.domain.Pageable pageable);
 
     UserDto createUser(UserDto dto);
 

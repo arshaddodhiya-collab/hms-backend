@@ -41,18 +41,23 @@ public class BedServiceImpl implements BedService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<BedResponse> getAvailableBeds(Long wardId, BedType type) {
+    public org.springframework.data.domain.Slice<BedResponse> getAvailableBeds(Long wardId, BedType type,
+            org.springframework.data.domain.Pageable pageable) {
         if (type != null) {
-            return ipdMapper.toBedResponseList(bedRepository.findAvailableBedsByWardAndType(wardId, type));
+            return bedRepository.findAvailableBedsByWardAndType(wardId, type, pageable)
+                    .map(ipdMapper::toBedResponse);
         } else {
-            return ipdMapper.toBedResponseList(bedRepository.findAvailableBedsByWard(wardId));
+            return bedRepository.findAvailableBedsByWard(wardId, pageable)
+                    .map(ipdMapper::toBedResponse);
         }
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<BedResponse> getAllBeds() {
-        return ipdMapper.toBedResponseList(bedRepository.findAll());
+    public org.springframework.data.domain.Slice<BedResponse> getAllBeds(
+            org.springframework.data.domain.Pageable pageable) {
+        return bedRepository.findAllBy(pageable)
+                .map(ipdMapper::toBedResponse);
     }
 
     @Override

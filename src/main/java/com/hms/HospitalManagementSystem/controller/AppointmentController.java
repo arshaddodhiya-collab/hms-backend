@@ -13,6 +13,10 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 
 @RestController
 @RequestMapping("/api/v1/appointments")
@@ -87,62 +91,65 @@ public class AppointmentController {
 
     @GetMapping("/doctor/{doctorId}/upcoming")
     @PreAuthorize("hasAnyAuthority('CMP_APPOINTMENT_LIST', 'ROLE_DOCTOR', 'ROLE_ADMIN')")
-    public ResponseEntity<List<AppointmentResponse>> getUpcomingAppointmentsForDoctor(@PathVariable Long doctorId) {
-        List<Appointment> appointments = appointmentService.getUpcomingAppointmentsForDoctor(doctorId);
-        return ResponseEntity.ok(appointments.stream().map(this::mapToResponse).collect(Collectors.toList()));
+    public ResponseEntity<Slice<AppointmentResponse>> getUpcomingAppointmentsForDoctor(
+            @PathVariable Long doctorId,
+            @PageableDefault(sort = "startDateTime", direction = Sort.Direction.ASC) Pageable pageable) {
+        Slice<Appointment> appointments = appointmentService.getUpcomingAppointmentsForDoctor(doctorId, pageable);
+        return ResponseEntity.ok(appointments.map(this::mapToResponse));
     }
 
     @GetMapping("/doctor/{doctorId}")
     @PreAuthorize("hasAnyAuthority('CMP_APPOINTMENT_LIST', 'ROLE_DOCTOR', 'ROLE_ADMIN')")
-    public ResponseEntity<List<AppointmentResponse>> getDoctorAppointments(
+    public ResponseEntity<Slice<AppointmentResponse>> getDoctorAppointments(
             @PathVariable Long doctorId,
-            @RequestParam String date) {
+            @RequestParam String date,
+            @PageableDefault(sort = "startDateTime", direction = Sort.Direction.ASC) Pageable pageable) {
 
         LocalDate localDate = LocalDate.parse(date);
         LocalDateTime start = localDate.atStartOfDay();
         LocalDateTime end = localDate.atTime(23, 59, 59);
 
-        List<Appointment> appointments = appointmentService.getDoctorAppointments(doctorId, start, end);
-        return ResponseEntity.ok(appointments.stream().map(this::mapToResponse).collect(Collectors.toList()));
+        Slice<Appointment> appointments = appointmentService.getDoctorAppointments(doctorId, start, end, pageable);
+        return ResponseEntity.ok(appointments.map(this::mapToResponse));
     }
 
     @GetMapping("/patient/{patientId}")
     @PreAuthorize("hasAnyAuthority('CMP_APPOINTMENT_LIST', 'ROLE_DOCTOR', 'ROLE_NURSE', 'ROLE_ADMIN', 'ROLE_PATIENT')")
-    public ResponseEntity<List<AppointmentResponse>> getPatientAppointments(
+    public ResponseEntity<Slice<AppointmentResponse>> getPatientAppointments(
             @PathVariable Long patientId,
-            @RequestParam(required = false) String status) {
-        List<Appointment> appointments;
+            @RequestParam(required = false) String status,
+            @PageableDefault(sort = "startDateTime", direction = Sort.Direction.DESC) Pageable pageable) {
+        Slice<Appointment> appointments;
         if (status != null) {
-            // Assuming AppointmentStatus is imported
-            // TODO: Handle invalid status string gracefully
             appointments = appointmentService.getPatientAppointmentsByStatus(
                     patientId,
-                    com.hms.HospitalManagementSystem.enums.AppointmentStatus.valueOf(status));
+                    com.hms.HospitalManagementSystem.enums.AppointmentStatus.valueOf(status),
+                    pageable);
         } else {
-            appointments = appointmentService.getPatientAppointments(patientId);
+            appointments = appointmentService.getPatientAppointments(patientId, pageable);
         }
-        return ResponseEntity.ok(appointments.stream()
-                .map(this::mapToResponse)
-                .collect(Collectors.toList()));
+        return ResponseEntity.ok(appointments.map(this::mapToResponse));
     }
 
     @GetMapping("/today")
     @PreAuthorize("hasAnyAuthority('CMP_APPOINTMENT_LIST', 'ROLE_RECEPTION', 'ROLE_NURSE', 'ROLE_DOCTOR', 'ROLE_ADMIN')")
-    public ResponseEntity<List<AppointmentResponse>> getTodayAppointments() {
+    public ResponseEntity<Slice<AppointmentResponse>> getTodayAppointments(
+            @PageableDefault(sort = "startDateTime", direction = Sort.Direction.ASC) Pageable pageable) {
         LocalDate today = LocalDate.now();
         LocalDateTime start = today.atStartOfDay();
         LocalDateTime end = today.atTime(23, 59, 59);
 
-        List<Appointment> appointments = appointmentService.getAppointmentsByDate(start, end);
-        return ResponseEntity.ok(appointments.stream().map(this::mapToResponse).collect(Collectors.toList()));
+        Slice<Appointment> appointments = appointmentService.getAppointmentsByDate(start, end, pageable);
+        return ResponseEntity.ok(appointments.map(this::mapToResponse));
     }
 
     @GetMapping
     @PreAuthorize("hasAnyAuthority('CMP_APPOINTMENT_LIST', 'ROLE_ADMIN')")
-    public ResponseEntity<List<AppointmentResponse>> getAllAppointments() {
+    public ResponseEntity<Slice<AppointmentResponse>> getAllAppointments(
+            @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         // Find all appointments
-        List<Appointment> appointments = appointmentService.getAllAppointments();
-        return ResponseEntity.ok(appointments.stream().map(this::mapToResponse).collect(Collectors.toList()));
+        Slice<Appointment> appointments = appointmentService.getAllAppointments(pageable);
+        return ResponseEntity.ok(appointments.map(this::mapToResponse));
     }
 
     @GetMapping("/{id}")

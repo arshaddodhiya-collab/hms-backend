@@ -19,14 +19,16 @@ public class UserController {
 
     @GetMapping
     @PreAuthorize("hasAuthority('CMP_ADMIN_USER_READ')")
-    public ResponseEntity<List<UserDto>> getAllUsers() {
-        return ResponseEntity.ok(userService.getAllUsers());
+    public ResponseEntity<org.springframework.data.domain.Slice<UserDto>> getAllUsers(
+            @org.springframework.data.web.PageableDefault(sort = "fullName", direction = org.springframework.data.domain.Sort.Direction.ASC) org.springframework.data.domain.Pageable pageable) {
+        return ResponseEntity.ok(userService.getAllUsers(pageable));
     }
 
     @GetMapping("/doctors")
     @PreAuthorize("hasAnyAuthority('CMP_ADMIN_USER_READ', 'CMP_APPOINTMENT_CREATE', 'CMP_APPOINTMENT_READ', 'MOD_PATIENTS', 'MOD_TRIAGE', 'MOD_CONSULTATION')")
-    public ResponseEntity<List<UserDto>> getDoctors() {
-        return ResponseEntity.ok(userService.getUsersByRole("DOCTOR"));
+    public ResponseEntity<org.springframework.data.domain.Slice<UserDto>> getDoctors(
+            @org.springframework.data.web.PageableDefault(sort = "fullName", direction = org.springframework.data.domain.Sort.Direction.ASC) org.springframework.data.domain.Pageable pageable) {
+        return ResponseEntity.ok(userService.getUsersByRole("DOCTOR", pageable));
     }
 
     @GetMapping("/{id}")

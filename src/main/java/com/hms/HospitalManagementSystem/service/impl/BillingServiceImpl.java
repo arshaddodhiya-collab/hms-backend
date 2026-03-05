@@ -277,12 +277,12 @@ public class BillingServiceImpl implements BillingService {
     }
 
     @Override
-    public List<InvoiceResponse> getOutstandingInvoices(Long patientId) {
+    public org.springframework.data.domain.Slice<InvoiceResponse> getOutstandingInvoices(Long patientId,
+            org.springframework.data.domain.Pageable pageable) {
         return invoiceRepository
-                .findByPatientIdAndStatusIn(patientId, List.of(InvoiceStatus.ISSUED, InvoiceStatus.PARTIALLY_PAID))
-                .stream()
-                .map(invoiceMapper::toResponse)
-                .toList();
+                .findByPatientIdAndStatusIn(patientId, List.of(InvoiceStatus.ISSUED, InvoiceStatus.PARTIALLY_PAID),
+                        pageable)
+                .map(invoiceMapper::toResponse);
     }
 
     @Override
@@ -293,10 +293,9 @@ public class BillingServiceImpl implements BillingService {
     }
 
     @Override
-    public List<InvoiceResponse> getAllInvoices() {
-        return invoiceRepository.findAll()
-                .stream()
-                .map(invoiceMapper::toResponse)
-                .toList();
+    public org.springframework.data.domain.Slice<InvoiceResponse> getAllInvoices(
+            org.springframework.data.domain.Pageable pageable) {
+        return invoiceRepository.findAll(pageable)
+                .map(invoiceMapper::toResponse);
     }
 }

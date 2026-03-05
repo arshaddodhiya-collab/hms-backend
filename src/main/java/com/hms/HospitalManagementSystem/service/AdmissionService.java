@@ -14,7 +14,8 @@ public interface AdmissionService {
 
     AdmissionResponse transferPatient(Long admissionId, TransferRequest request);
 
-    List<AdmissionResponse> getActiveAdmissions();
+    org.springframework.data.domain.Slice<AdmissionResponse> getActiveAdmissions(
+            org.springframework.data.domain.Pageable pageable);
 
     AdmissionResponse getAdmissionById(Long id);
 }

@@ -11,4 +11,6 @@ public interface DepartmentRepository extends JpaRepository<Department, Long> {
     Optional<Department> findByName(String name);
 
     boolean existsByName(String name);
+
+    org.springframework.data.domain.Slice<Department> findAllBy(org.springframework.data.domain.Pageable pageable);
 }

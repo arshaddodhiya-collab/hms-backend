@@ -200,8 +200,10 @@ public class AdmissionServiceImpl implements AdmissionService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<AdmissionResponse> getActiveAdmissions() {
-        return ipdMapper.toAdmissionResponseList(admissionRepository.findByStatus(AdmissionStatus.ADMITTED));
+    public org.springframework.data.domain.Slice<AdmissionResponse> getActiveAdmissions(
+            org.springframework.data.domain.Pageable pageable) {
+        return admissionRepository.findByStatus(AdmissionStatus.ADMITTED, pageable)
+                .map(ipdMapper::toAdmissionResponse);
     }
 
     @Override

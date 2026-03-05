@@ -18,9 +18,11 @@ public interface BillingService {
 
     BillingSummaryResponse getBillingSummary(Long patientId);
 
-    List<InvoiceResponse> getOutstandingInvoices(Long patientId);
+    org.springframework.data.domain.Slice<InvoiceResponse> getOutstandingInvoices(Long patientId,
+            org.springframework.data.domain.Pageable pageable);
 
     InvoiceResponse getInvoiceById(Long id);
 
-    List<InvoiceResponse> getAllInvoices();
+    org.springframework.data.domain.Slice<InvoiceResponse> getAllInvoices(
+            org.springframework.data.domain.Pageable pageable);
 }

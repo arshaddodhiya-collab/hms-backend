@@ -29,12 +29,10 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public List<UserDto> getAllUsers() {
-        return userRepository.findAll().stream()
-                .filter(u -> u.getRoles().stream()
-                        .noneMatch(r -> r.getName().equalsIgnoreCase("PATIENT")))
-                .map(this::mapToDto)
-                .collect(Collectors.toList());
+    public org.springframework.data.domain.Slice<UserDto> getAllUsers(
+            org.springframework.data.domain.Pageable pageable) {
+        return userRepository.findNonPatientUsers(pageable)
+                .map(this::mapToDto);
     }
 
     @Override
@@ -51,10 +49,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserDto> getUsersByRole(String roleName) {
-        return userRepository.findByRoles_Name(roleName).stream()
-                .map(this::mapToDto)
-                .collect(Collectors.toList());
+    public org.springframework.data.domain.Slice<UserDto> getUsersByRole(String roleName,
+            org.springframework.data.domain.Pageable pageable) {
+        return userRepository.findByRoles_Name(roleName, pageable)
+                .map(this::mapToDto);
     }
 
     @Override

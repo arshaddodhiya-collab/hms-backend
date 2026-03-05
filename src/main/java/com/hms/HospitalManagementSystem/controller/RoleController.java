@@ -20,14 +20,16 @@ public class RoleController {
 
     @GetMapping
     @PreAuthorize("hasAuthority('CMP_ADMIN_USER_READ')")
-    public ResponseEntity<List<RoleDto>> getAllRoles() {
-        return ResponseEntity.ok(roleService.getAllRoles());
+    public ResponseEntity<org.springframework.data.domain.Slice<RoleDto>> getAllRoles(
+            @org.springframework.data.web.PageableDefault(sort = "name", direction = org.springframework.data.domain.Sort.Direction.ASC) org.springframework.data.domain.Pageable pageable) {
+        return ResponseEntity.ok(roleService.getAllRoles(pageable));
     }
 
     @GetMapping("/permissions")
     @PreAuthorize("hasAuthority('CMP_ADMIN_USER_READ')")
-    public ResponseEntity<List<PermissionDto>> getAllPermissions() {
-        return ResponseEntity.ok(roleService.getAllPermissions());
+    public ResponseEntity<org.springframework.data.domain.Slice<PermissionDto>> getAllPermissions(
+            @org.springframework.data.web.PageableDefault(sort = "module", direction = org.springframework.data.domain.Sort.Direction.ASC) org.springframework.data.domain.Pageable pageable) {
+        return ResponseEntity.ok(roleService.getAllPermissions(pageable));
     }
 
     @PutMapping("/{id}/permissions")

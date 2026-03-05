@@ -12,15 +12,18 @@ import java.util.List;
 public interface LabService {
     LabTestCatalog createLabTest(LabTestRequest request);
 
-    List<LabTestCatalog> getAllLabTests();
+    org.springframework.data.domain.Slice<LabTestCatalog> getAllLabTests(
+            org.springframework.data.domain.Pageable pageable);
 
     LabRequest createLabRequest(LabRequestCreateRequest request);
 
-    List<LabRequest> getLabQueue(List<LabRequestStatus> statuses);
+    org.springframework.data.domain.Slice<LabRequest> getLabQueue(List<LabRequestStatus> statuses,
+            org.springframework.data.domain.Pageable pageable);
 
     LabRequest getLabRequestById(Long id);
 
-    List<LabRequest> getRequestsByEncounter(Long encounterId);
+    org.springframework.data.domain.Slice<LabRequest> getRequestsByEncounter(Long encounterId,
+            org.springframework.data.domain.Pageable pageable);
 
     LabRequest updateStatus(Long id, LabRequestStatus status);
 

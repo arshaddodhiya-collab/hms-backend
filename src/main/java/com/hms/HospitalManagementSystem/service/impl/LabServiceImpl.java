@@ -50,8 +50,9 @@ public class LabServiceImpl implements LabService {
     }
 
     @Override
-    public List<LabTestCatalog> getAllLabTests() {
-        return labTestCatalogRepository.findAll(); // Should actully filter by active/deleted in real app
+    public org.springframework.data.domain.Slice<LabTestCatalog> getAllLabTests(
+            org.springframework.data.domain.Pageable pageable) {
+        return labTestCatalogRepository.findAll(pageable); // Should actully filter by active/deleted in real app
     }
 
     // --- Request Management ---
@@ -91,8 +92,9 @@ public class LabServiceImpl implements LabService {
     }
 
     @Override
-    public List<LabRequest> getLabQueue(List<LabRequestStatus> statuses) {
-        return labRequestRepository.findByStatusIn(statuses);
+    public org.springframework.data.domain.Slice<LabRequest> getLabQueue(List<LabRequestStatus> statuses,
+            org.springframework.data.domain.Pageable pageable) {
+        return labRequestRepository.findByStatusIn(statuses, pageable);
     }
 
     @Override
@@ -104,8 +106,9 @@ public class LabServiceImpl implements LabService {
     }
 
     @Override
-    public List<LabRequest> getRequestsByEncounter(Long encounterId) {
-        return labRequestRepository.findByEncounterId(encounterId);
+    public org.springframework.data.domain.Slice<LabRequest> getRequestsByEncounter(Long encounterId,
+            org.springframework.data.domain.Pageable pageable) {
+        return labRequestRepository.findByEncounterId(encounterId, pageable);
     }
 
     @Override

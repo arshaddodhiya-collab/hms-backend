@@ -28,16 +28,18 @@ public class BedController {
 
     @GetMapping("/available")
     @PreAuthorize("hasAnyAuthority('MOD_ADMIN', 'MOD_PATIENTS', 'MOD_APPOINTMENTS', 'MOD_TRIAGE', 'MOD_CONSULTATION', 'MOD_LAB', 'MOD_BILLING', 'MOD_DASHBOARD')")
-    public ResponseEntity<List<BedResponse>> getAvailableBeds(
+    public ResponseEntity<org.springframework.data.domain.Slice<BedResponse>> getAvailableBeds(
             @RequestParam Long wardId,
-            @RequestParam(required = false) BedType type) {
-        return ResponseEntity.ok(bedService.getAvailableBeds(wardId, type));
+            @RequestParam(required = false) BedType type,
+            @org.springframework.data.web.PageableDefault(sort = "bedNumber", direction = org.springframework.data.domain.Sort.Direction.ASC) org.springframework.data.domain.Pageable pageable) {
+        return ResponseEntity.ok(bedService.getAvailableBeds(wardId, type, pageable));
     }
 
     @GetMapping
     @PreAuthorize("hasAnyAuthority('MOD_ADMIN', 'MOD_PATIENTS', 'MOD_APPOINTMENTS', 'MOD_TRIAGE', 'MOD_CONSULTATION', 'MOD_LAB', 'MOD_BILLING', 'MOD_DASHBOARD')")
-    public ResponseEntity<List<BedResponse>> getAllBeds() {
-        return ResponseEntity.ok(bedService.getAllBeds());
+    public ResponseEntity<org.springframework.data.domain.Slice<BedResponse>> getAllBeds(
+            @org.springframework.data.web.PageableDefault(sort = "bedNumber", direction = org.springframework.data.domain.Sort.Direction.ASC) org.springframework.data.domain.Pageable pageable) {
+        return ResponseEntity.ok(bedService.getAllBeds(pageable));
     }
 
     @PatchMapping("/{id}/status")

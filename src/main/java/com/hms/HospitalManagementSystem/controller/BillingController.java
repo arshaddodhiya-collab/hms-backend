@@ -14,6 +14,10 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 
 @RestController
 @RequestMapping("/api/v1/billing")
@@ -43,8 +47,10 @@ public class BillingController {
 
     @GetMapping("/outstanding")
     @PreAuthorize("hasAuthority('CMP_BILLING_SUMMARY')")
-    public ResponseEntity<List<InvoiceResponse>> getOutstandingInvoices(@RequestParam Long patientId) {
-        return ResponseEntity.ok(billingService.getOutstandingInvoices(patientId));
+    public ResponseEntity<Slice<InvoiceResponse>> getOutstandingInvoices(
+            @RequestParam Long patientId,
+            @PageableDefault(sort = "issueDate", direction = Sort.Direction.DESC) Pageable pageable) {
+        return ResponseEntity.ok(billingService.getOutstandingInvoices(patientId, pageable));
     }
 
     @GetMapping("/invoices/{id}")
@@ -55,8 +61,9 @@ public class BillingController {
 
     @GetMapping("/invoices")
     @PreAuthorize("hasAuthority('CMP_BILLING_SUMMARY')")
-    public ResponseEntity<List<InvoiceResponse>> getAllInvoices() {
-        return ResponseEntity.ok(billingService.getAllInvoices());
+    public ResponseEntity<Slice<InvoiceResponse>> getAllInvoices(
+            @PageableDefault(sort = "issueDate", direction = Sort.Direction.DESC) Pageable pageable) {
+        return ResponseEntity.ok(billingService.getAllInvoices(pageable));
     }
 
     @GetMapping("/invoices/{id}/pdf")

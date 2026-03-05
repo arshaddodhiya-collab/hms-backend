@@ -256,19 +256,23 @@ public class AppointmentServiceImpl implements AppointmentService {
     }
 
     @Override
-    public List<Appointment> getDoctorAppointments(Long doctorId, LocalDateTime start, LocalDateTime end) {
+    public org.springframework.data.domain.Slice<Appointment> getDoctorAppointments(Long doctorId, LocalDateTime start,
+            LocalDateTime end, org.springframework.data.domain.Pageable pageable) {
         // TODO: Validate current user is doctor or admin
-        return appointmentRepository.findByDoctorIdAndStartDateTimeBetweenAndDeletedFalse(doctorId, start, end);
+        return appointmentRepository.findByDoctorIdAndStartDateTimeBetweenAndDeletedFalse(doctorId, start, end,
+                pageable);
     }
 
     @Override
-    public List<Appointment> getAllAppointments() {
-        return appointmentRepository.findAll();
+    public org.springframework.data.domain.Slice<Appointment> getAllAppointments(
+            org.springframework.data.domain.Pageable pageable) {
+        return appointmentRepository.findAll(pageable);
     }
 
     @Override
-    public List<Appointment> getAppointmentsByDate(LocalDateTime start, LocalDateTime end) {
-        return appointmentRepository.findByStartDateTimeBetweenAndDeletedFalse(start, end);
+    public org.springframework.data.domain.Slice<Appointment> getAppointmentsByDate(LocalDateTime start,
+            LocalDateTime end, org.springframework.data.domain.Pageable pageable) {
+        return appointmentRepository.findByStartDateTimeBetweenAndDeletedFalse(start, end, pageable);
     }
 
     @Override
@@ -278,13 +282,15 @@ public class AppointmentServiceImpl implements AppointmentService {
     }
 
     @Override
-    public List<Appointment> getPatientAppointments(Long patientId) {
-        return appointmentRepository.findByPatientId(patientId);
+    public org.springframework.data.domain.Slice<Appointment> getPatientAppointments(Long patientId,
+            org.springframework.data.domain.Pageable pageable) {
+        return appointmentRepository.findByPatientId(patientId, pageable);
     }
 
     @Override
-    public List<Appointment> getPatientAppointmentsByStatus(Long patientId, AppointmentStatus status) {
-        return appointmentRepository.findByPatientIdAndStatus(patientId, status);
+    public org.springframework.data.domain.Slice<Appointment> getPatientAppointmentsByStatus(Long patientId,
+            AppointmentStatus status, org.springframework.data.domain.Pageable pageable) {
+        return appointmentRepository.findByPatientIdAndStatus(patientId, status, pageable);
     }
 
     @Override
@@ -307,20 +313,16 @@ public class AppointmentServiceImpl implements AppointmentService {
     }
 
     @Override
-    public List<Appointment> getUpcomingAppointmentsForDoctor(Long doctorId) {
+    public org.springframework.data.domain.Slice<Appointment> getUpcomingAppointmentsForDoctor(Long doctorId,
+            org.springframework.data.domain.Pageable pageable) {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime endOfDay = now.toLocalDate().atTime(23, 59, 59);
 
         // For dashboard: We want future appointments OR active appointments (even if
         // time passed but not completed)
-        return appointmentRepository
-                .findByDoctorIdAndStartDateTimeBetweenAndDeletedFalse(doctorId, now.toLocalDate().atStartOfDay(),
-                        endOfDay)
-                .stream()
-                .filter(a -> a.getStatus() == AppointmentStatus.SCHEDULED ||
-                        a.getStatus() == AppointmentStatus.CHECKED_IN ||
-                        a.getStatus() == AppointmentStatus.IN_PROGRESS)
-                .sorted((a1, a2) -> a1.getStartDateTime().compareTo(a2.getStartDateTime()))
-                .collect(java.util.stream.Collectors.toList());
+        return appointmentRepository.findByDoctorIdAndStartDateTimeBetweenAndStatusInAndDeletedFalse(
+                doctorId, now.toLocalDate().atStartOfDay(), endOfDay,
+                List.of(AppointmentStatus.SCHEDULED, AppointmentStatus.CHECKED_IN, AppointmentStatus.IN_PROGRESS),
+                pageable);
     }
 }

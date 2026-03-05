@@ -9,17 +9,20 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface BedRepository extends JpaRepository<Bed, Long> {
 
     @Query("SELECT b FROM Bed b WHERE b.ward.id = :wardId AND b.isOccupied = false AND b.isActive = true")
-    List<Bed> findAvailableBedsByWard(@Param("wardId") Long wardId);
+    org.springframework.data.domain.Slice<Bed> findAvailableBedsByWard(@Param("wardId") Long wardId,
+            org.springframework.data.domain.Pageable pageable);
 
     @Query("SELECT b FROM Bed b WHERE b.ward.id = :wardId AND b.type = :type AND b.isOccupied = false AND b.isActive = true")
-    List<Bed> findAvailableBedsByWardAndType(@Param("wardId") Long wardId, @Param("type") BedType type);
+    org.springframework.data.domain.Slice<Bed> findAvailableBedsByWardAndType(@Param("wardId") Long wardId,
+            @Param("type") BedType type, org.springframework.data.domain.Pageable pageable);
+
+    org.springframework.data.domain.Slice<Bed> findAllBy(org.springframework.data.domain.Pageable pageable);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT b FROM Bed b WHERE b.id = :id")

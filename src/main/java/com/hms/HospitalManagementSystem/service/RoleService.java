@@ -7,9 +7,10 @@ import java.util.List;
 import java.util.Set;
 
 public interface RoleService {
-    List<RoleDto> getAllRoles();
+    org.springframework.data.domain.Slice<RoleDto> getAllRoles(org.springframework.data.domain.Pageable pageable);
 
-    List<PermissionDto> getAllPermissions();
+    org.springframework.data.domain.Slice<PermissionDto> getAllPermissions(
+            org.springframework.data.domain.Pageable pageable);
 
     RoleDto updateRolePermissions(Long roleId, Set<Long> permissionIds);
 }

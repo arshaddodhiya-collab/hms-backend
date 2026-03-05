@@ -5,7 +5,8 @@ import com.hms.HospitalManagementSystem.dto.response.DepartmentDto;
 import java.util.List;
 
 public interface DepartmentService {
-    List<DepartmentDto> getAllDepartments();
+    org.springframework.data.domain.Slice<DepartmentDto> getAllDepartments(
+            org.springframework.data.domain.Pageable pageable);
 
     DepartmentDto getDepartmentById(Long id);
 

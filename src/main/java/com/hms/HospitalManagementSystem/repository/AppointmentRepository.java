@@ -15,6 +15,9 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
 
         List<Appointment> findByPatientId(Long patientId);
 
+        org.springframework.data.domain.Slice<Appointment> findByPatientId(Long patientId,
+                        org.springframework.data.domain.Pageable pageable);
+
         List<Appointment> findByDoctorIdAndStartDateTimeBetween(Long doctorId, LocalDateTime start, LocalDateTime end);
 
         boolean existsByDoctorIdAndStartDateTimeBetween(Long doctorId, LocalDateTime start, LocalDateTime end);
@@ -38,10 +41,25 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
 
         List<Appointment> findByPatientIdAndStatus(Long patientId, AppointmentStatus status);
 
+        org.springframework.data.domain.Slice<Appointment> findByPatientIdAndStatus(Long patientId,
+                        AppointmentStatus status, org.springframework.data.domain.Pageable pageable);
+
         List<Appointment> findByDoctorIdAndStartDateTimeBetweenAndDeletedFalse(Long doctorId, LocalDateTime start,
                         LocalDateTime end);
 
+        org.springframework.data.domain.Slice<Appointment> findByDoctorIdAndStartDateTimeBetweenAndDeletedFalse(
+                        Long doctorId, LocalDateTime start,
+                        LocalDateTime end, org.springframework.data.domain.Pageable pageable);
+
+        org.springframework.data.domain.Slice<Appointment> findByDoctorIdAndStartDateTimeBetweenAndStatusInAndDeletedFalse(
+                        Long doctorId, LocalDateTime start,
+                        LocalDateTime end, java.util.Collection<AppointmentStatus> statuses,
+                        org.springframework.data.domain.Pageable pageable);
+
         List<Appointment> findByStartDateTimeBetweenAndDeletedFalse(LocalDateTime start, LocalDateTime end);
+
+        org.springframework.data.domain.Slice<Appointment> findByStartDateTimeBetweenAndDeletedFalse(
+                        LocalDateTime start, LocalDateTime end, org.springframework.data.domain.Pageable pageable);
 
         long countByStartDateTimeBetweenAndDeletedFalse(LocalDateTime start, LocalDateTime end);
 

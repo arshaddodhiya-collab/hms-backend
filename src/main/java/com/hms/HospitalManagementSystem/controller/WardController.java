@@ -27,8 +27,9 @@ public class WardController {
 
     @GetMapping
     @PreAuthorize("hasAnyAuthority('MOD_ADMIN', 'MOD_PATIENTS', 'MOD_APPOINTMENTS', 'MOD_TRIAGE', 'MOD_CONSULTATION', 'MOD_LAB', 'MOD_BILLING', 'MOD_DASHBOARD')")
-    public ResponseEntity<List<WardResponse>> getAllWards() {
-        return ResponseEntity.ok(wardService.getAllWards());
+    public ResponseEntity<org.springframework.data.domain.Slice<WardResponse>> getAllWards(
+            @org.springframework.data.web.PageableDefault(sort = "name", direction = org.springframework.data.domain.Sort.Direction.ASC) org.springframework.data.domain.Pageable pageable) {
+        return ResponseEntity.ok(wardService.getAllWards(pageable));
     }
 
     @GetMapping("/{id}")

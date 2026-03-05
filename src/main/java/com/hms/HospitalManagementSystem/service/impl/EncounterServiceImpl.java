@@ -173,34 +173,38 @@ public class EncounterServiceImpl implements EncounterService {
     }
 
     @Override
-    public List<EncounterResponse> getTriageQueue() {
-        return encounterRepository.findByStatus(EncounterStatus.TRIAGE)
-                .stream().map(encounterMapper::toResponse).collect(Collectors.toList());
+    public org.springframework.data.domain.Slice<EncounterResponse> getTriageQueue(
+            org.springframework.data.domain.Pageable pageable) {
+        return encounterRepository.findByStatus(EncounterStatus.TRIAGE, pageable)
+                .map(encounterMapper::toResponse);
     }
 
     @Override
-    public List<EncounterResponse> getDoctorQueue(Long doctorId) {
+    public org.springframework.data.domain.Slice<EncounterResponse> getDoctorQueue(Long doctorId,
+            org.springframework.data.domain.Pageable pageable) {
         // Return encounters in both TRIAGE and IN_PROGRESS status
         // This follows HMIS standards where encounters appear in consultation queue
         // immediately after triage is completed (vitals recorded)
         return encounterRepository.findByDoctorIdAndStatusIn(
                 doctorId,
-                Arrays.asList(EncounterStatus.TRIAGE, EncounterStatus.IN_PROGRESS))
-                .stream().map(encounterMapper::toResponse).collect(Collectors.toList());
+                Arrays.asList(EncounterStatus.TRIAGE, EncounterStatus.IN_PROGRESS), pageable)
+                .map(encounterMapper::toResponse);
     }
 
     @Override
-    public List<EncounterResponse> getOpdDoctorQueue(Long doctorId) {
+    public org.springframework.data.domain.Slice<EncounterResponse> getOpdDoctorQueue(Long doctorId,
+            org.springframework.data.domain.Pageable pageable) {
         return encounterRepository.findByDoctorIdAndAppointmentIsNotNullAndStatusIn(
                 doctorId,
-                Arrays.asList(EncounterStatus.TRIAGE, EncounterStatus.IN_PROGRESS))
-                .stream().map(encounterMapper::toResponse).collect(Collectors.toList());
+                Arrays.asList(EncounterStatus.TRIAGE, EncounterStatus.IN_PROGRESS), pageable)
+                .map(encounterMapper::toResponse);
     }
 
     @Override
-    public List<EncounterResponse> getPatientEncounters(Long patientId) {
-        return encounterRepository.findByPatientId(patientId)
-                .stream().map(encounterMapper::toResponse).collect(Collectors.toList());
+    public org.springframework.data.domain.Slice<EncounterResponse> getPatientEncounters(Long patientId,
+            org.springframework.data.domain.Pageable pageable) {
+        return encounterRepository.findByPatientId(patientId, pageable)
+                .map(encounterMapper::toResponse);
     }
 
     // IPD Rounds
@@ -248,14 +252,15 @@ public class EncounterServiceImpl implements EncounterService {
     }
 
     @Override
-    public List<EncounterResponse> getIpdDoctorQueue(Long doctorId) {
+    public org.springframework.data.domain.Slice<EncounterResponse> getIpdDoctorQueue(Long doctorId,
+            org.springframework.data.domain.Pageable pageable) {
         // IPD Queue: Active Encounters (Admitted) assigned to doctor or all?
         // Typically IPD patients are assigned to a doctor.
         // Encounter Status: IN_PROGRESS (since they are admitted)
         // And Admission is not null
         return encounterRepository.findByDoctorIdAndAdmissionIsNotNullAndStatusIn(
                 doctorId,
-                Arrays.asList(EncounterStatus.IN_PROGRESS))
-                .stream().map(encounterMapper::toResponse).collect(Collectors.toList());
+                Arrays.asList(EncounterStatus.IN_PROGRESS), pageable)
+                .map(encounterMapper::toResponse);
     }
 }

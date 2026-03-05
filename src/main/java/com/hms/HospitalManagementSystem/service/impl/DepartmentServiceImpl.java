@@ -22,10 +22,10 @@ public class DepartmentServiceImpl implements DepartmentService {
     private final UserRepository userRepository;
 
     @Override
-    public List<DepartmentDto> getAllDepartments() {
-        return departmentRepository.findAll().stream()
-                .map(this::mapToDto)
-                .collect(Collectors.toList());
+    public org.springframework.data.domain.Slice<DepartmentDto> getAllDepartments(
+            org.springframework.data.domain.Pageable pageable) {
+        return departmentRepository.findAllBy(pageable)
+                .map(this::mapToDto);
     }
 
     @Override

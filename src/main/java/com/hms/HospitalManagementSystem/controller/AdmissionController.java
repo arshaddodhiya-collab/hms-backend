@@ -47,8 +47,9 @@ public class AdmissionController {
 
     @GetMapping("/active")
     @PreAuthorize("hasAnyAuthority('MOD_ADMIN', 'MOD_PATIENTS', 'MOD_APPOINTMENTS', 'MOD_TRIAGE', 'MOD_CONSULTATION', 'MOD_LAB', 'MOD_BILLING', 'MOD_DASHBOARD')")
-    public ResponseEntity<List<AdmissionResponse>> getActiveAdmissions() {
-        return ResponseEntity.ok(admissionService.getActiveAdmissions());
+    public ResponseEntity<org.springframework.data.domain.Slice<AdmissionResponse>> getActiveAdmissions(
+            @org.springframework.data.web.PageableDefault(sort = "admissionDate", direction = org.springframework.data.domain.Sort.Direction.DESC) org.springframework.data.domain.Pageable pageable) {
+        return ResponseEntity.ok(admissionService.getActiveAdmissions(pageable));
     }
 
     @GetMapping("/{id}")

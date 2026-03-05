@@ -8,7 +8,7 @@ import java.util.List;
 public interface WardService {
     WardResponse createWard(WardRequest request);
 
-    List<WardResponse> getAllWards();
+    org.springframework.data.domain.Slice<WardResponse> getAllWards(org.springframework.data.domain.Pageable pageable);
 
     WardResponse getWardById(Long id);
 

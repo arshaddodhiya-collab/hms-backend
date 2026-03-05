@@ -15,6 +15,9 @@ public interface AdmissionRepository extends JpaRepository<Admission, Long> {
 
     List<Admission> findByStatus(AdmissionStatus status);
 
+    org.springframework.data.domain.Slice<Admission> findByStatus(AdmissionStatus status,
+            org.springframework.data.domain.Pageable pageable);
+
     @Query("SELECT a FROM Admission a WHERE a.patient.id = :patientId AND a.status = 'ADMITTED'")
     Optional<Admission> findActiveByPatientId(@Param("patientId") Long patientId);
 

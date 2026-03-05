@@ -26,19 +26,25 @@ public interface AppointmentService {
 
     Appointment restoreAppointment(Long id);
 
-    List<Appointment> getDoctorAppointments(Long doctorId, LocalDateTime start, LocalDateTime end);
+    org.springframework.data.domain.Slice<Appointment> getDoctorAppointments(Long doctorId, LocalDateTime start,
+            LocalDateTime end, org.springframework.data.domain.Pageable pageable);
 
-    List<Appointment> getAllAppointments();
+    org.springframework.data.domain.Slice<Appointment> getAllAppointments(
+            org.springframework.data.domain.Pageable pageable);
 
-    List<Appointment> getAppointmentsByDate(LocalDateTime start, LocalDateTime end);
+    org.springframework.data.domain.Slice<Appointment> getAppointmentsByDate(LocalDateTime start, LocalDateTime end,
+            org.springframework.data.domain.Pageable pageable);
 
     Appointment getAppointmentById(Long id);
 
-    List<Appointment> getPatientAppointments(Long patientId);
+    org.springframework.data.domain.Slice<Appointment> getPatientAppointments(Long patientId,
+            org.springframework.data.domain.Pageable pageable);
 
-    List<Appointment> getPatientAppointmentsByStatus(Long patientId, AppointmentStatus status);
+    org.springframework.data.domain.Slice<Appointment> getPatientAppointmentsByStatus(Long patientId,
+            AppointmentStatus status, org.springframework.data.domain.Pageable pageable);
 
     void completeActiveAppointmentsForPatient(Long patientId);
 
-    List<Appointment> getUpcomingAppointmentsForDoctor(Long doctorId);
+    org.springframework.data.domain.Slice<Appointment> getUpcomingAppointmentsForDoctor(Long doctorId,
+            org.springframework.data.domain.Pageable pageable);
 }

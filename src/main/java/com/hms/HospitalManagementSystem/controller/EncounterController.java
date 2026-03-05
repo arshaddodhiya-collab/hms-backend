@@ -18,7 +18,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 
-import java.util.List;
+// import java.util.List;
+
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 
 @RestController
 @RequestMapping("/api/v1/encounters")
@@ -84,30 +89,37 @@ public class EncounterController {
 
     @GetMapping("/queue/triage")
     @PreAuthorize("hasAuthority('CMP_VITALS_READ')")
-    public ResponseEntity<List<EncounterResponse>> getTriageQueue() {
-        List<EncounterResponse> encounters = encounterService.getTriageQueue();
+    public ResponseEntity<Slice<EncounterResponse>> getTriageQueue(
+            @PageableDefault(sort = "startedAt", direction = Sort.Direction.ASC) Pageable pageable) {
+        Slice<EncounterResponse> encounters = encounterService.getTriageQueue(pageable);
         return ResponseEntity.ok(encounters);
     }
 
     @GetMapping("/queue/doctor/{doctorId}")
     @PreAuthorize("hasAuthority('CMP_CONSULTATION_READ')") // Or check if current user is the doctor
-    public ResponseEntity<List<EncounterResponse>> getDoctorQueue(@PathVariable Long doctorId) {
+    public ResponseEntity<Slice<EncounterResponse>> getDoctorQueue(
+            @PathVariable Long doctorId,
+            @PageableDefault(sort = "startedAt", direction = Sort.Direction.ASC) Pageable pageable) {
         // TODO: Optional: validate if current user is this doctor or admin
-        List<EncounterResponse> encounters = encounterService.getDoctorQueue(doctorId);
+        Slice<EncounterResponse> encounters = encounterService.getDoctorQueue(doctorId, pageable);
         return ResponseEntity.ok(encounters);
     }
 
     @GetMapping("/queue/opd/doctor/{doctorId}")
     @PreAuthorize("hasAuthority('CMP_CONSULTATION_READ')")
-    public ResponseEntity<List<EncounterResponse>> getOpdDoctorQueue(@PathVariable Long doctorId) {
-        List<EncounterResponse> encounters = encounterService.getOpdDoctorQueue(doctorId);
+    public ResponseEntity<Slice<EncounterResponse>> getOpdDoctorQueue(
+            @PathVariable Long doctorId,
+            @PageableDefault(sort = "startedAt", direction = Sort.Direction.ASC) Pageable pageable) {
+        Slice<EncounterResponse> encounters = encounterService.getOpdDoctorQueue(doctorId, pageable);
         return ResponseEntity.ok(encounters);
     }
 
     @GetMapping("/queue/ipd/doctor/{doctorId}")
     @PreAuthorize("hasAuthority('CMP_CONSULTATION_READ')")
-    public ResponseEntity<List<EncounterResponse>> getIpdDoctorQueue(@PathVariable Long doctorId) {
-        List<EncounterResponse> encounters = encounterService.getIpdDoctorQueue(doctorId);
+    public ResponseEntity<Slice<EncounterResponse>> getIpdDoctorQueue(
+            @PathVariable Long doctorId,
+            @PageableDefault(sort = "startedAt", direction = Sort.Direction.ASC) Pageable pageable) {
+        Slice<EncounterResponse> encounters = encounterService.getIpdDoctorQueue(doctorId, pageable);
         return ResponseEntity.ok(encounters);
     }
 
@@ -123,8 +135,10 @@ public class EncounterController {
 
     @GetMapping("/patient/{patientId}")
     @PreAuthorize("hasAnyAuthority('CMP_CONSULTATION_READ', 'CMP_PATIENT_VIEW')")
-    public ResponseEntity<List<EncounterResponse>> getPatientEncounters(@PathVariable Long patientId) {
-        List<EncounterResponse> encounters = encounterService.getPatientEncounters(patientId);
+    public ResponseEntity<Slice<EncounterResponse>> getPatientEncounters(
+            @PathVariable Long patientId,
+            @PageableDefault(sort = "startedAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        Slice<EncounterResponse> encounters = encounterService.getPatientEncounters(patientId, pageable);
         return ResponseEntity.ok(encounters);
     }
 

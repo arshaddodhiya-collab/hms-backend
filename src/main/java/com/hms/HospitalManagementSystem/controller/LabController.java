@@ -19,6 +19,11 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
+
 @RestController
 @RequestMapping("/api/v1")
 @RequiredArgsConstructor
@@ -38,8 +43,9 @@ public class LabController {
 
     @GetMapping("/lab-tests")
     @PreAuthorize("hasAnyAuthority('CMP_LAB_READ', 'CMP_CONSULTATION_READ', 'CMP_LAB_ENTRY')")
-    public ResponseEntity<List<LabTestCatalog>> getAllLabTests() {
-        return ResponseEntity.ok(labService.getAllLabTests());
+    public ResponseEntity<Slice<LabTestCatalog>> getAllLabTests(
+            @PageableDefault(sort = "name", direction = Sort.Direction.ASC) Pageable pageable) {
+        return ResponseEntity.ok(labService.getAllLabTests(pageable));
     }
 
     // --- Lab Request Endpoints ---
@@ -53,24 +59,23 @@ public class LabController {
 
     @GetMapping("/lab-requests")
     @PreAuthorize("hasAnyAuthority('CMP_LAB_READ', 'CMP_LAB_ENTRY')")
-    public ResponseEntity<List<LabRequestResponse>> getLabQueue(
+    public ResponseEntity<Slice<LabRequestResponse>> getLabQueue(
             @RequestParam(required = false) List<LabRequestStatus> status,
-            @RequestParam(required = false) Long encounterId) {
+            @RequestParam(required = false) Long encounterId,
+            @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
 
-        List<LabRequest> requests;
+        Slice<LabRequest> requests;
         if (encounterId != null) {
-            requests = labService.getRequestsByEncounter(encounterId);
+            requests = labService.getRequestsByEncounter(encounterId, pageable);
         } else if (status != null && !status.isEmpty()) {
-            requests = labService.getLabQueue(status);
+            requests = labService.getLabQueue(status, pageable);
         } else {
             // Default to active requests if no status provided? Or all?
             // Let's return all for now or ORDERED/SAMPLED/COMPLETED.
-            requests = labService.getLabQueue(List.of(LabRequestStatus.values()));
+            requests = labService.getLabQueue(List.of(LabRequestStatus.values()), pageable);
         }
 
-        return ResponseEntity.ok(requests.stream()
-                .map(this::mapToResponse)
-                .collect(Collectors.toList()));
+        return ResponseEntity.ok(requests.map(this::mapToResponse));
     }
 
     @GetMapping("/lab-requests/{id}")
