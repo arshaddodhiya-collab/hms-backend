@@ -95,8 +95,8 @@ public class PatientServiceImpl implements PatientService {
     public void deletePatient(Long id) {
         Patient patient = patientRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Patient not found with ID: " + id));
-        patient.setDeleted(true);
-        patient.setActive(false);
+        patient.setDeleted(true); // soft delete
+        patient.setActive(false); // soft delete
         patientRepository.save(patient);
     }
 }

@@ -5,6 +5,7 @@ import com.hms.HospitalManagementSystem.entity.Appointment;
 import com.hms.HospitalManagementSystem.enums.AppointmentStatus;
 import com.hms.HospitalManagementSystem.enums.AppointmentType;
 import com.hms.HospitalManagementSystem.repository.AppointmentRepository;
+import com.hms.HospitalManagementSystem.repository.EncounterRepository;
 import com.hms.HospitalManagementSystem.repository.PatientRepository;
 import com.hms.HospitalManagementSystem.repository.UserRepository;
 import com.hms.HospitalManagementSystem.exception.ResourceNotFoundException;
@@ -27,7 +28,7 @@ public class AppointmentServiceImpl implements AppointmentService {
     private final AppointmentRepository appointmentRepository;
     private final PatientRepository patientRepository;
     private final UserRepository userRepository;
-    private final com.hms.HospitalManagementSystem.repository.EncounterRepository encounterRepository;
+    private final EncounterRepository encounterRepository;
 
     @Override
     @Transactional

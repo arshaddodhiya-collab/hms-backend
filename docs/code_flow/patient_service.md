@@ -189,3 +189,150 @@ Client DELETE /api/patients/{id}
 | `ConflictException` | Duplicate contact, email, or name+DOB+contact found |
 | `ConflictException` | Version mismatch during update (optimistic locking) |
 | `ResourceNotFoundException` | Patient not found by ID |
+
+---
+---
+
+# Deep Dive: `@Version` & Optimistic Locking
+
+## What Is It?
+
+The `Patient` entity has a `@Version` field that enables **optimistic locking** — a concurrency control strategy that prevents two users from silently overwriting each other's changes.
+
+```java
+// Patient.java (entity)
+@Version
+private Long version;  // Starts at 0, auto-incremented by Hibernate on every UPDATE
+```
+
+This adds a `version` column to the `patients` table:
+
+```sql
+CREATE TABLE patients (
+    id         BIGINT,
+    first_name VARCHAR,
+    last_name  VARCHAR,
+    ...
+    version    BIGINT DEFAULT 0   ← auto-managed by Hibernate
+);
+```
+
+---
+
+## How Hibernate Uses It Automatically
+
+Every time Hibernate saves an update, it **automatically adds `version` to the WHERE clause**:
+
+```sql
+-- What you'd expect:
+UPDATE patients SET first_name = 'John' WHERE id = 5;
+
+-- What ACTUALLY runs with @Version:
+UPDATE patients
+  SET first_name = 'John', version = 4
+  WHERE id = 5 AND version = 3;
+--                ^^^^^^^^^^^^^^^
+--                "only update if version hasn't changed"
+```
+
+- If the `WHERE` matches → update succeeds, version increments to `4`
+- If someone else already changed it (`version` is now `4`, not `3`) → `WHERE` matches **zero rows** → Hibernate throws `OptimisticLockException`
+
+**You never set the version manually.** Hibernate manages it entirely.
+
+---
+
+## How It's Used in `updatePatient()` — Manual Check
+
+On top of Hibernate's automatic protection, the service adds a **manual check** for a friendlier error message:
+
+```java
+// PatientServiceImpl.updatePatient()
+public PatientProjection updatePatient(Long id, PatientUpdateRequest request) {
+    Patient patient = patientRepository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("Patient not found"));
+
+    // ★ MANUAL VERSION CHECK — before Hibernate even tries to save
+    if (request.getVersion() != null && patient.getVersion() != null
+            && !request.getVersion().equals(patient.getVersion())) {
+        throw new ConflictException(
+            "Patient record has been modified by another transaction. "
+            + "Please refresh and try again."
+        );
+    }
+
+    // ... merge changes and save
+}
+```
+
+**Why both manual AND automatic?**
+
+| Layer | Error Type | User Experience |
+|-------|-----------|-----------------|
+| Manual check (service code) | `ConflictException` → 409 | Clean JSON error: `"Please refresh and try again"` |
+| Hibernate automatic (if manual missed) | `OptimisticLockException` → 500 | Generic server error — bad UX |
+
+The manual check catches the problem early and returns a **user-friendly response**. The Hibernate check is the safety net.
+
+---
+
+## Real-World Scenario
+
+```
+Time    Receptionist A                     Receptionist B
+────────────────────────────────────────────────────────────
+ T1     Opens patient #5                   Opens patient #5
+        Sees: { phone: "111", ver: 3 }     Sees: { phone: "111", ver: 3 }
+
+ T2     Changes phone → "222"
+        PUT /patients/5 { phone: "222", version: 3 }
+        Backend: request.ver(3) == db.ver(3) ✅
+        UPDATE ... SET phone='222', version=4 WHERE id=5 AND version=3
+        ✅ Success! DB version is now 4
+
+ T3                                        Changes email → "new@email.com"
+                                           PUT /patients/5 { email: "new@email.com", version: 3 }
+                                           Backend: request.ver(3) != db.ver(4) ❌
+                                           → ConflictException:
+                                             "Record modified. Please refresh."
+```
+
+**Without `@Version`:** Receptionist B's save would succeed and **silently overwrite** A's phone change back (the phone would disappear from the update).
+
+**With `@Version`:** B is told to refresh, sees A's phone change, then adds the email — **both changes are preserved**.
+
+---
+
+## The Frontend's Role
+
+For this to work, the frontend must:
+
+1. **Receive** the `version` when loading patient data
+2. **Send it back** in the update request
+
+```json
+// GET /api/patients/5 response:
+{
+  "id": 5,
+  "firstName": "Rahul",
+  "contact": "9876543210",
+  "version": 3            ← frontend stores this
+}
+
+// PUT /api/patients/5 request:
+{
+  "contact": "1111111111",
+  "version": 3            ← frontend sends it back
+}
+```
+
+If the versions match → save proceeds. If not → 409 error → frontend shows "Record was modified, please refresh."
+
+---
+
+## Where `@Version` Is Used in HMS
+
+| Entity | Purpose |
+|--------|---------|
+| `Patient` | Prevents concurrent patient profile edits |
+| `Charge` | Prevents concurrent billing charge modifications |

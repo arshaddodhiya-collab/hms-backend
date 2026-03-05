@@ -4,11 +4,9 @@ import com.hms.HospitalManagementSystem.dto.ipd.AdmissionRequest;
 import com.hms.HospitalManagementSystem.dto.ipd.AdmissionResponse;
 import com.hms.HospitalManagementSystem.dto.ipd.DischargeRequest;
 import com.hms.HospitalManagementSystem.dto.ipd.TransferRequest;
-import com.hms.HospitalManagementSystem.entity.Admission;
-import com.hms.HospitalManagementSystem.entity.Bed;
-import com.hms.HospitalManagementSystem.entity.Patient;
-import com.hms.HospitalManagementSystem.entity.User;
+import com.hms.HospitalManagementSystem.entity.*;
 import com.hms.HospitalManagementSystem.enums.AdmissionStatus;
+import com.hms.HospitalManagementSystem.enums.EncounterStatus;
 import com.hms.HospitalManagementSystem.exception.BusinessRuleViolationException;
 import com.hms.HospitalManagementSystem.exception.ResourceNotFoundException;
 import com.hms.HospitalManagementSystem.mapper.IpdMapper;
@@ -88,12 +86,12 @@ public class AdmissionServiceImpl implements AdmissionService {
         admission = admissionRepository.save(admission);
 
         // 6. Create Encounter for Admission
-        com.hms.HospitalManagementSystem.entity.Encounter encounter = com.hms.HospitalManagementSystem.entity.Encounter
+        Encounter encounter = Encounter
                 .builder()
                 .admission(admission)
                 .patient(patient)
                 .doctor(doctor)
-                .status(com.hms.HospitalManagementSystem.enums.EncounterStatus.IN_PROGRESS)
+                .status(EncounterStatus.IN_PROGRESS)
                 .startedAt(LocalDateTime.now())
                 .build();
         encounterRepository.save(encounter);
